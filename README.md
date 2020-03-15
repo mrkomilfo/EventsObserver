@@ -1,7 +1,7 @@
 # TrainingProject
 
 ## Описание
-Шаблон проекта для прохождения стажировки. Стажер может использовать предложенную структуру или по согласованием с ментором свою.
+Шаблон проекта для прохождения стажировки. Стажер может использовать предложенную структуру или, по согласованию с ментором, свою.
 
 ## Начало работы
 - Сделать форк проекта в свой репозиторий
@@ -18,16 +18,16 @@
 - **TrainingProject.Logic.Tests** - тесты уровня логики
 
 ## Используемые пакеты по-умолчанию
-- [Automapper]('https://automapper.org')
-- [NSwag]('https://github.com/RicoSuter/NSwag')
-- [Moq]('https://github.com/moq/moq4')
-- [EntityFramework.Core]('https://docs.microsoft.com/en-us/ef/core/')
-- [Serilog]('https://serilog.net')
-- [FluentValidation]('https://fluentvalidation.net')
-- [FluentAssertions]('https://fluentassertions.com')
-- [xUnit]('https://xunit.net')
+- [Automapper](https://automapper.org)
+- [NSwag](https://github.com/RicoSuter/NSwag)
+- [Moq](https://github.com/moq/moq4)
+- [EntityFramework.Core](https://docs.microsoft.com/en-us/ef/core)
+- [Serilog](https://serilog.net)
+- [FluentValidation](https://fluentvalidation.net)
+- [FluentAssertions](https://fluentassertions.com)
+- [xUnit](https://xunit.net)
 
-По согласованию с ментором, стажер в праве использовать дополнительный набор сторонних пакетов.
+По согласованию с ментором, стажер вправе использовать дополнительный набор сторонних пакетов.
 
 ## Лицензия
 GPL v3 - open source
