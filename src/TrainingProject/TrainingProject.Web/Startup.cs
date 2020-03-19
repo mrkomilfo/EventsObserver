@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TrainingProject.Domain.Logic;
+using TrainingProject.Data.Interfaces;
+using TrainingProject.Data;
 
 namespace TrainingProject.Web
 {
@@ -32,6 +34,8 @@ namespace TrainingProject.Web
             services.AddOpenApiDocument();
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+            services.AddScoped<IAppContextFactory, AppContextFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
