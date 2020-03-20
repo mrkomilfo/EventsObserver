@@ -4,10 +4,11 @@ using TrainingProject.Domain;
 
 namespace TrainingProject.Data.Interfaces
 {
-    interface IEventRepository
+    public interface IEventRepository
     {
         Task<Event> GetEvent(int id);
-        Task<Page<Event>> GetEvents(int index, int pageSize, byte? categoryId, string tag, bool upComing, bool onlyFree, bool vacancies);
+        Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, int? organizer, int? participant);
+        Task<int> GetEventsNum(byte? category, int? organizer, int? participant);
         Task AddEvent(Event @event);
         Task UpdateEvent(Event @event);
         Task DeleteEvent(int id);
@@ -15,7 +16,7 @@ namespace TrainingProject.Data.Interfaces
         Task<Category> GetCategory(byte id);
         Task AddCategory(Category category);
         Task UpdateCategory(Category category);
-        Task DeleteCategory(Category category);
-        Task<IEnumerable<string>> GetCategories();
+        Task DeleteCategory(byte category);
+        Task<IEnumerable<Category>> GetCategories();
     }
 }

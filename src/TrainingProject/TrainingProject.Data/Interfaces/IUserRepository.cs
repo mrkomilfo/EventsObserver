@@ -3,9 +3,10 @@ using TrainingProject.Domain;
 
 namespace TrainingProject.Data.Interfaces
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
         Task<User> GetUser(string login);
+        Task<Page<User>> GetUsers(int index, int pageSize);
         Task<bool> IsUserExist(string login);
         Task AddUser(User user);
         Task UpdateUser(User user);
