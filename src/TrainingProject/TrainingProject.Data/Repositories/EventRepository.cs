@@ -15,7 +15,7 @@ namespace TrainingProject.Data.Repositories
         public async Task<Event> GetEvent(int id)
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
-            return await context.Events.Include(e => e.Category).Include(e => e.Tags).Include(e => e.Organizer).Include(e => e.Participants).FirstOrDefaultAsync(e => e.EventId == id);
+            return await context.Events.Include(e => e.Category).Include(e => e.Tags).Include(e => e.Organizer).Include(e => e.Participants).FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
@@ -30,7 +30,7 @@ namespace TrainingProject.Data.Repositories
             }
             if (categoryId != null)
             {
-                query = query.Where(e => e.Category.CategoryId == categoryId);
+                query = query.Where(e => e.Category.Id == categoryId);
             }
             if (tag != null)
             {
@@ -50,11 +50,11 @@ namespace TrainingProject.Data.Repositories
             }
             if (organizer != null)
             {
-                query = query.Where(e => e.Organizer.UserId == organizer);
+                query = query.Where(e => e.Organizer.Id == organizer);
             }
             if (participant != null)
             {
-                query = query.Where(e => e.Participants.Any(p=>p.UserId == participant));
+                query = query.Where(e => e.Participants.Any(p=>p.Id == participant));
             }
 
             if (upComing != null && (bool)upComing)
@@ -77,15 +77,15 @@ namespace TrainingProject.Data.Repositories
             var query = context.Events.Include(e => e.Category).Include(e => e.Organizer).Include(e => e.Participants).AsQueryable();
             if (category != null)
             {
-                return query.Count(e => e.Category.CategoryId == category);
+                return query.Count(e => e.Category.Id == category);
             }
             if (organizer != null)
             {
-                return query.Count(e => e.Organizer.UserId == organizer);
+                return query.Count(e => e.Organizer.Id == organizer);
             }
             if (participant != null)
             {
-                return query.Count(e => e.Participants.Any(p=>p.UserId == participant));
+                return query.Count(e => e.Participants.Any(p=>p.Id == participant));
             }
             return query.Count();
         }
@@ -107,7 +107,7 @@ namespace TrainingProject.Data.Repositories
         public async Task DeleteEvent(int id)
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
-            var eventToDelete = new Event() { EventId = id};
+            var eventToDelete = new Event() { Id = id};
             context.Events.Remove(eventToDelete);
             await context.SaveChangesAsync();
         }
@@ -115,7 +115,7 @@ namespace TrainingProject.Data.Repositories
         public async Task<Category> GetCategory(byte id)
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
-            return await context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+            return await context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task AddCategory(Category category)
@@ -135,7 +135,7 @@ namespace TrainingProject.Data.Repositories
         public async Task DeleteCategory(byte id)
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
-            var category = new Category() { CategoryId = id };
+            var category = new Category() { Id = id };
             context.Categories.Remove(category);
             await context.SaveChangesAsync();
         }
@@ -144,6 +144,17 @@ namespace TrainingProject.Data.Repositories
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
             return context.Categories.AsEnumerable();
+        }
+
+        public async Task<Tag> FindOrAddTag(string tagName)
+        {
+            await using var context = ContextFactory.CreateDbContext(ConnectionString);
+            var tag = context.Tags.FirstOrDefault(t => t.Name == tagName);
+            if (tag != null) 
+                return tag;
+            tag = new Tag {Name = tagName};
+            context.Tags.Add(tag);
+            return tag;
         }
     }
 }

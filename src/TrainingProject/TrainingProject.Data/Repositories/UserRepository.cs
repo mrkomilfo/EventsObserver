@@ -20,7 +20,7 @@ namespace TrainingProject.Data.Repositories
         public async Task DeleteUser(int id)
         {
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
-            var user = new User() { UserId = id };
+            var user = new User() { Id = id };
             context.Users.Remove(user);
             await context.SaveChangesAsync();
         }

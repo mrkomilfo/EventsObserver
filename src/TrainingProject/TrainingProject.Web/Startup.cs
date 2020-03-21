@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using TrainingProject.Domain.Logic;
 using TrainingProject.Data.Interfaces;
 using TrainingProject.Data;
+using TrainingProject.Data.Repositories;
+using AppContext = TrainingProject.Data.AppContext;
 
 namespace TrainingProject.Web
 {
@@ -36,6 +39,12 @@ namespace TrainingProject.Web
             services.AddAutoMapper(typeof(Startup).Assembly);
 
             services.AddScoped<IAppContextFactory, AppContextFactory>();
+            services.AddScoped<IUserRepository>(provider => new UserRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IAppContextFactory>()));
+            services.AddScoped<IEventRepository>(provider => new EventRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IAppContextFactory>()));
+
+
+            services.AddDbContext<AppContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

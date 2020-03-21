@@ -18,5 +18,7 @@ namespace TrainingProject.Data.Interfaces
         Task UpdateCategory(Category category);
         Task DeleteCategory(byte category);
         Task<IEnumerable<Category>> GetCategories();
+
+        Task<Tag> FindOrAddTag(string tag);
     }
 }
