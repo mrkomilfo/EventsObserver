@@ -1,15 +1,17 @@
 ﻿using System.Data.Entity;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TrainingProject.Domain;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace TrainingProject.Data
 {
-    public sealed class AppContext : DbContext
+    public sealed class AppContext : DbContext, IAppContext
     {
         public AppContext(DbContextOptions<AppContext> options) : base(options)
         {
             Database.EnsureCreated();
+            this.ChangeTracker.LazyLoadingEnabled = false;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -58,9 +60,56 @@ namespace TrainingProject.Data
                 .HasKey(eu=>new { eu.EventId, eu.ParticipantId});
 
             builder.Entity<User>()
+                .HasKey(u => u.Id);
+
+            builder.Entity<User>()
+                .Property(u => u.Id)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<User>()
                 .HasMany(u => u.OrganizedEvents)
                 .WithOne(e => e.Organizer)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<User>()
+                .HasQueryFilter(u => !u.IsDeleted);
+
+
+            builder.Entity<Role>()
+                .HasKey(r => r.Id);
+
+            builder.Entity<Role>()
+                .Property(r => r.Id)
+                .ValueGeneratedOnAdd();
+
+
+            builder.Entity<Event>()
+                .HasKey(e => e.Id);
+
+            builder.Entity<Event>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+            builder.Entity<Event>()
+                .HasQueryFilter(e => !e.IsDeleted);
+
+
+            builder.Entity<Category>()
+                .HasKey(c => c.Id);
+
+            builder.Entity<Category>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Category>()
+                .HasQueryFilter(c => !c.IsDeleted);
+
+
+            builder.Entity<Tag>()
+                .HasKey(t => t.Id);
+
+            builder.Entity<Tag>()
+                .Property(t => t.Id)
+                .ValueGeneratedOnAdd();
         }
     }
 }

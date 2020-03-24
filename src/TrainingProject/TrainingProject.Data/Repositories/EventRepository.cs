@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrainingProject.Data.Interfaces;
 using TrainingProject.Domain;
-using  System.Linq;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace TrainingProject.Data.Repositories
@@ -18,7 +18,7 @@ namespace TrainingProject.Data.Repositories
             return await context.Events.Include(e => e.Category).Include(e => e.Tags).Include(e => e.Organizer).Include(e => e.Participants).FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
+        /*public async Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
             bool vacancies, int? organizer, int? participant)
         {
             var result = new Page<Event>() { CurrentPage = index, PageSize = pageSize };
@@ -69,7 +69,7 @@ namespace TrainingProject.Data.Repositories
             result.Records = await query.ToListAsync();
 
             return result;
-        }
+        }*/
 
         public async Task<int> GetEventsNum(byte? category, int? organizer, int? participant)
         {

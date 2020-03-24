@@ -22,25 +22,28 @@ namespace TrainingProject.Web
         public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+            await CreateDbIfNotExists(host);
+            host.Run();
+        }
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-
-            var config = builder.Build();
+        private static async Task CreateDbIfNotExists(IHost host)
+        {
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var factory = services.GetRequiredService<IAppContextFactory>();
-                factory.CreateDbContext(config.GetConnectionString("DefaultConnection")).Database.Migrate();
+                try
                 {
-                    await using var context = factory.CreateDbContext(config.GetConnectionString("DefaultConnection"));
+                    var context = (AppContext)services.GetRequiredService<IAppContext>();
+                    context.Database.Migrate();
                     await DBInitializer.InitializeUsers(context);
                     await DBInitializer.InitializeEvents(context);
                 }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred creating the DB.");
+                }
             }
-
-            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

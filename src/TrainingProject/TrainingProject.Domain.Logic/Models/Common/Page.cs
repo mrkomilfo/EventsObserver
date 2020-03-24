@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TrainingProject.Domain
+namespace TrainingProject.DomainLogic.Models.Common
 {
     public class Page<T>
     {

@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrainingProject.Domain;
+//using TrainingProject.Domain.Logic.Models;
 
 namespace TrainingProject.Data.Interfaces
 {
     public interface IEventRepository
     {
         Task<Event> GetEvent(int id);
-        Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, int? organizer, int? participant);
+        //Task<Page<Event>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, int? organizer, int? participant);
         Task<int> GetEventsNum(byte? category, int? organizer, int? participant);
         Task AddEvent(Event @event);
         Task UpdateEvent(Event @event);

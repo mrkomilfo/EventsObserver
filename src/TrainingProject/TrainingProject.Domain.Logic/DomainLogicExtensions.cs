@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TrainingProject.Data;
 
-namespace TrainingProject.Domain.Logic
+namespace TrainingProject.DomainLogic
 {
     public static class DomainLogicExtensions
     {

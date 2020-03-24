@@ -12,10 +12,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TrainingProject.Domain.Logic;
+using TrainingProject.DomainLogic;
 using TrainingProject.Data.Interfaces;
 using TrainingProject.Data;
 using TrainingProject.Data.Repositories;
+using TrainingProject.DomainLogic.Interfaces;
+using TrainingProject.DomainLogic.Managers;
 using AppContext = TrainingProject.Data.AppContext;
 
 namespace TrainingProject.Web
@@ -38,13 +40,10 @@ namespace TrainingProject.Web
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
 
-            services.AddScoped<IAppContextFactory, AppContextFactory>();
-            services.AddScoped<IUserRepository>(provider => new UserRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IAppContextFactory>()));
-            services.AddScoped<IEventRepository>(provider => new EventRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IAppContextFactory>()));
-
-
-            services.AddDbContext<AppContext>(options =>
+            services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IUsersManager, UsersManager>();
+            services.AddScoped<IEventsManager, EventsManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

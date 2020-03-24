@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TrainingProject.Domain.Logic.DTO
+﻿namespace TrainingProject.DomainLogic.Models.Users
 {
     public class LoginDTO
     { 

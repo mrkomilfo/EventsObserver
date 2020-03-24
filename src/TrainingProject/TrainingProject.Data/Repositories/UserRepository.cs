@@ -31,7 +31,7 @@ namespace TrainingProject.Data.Repositories
             return await context.Users.Include(u=>u.Role).FirstOrDefaultAsync(u => u.Login == login);
         }
 
-        public async Task<Page<User>> GetUsers(int index, int pageSize)
+        /*public async Task<Page<User>> GetUsers(int index, int pageSize)
         {
             var result = new Page<User>() { CurrentPage = index, PageSize = pageSize };
             await using var context = ContextFactory.CreateDbContext(ConnectionString);
@@ -39,7 +39,7 @@ namespace TrainingProject.Data.Repositories
             result.TotalRecords = await query.CountAsync();
             result.Records = await query.ToListAsync();
             return result;
-        }
+        }*/
 
         public async Task<bool> IsUserExist(string login)
         {

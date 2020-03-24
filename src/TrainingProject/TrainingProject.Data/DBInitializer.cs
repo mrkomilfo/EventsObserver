@@ -9,7 +9,7 @@ namespace TrainingProject.Data
 {
     public static class DBInitializer
     {
-        public static async Task InitializeEvents(AppContext context)
+        public static async Task InitializeEvents(IAppContext context)
         {
             if (!await context.Categories.AnyAsync())
             {
@@ -17,26 +17,24 @@ namespace TrainingProject.Data
                 {
                     new Category()
                     {
-                        Id = 0,
                         Name = "Другое"
                     },
                     new Category()
                     {
-                        Id = 1,
                         Name = "Лекции",
                         Description =
                             "В данном разделе размещается информация о проводимых открытых лекциях в нашем городе."
                     },
                     new Category()
                     {
-                        Id = 2,
                         Name = "Тренинги",
                         Description =
                             "Активисты из различных общественных организаций регулярно проводят тренинги на социальные и общеобразовательные темы."
                     },
                     
                 };
-                context.Categories.AddRange(categories);
+                await context.Categories.AddRangeAsync(categories);
+                await context.SaveChangesAsync(default);
 
                 IEnumerable<Tag> tags = new List<Tag>()
                 {
@@ -45,7 +43,8 @@ namespace TrainingProject.Data
                     new Tag() { Name = "экология"},
                     new Tag() { Name = "климат"}
                 };
-                context.Tags.AddRange(tags);
+                await context.Tags.AddRangeAsync(tags);
+                await context.SaveChangesAsync(default);
 
                 IEnumerable<Event> events = new List<Event>()
                 {
@@ -74,8 +73,8 @@ namespace TrainingProject.Data
                         PublicationTime = DateTime.Now,
                     }
                 };
-                context.Events.AddRange(events);
-                await context.SaveChangesAsync();
+                await  context.Events.AddRangeAsync(events);
+                await context.SaveChangesAsync(default);
 
                 IEnumerable<EventsTags> eventTags = new List<EventsTags>()
                 {
@@ -85,8 +84,7 @@ namespace TrainingProject.Data
                     new EventsTags{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(3)?.Id},
                 };
                 context.EventsTags.AddRange(eventTags);
-
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(default);
             }
         }
 
@@ -96,11 +94,12 @@ namespace TrainingProject.Data
             {
                 IEnumerable<Role> roles = new List<Role>()
                 {
-                    new Role { Id = 0, Name = "Account manager"},
-                    new Role { Id = 1, Name = "Admin"},
-                    new Role { Id = 2, Name = "User"},
+                    new Role { Name = "Account manager"},
+                    new Role { Name = "Admin"},
+                    new Role { Name = "User"},
                 }; 
                 context.Roles.AddRange(roles);
+                await context.SaveChangesAsync();
 
                 IEnumerable<User> users = new List<User>()
                 {
@@ -130,7 +129,6 @@ namespace TrainingProject.Data
                     },
                 };
                 context.Users.AddRange(users);
-
                 await context.SaveChangesAsync();
             }
         }

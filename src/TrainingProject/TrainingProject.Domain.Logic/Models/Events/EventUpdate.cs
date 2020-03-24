@@ -1,26 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TrainingProject.Domain
+namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class Event
+    public class EventUpdate
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }
-        public Category Category { get; set; }
         public string Description { get; set; }
         public DateTime Start { get; set; }
         public string Place { get; set; }
         public int Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
-        public int? OrganizerId { get; set; }
-        public User Organizer { get; set; }
-        public ICollection<User> Participants { get; set; }
-        public ICollection<Tag> Tags { get; set; }
-        public DateTime PublicationTime { get; set; }
+        public ICollection<string> Tags { get; set; }
         public bool HasPhoto { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }
