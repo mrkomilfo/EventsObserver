@@ -24,12 +24,14 @@ namespace TrainingProject.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -42,8 +44,10 @@ namespace TrainingProject.Web
 
             services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IUsersManager, UsersManager>();
-            services.AddScoped<IEventsManager, EventsManager>();
+            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<ICategoryManager, CategoryManager>();
+            services.AddScoped<IEventManager, EventManager>();
+            services.AddSingleton<IWebHostEnvironment>(Environment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

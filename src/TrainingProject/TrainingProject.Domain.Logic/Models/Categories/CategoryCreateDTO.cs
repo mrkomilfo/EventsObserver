@@ -1,4 +1,4 @@
-﻿namespace TrainingProject.DomainLogic.Models.Events
+﻿namespace TrainingProject.DomainLogic.Models.Categories
 {
     public class CategoryCreateDTO
     {

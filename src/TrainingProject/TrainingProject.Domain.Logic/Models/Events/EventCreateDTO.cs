@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Models.Events
@@ -14,6 +15,6 @@ namespace TrainingProject.DomainLogic.Models.Events
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public int? OrganizerId { get; set; }
         public ICollection<string> Tags { get; set; }
-        public bool HasPhoto { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

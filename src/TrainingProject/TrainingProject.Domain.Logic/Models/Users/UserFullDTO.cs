@@ -2,7 +2,7 @@
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    class UserFullDTO
+    public class UserFullDTO
     {
         public int Id { get; set; }
         public string UserName { get; set; }

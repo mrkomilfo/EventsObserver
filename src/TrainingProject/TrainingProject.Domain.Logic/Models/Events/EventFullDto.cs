@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventFull
+    public class EventFullDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -12,7 +12,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public string Description { get; set; }
         public DateTime Start { get; set; }
         public string Place { get; set; }
-        public string Fee { get; set; }
+        public int Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public int? OrganizerId { get; set; }
         public string Organizer { get; set; }

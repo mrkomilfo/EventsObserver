@@ -1,0 +1,66 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TrainingProject.Data;
+using TrainingProject.Domain;
+using TrainingProject.DomainLogic.Interfaces;
+using TrainingProject.DomainLogic.Models.Events;
+using Microsoft.EntityFrameworkCore;
+using TrainingProject.DomainLogic.Models.Categories;
+
+namespace TrainingProject.DomainLogic.Managers
+{
+    public class CategoryManager: ICategoryManager
+    {
+        private readonly IAppContext _appContext;
+
+        public CategoryManager(IAppContext appContext)
+        {
+            _appContext = appContext;
+        }
+        public async Task<bool> AddCategory(CategoryCreateDTO category)
+        {
+            if (await _appContext.Categories.AnyAsync(c => c.Name == category.Name))
+            {
+                return false;
+            }
+            await _appContext.Categories.AddAsync(new Category {Name = category.Name, Description = category.Description});
+            await _appContext.SaveChangesAsync(default);
+            return true;
+        }
+
+        public async Task UpdateCategory(Category category)
+        {
+            var update = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+            if (update != null)
+            {
+                update.Name = category.Name;
+                update.Description = category.Description;
+            }
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task DeleteCategory(int categoryId, bool force = false)
+        {
+            var category = await _appContext.Categories.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (category != null)
+            {
+                if (force)
+                {
+                    _appContext.Categories.Remove(category);
+                }
+                else
+                {
+                    category.IsDeleted = true;
+                }
+                await _appContext.SaveChangesAsync(default);
+            }
+        }
+
+        public async Task<ICollection<CategoryLiteDTO>> GetCategories()
+        {
+            return await _appContext.Categories.Select(c=> new CategoryLiteDTO{Id=c.Id, Name = c.Name}).ToListAsync();
+        }
+    }
+}

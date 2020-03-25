@@ -11,7 +11,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public string Category { get; set; }
         public DateTime Start { get; set; }
         public string Place { get; set; }
-        public string Fee { get; set; } //0 - unlimited
+        public int Fee { get; set; } //0 - unlimited
         public ICollection<string> Tags { get; set; }
         public bool HasPhoto { get; set; }
     }

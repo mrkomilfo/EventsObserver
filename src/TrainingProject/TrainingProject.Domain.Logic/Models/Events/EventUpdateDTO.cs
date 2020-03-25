@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventUpdate
+    public class EventUpdateDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -14,6 +15,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public int Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public ICollection<string> Tags { get; set; }
+        public IFormFile Image { get; set; }
         public bool HasPhoto { get; set; }
     }
 }
