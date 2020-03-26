@@ -40,7 +40,7 @@ namespace TrainingProject.Web
             
             services.AddOpenApiDocument();
             services.AddControllers();
-            services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));

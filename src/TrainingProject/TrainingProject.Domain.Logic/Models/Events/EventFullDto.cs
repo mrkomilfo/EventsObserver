@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventFullDto
+    public class EventFullDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

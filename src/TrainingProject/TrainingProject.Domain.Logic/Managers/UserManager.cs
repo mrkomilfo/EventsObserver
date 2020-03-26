@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
@@ -13,14 +14,17 @@ namespace TrainingProject.DomainLogic.Managers
     public class UserManager : IUserManager
     {
         private readonly IAppContext _appContext;
+        private readonly IMapper _mapper;
 
-        public UserManager(IAppContext appContext)
+        public UserManager(IAppContext appContext, IMapper mapper)
         {
             _appContext = appContext;
+            _mapper = mapper;
         }
 
         public Task<UserFullDTO> GetUser(string userId)
         {
+            //организованные, посещённые события и фото вручную
             throw new NotImplementedException();
         }
 
@@ -50,6 +54,11 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public Task BanUser(int userId, int days)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ChangeRole(int userId, int roleId)
         {
             throw new NotImplementedException();
         }

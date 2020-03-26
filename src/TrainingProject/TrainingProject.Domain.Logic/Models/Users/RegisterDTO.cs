@@ -5,6 +5,8 @@ namespace TrainingProject.DomainLogic.Models.Users
     public class RegisterDTO
     {
         [Required]
+        public string UserName { get; set; }
+        [Required]
         public string Login { get; set; }
         [Required]
         public string Password { get; set; }

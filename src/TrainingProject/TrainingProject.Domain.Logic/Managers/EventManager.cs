@@ -4,51 +4,37 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
-using Microsoft.AspNetCore.Hosting;
 
 namespace TrainingProject.DomainLogic.Managers
 {
     public class EventManager : IEventManager
     {
         private readonly IAppContext _appContext;
-        private readonly IWebHostEnvironment _environment;
-        public EventManager(IAppContext appContext, IWebHostEnvironment environment)
+        private readonly IMapper _mapper;
+        public EventManager(IAppContext appContext, IMapper mapper)
         {
             _appContext = appContext;
-            _environment = environment;
+            _mapper = mapper;
         }
 
-        public async Task AddEvent(EventCreateDTO @event)
+        public async Task AddEvent(EventCreateDTO @event, string hostRoot)
         {
-            Event newEvent = new Event()
-            {
-                Name = @event.Name,
-                CategoryId = @event.CategoryId,
-                Description = @event.Description,
-                Start = @event.Start,
-                Place = @event.Place,
-                Fee = @event.Fee,
-                ParticipantsLimit = @event.ParticipantsLimit,
-                OrganizerId = @event.OrganizerId,
-                HasPhoto = @event.Image != null,
-                PublicationTime = DateTime.Now
-            };
+            var newEvent = _mapper.Map<EventCreateDTO, Event>(@event);
             await _appContext.Events.AddAsync(newEvent);
             await _appContext.SaveChangesAsync(default);
 
             if (@event.Image != null)
             {
-                string path = "/img/" + newEvent.Id + ".jpg";
-                using (var fileStream = new FileStream(_environment.WebRootPath + path, FileMode.Create))
-                {
-                    await @event.Image.CopyToAsync(fileStream);
-                }
+                string path = $"/img/events/{newEvent.Id}.jpg";
+                await using var fileStream = new FileStream(hostRoot + path, FileMode.Create);
+                await @event.Image.CopyToAsync(fileStream);
             }
 
             foreach (var tagName in @event.Tags)
@@ -56,7 +42,7 @@ namespace TrainingProject.DomainLogic.Managers
                 var tag = await _appContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName);
                 if (tag == null)
                 {
-                    tag = new Tag{Name = tagName};
+                    tag = _mapper.Map<string, Tag>(tagName);
                     await _appContext.Tags.AddAsync(tag);
                     await _appContext.SaveChangesAsync(default);
                 }
@@ -67,6 +53,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public Task UpdateEvent(EventUpdateDTO @event)
         {
+            //вручную проверить теги и картинку
             throw new NotImplementedException();
         }
 
@@ -88,12 +75,12 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public Task<EventFullDto> GetEvent(int eventId)
+        public Task<EventFullDTO> GetEvent(int eventId, string hostPath)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
+        public Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostPath, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
             bool vacancies, int? organizer, int? participant)
         {
             throw new NotImplementedException();

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
@@ -13,10 +14,12 @@ namespace TrainingProject.DomainLogic.Managers
     public class CategoryManager: ICategoryManager
     {
         private readonly IAppContext _appContext;
+        private readonly IMapper _mapper;
 
-        public CategoryManager(IAppContext appContext)
+        public CategoryManager(IAppContext appContext, IMapper mapper)
         {
             _appContext = appContext;
+            _mapper = mapper;
         }
         public async Task<bool> AddCategory(CategoryCreateDTO category)
         {
@@ -24,7 +27,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 return false;
             }
-            await _appContext.Categories.AddAsync(new Category {Name = category.Name, Description = category.Description});
+            await _appContext.Categories.AddAsync(_mapper.Map<Category>(category));
             await _appContext.SaveChangesAsync(default);
             return true;
         }
