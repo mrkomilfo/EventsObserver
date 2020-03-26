@@ -4,8 +4,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventUpdateDTO
+    public sealed class EventUpdateDTO
     {
+        public EventUpdateDTO()
+        {
+            Tags = new HashSet<string>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }

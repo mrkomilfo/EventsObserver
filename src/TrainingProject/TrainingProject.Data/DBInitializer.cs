@@ -59,6 +59,10 @@ namespace TrainingProject.Data
                         ParticipantsLimit = 20,
                         OrganizerId = context.Users.Select(u => u.Id).FirstOrDefault(),
                         PublicationTime = new DateTime(2020, 03, 10, 15, 0, 0),
+                        Tags = new HashSet<Tag> {
+                            await context.Tags.FirstOrDefaultAsync(t=>t.Name == "психология"),
+                            await context.Tags.FirstOrDefaultAsync(t=>t.Name == "привязанности")
+                        }
                     },
                     new Event()
                     {
@@ -71,12 +75,16 @@ namespace TrainingProject.Data
                         ParticipantsLimit = 20,
                         OrganizerId = context.Users.Select(u => u.Id).FirstOrDefault(),
                         PublicationTime = DateTime.Now,
+                        Tags = new HashSet<Tag> {
+                            await context.Tags.FirstOrDefaultAsync(t=>t.Name == "экология"),
+                            await context.Tags.FirstOrDefaultAsync(t=>t.Name == "климат")
+                        }
                     }
                 };
-                await  context.Events.AddRangeAsync(events);
+                await context.Events.AddRangeAsync(events);
                 await context.SaveChangesAsync(default);
 
-                IEnumerable<EventsTags> eventTags = new List<EventsTags>()
+                /*IEnumerable<EventsTags> eventTags = new List<EventsTags>()
                 {
                     new EventsTags{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(0)?.Id},
                     new EventsTags{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(1)?.Id},
@@ -84,7 +92,7 @@ namespace TrainingProject.Data
                     new EventsTags{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(3)?.Id},
                 };
                 context.EventsTags.AddRange(eventTags);
-                await context.SaveChangesAsync(default);
+                await context.SaveChangesAsync(default);*/
             }
         }
 

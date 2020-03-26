@@ -3,8 +3,12 @@ using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventLiteDTO
+    public sealed class EventLiteDTO
     {
+        public EventLiteDTO()
+        {
+            Tags = new HashSet<string>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }

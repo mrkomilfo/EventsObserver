@@ -4,8 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TrainingProject.Domain
 {
-    public class User
+    public sealed class User
     {
+        public User()
+        {
+            OrganizedEvents = new HashSet<Event>();
+            VisitedEvents = new HashSet<Event>();
+        }
+
         public int Id { get; set; }
         public string UserName { get; set; }
         [Index("INDEX_LOGIN", IsClustered = true, IsUnique = true)]
@@ -17,8 +23,8 @@ namespace TrainingProject.Domain
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
         public DateTime RegistrationDate { get; set; }
-        public virtual ICollection<Event> OrganizedEvents { get; set; }
-        public virtual ICollection<Event> VisitedEvents { get; set; }
+        public ICollection<Event> OrganizedEvents { get; set; }
+        public ICollection<Event> VisitedEvents { get; set; }
         public bool HasPhoto { get; set; }
         public bool IsDeleted { get; set; }
     }

@@ -6,6 +6,11 @@ namespace TrainingProject.DomainLogic.Models.Events
 {
     public class EventCreateDTO
     {
+        public EventCreateDTO()
+        {
+            Tags = new HashSet<string>();
+        }
+
         public string Name { get; set; }
         public int? CategoryId { get; set; }
         public string Description { get; set; }

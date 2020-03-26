@@ -3,8 +3,14 @@ using System.Collections.Generic;
 
 namespace TrainingProject.Domain
 {
-    public class Event
+    public sealed class Event
     {
+        public Event()
+        {
+            Participants = new HashSet<User>();
+            Tags = new HashSet<Tag>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }
