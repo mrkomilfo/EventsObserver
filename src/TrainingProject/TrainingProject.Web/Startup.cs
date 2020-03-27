@@ -13,9 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TrainingProject.DomainLogic;
-using TrainingProject.Data.Interfaces;
 using TrainingProject.Data;
-using TrainingProject.Data.Repositories;
 using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Managers;
@@ -25,14 +23,12 @@ namespace TrainingProject.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
-        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -41,13 +37,11 @@ namespace TrainingProject.Web
             
             services.AddOpenApiDocument();
             services.AddControllers();
-            //services.AddAutoMapper(typeof(Startup));
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MappingProfile());
             });
-
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
