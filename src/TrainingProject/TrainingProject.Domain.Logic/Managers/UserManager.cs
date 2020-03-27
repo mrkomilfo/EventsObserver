@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
@@ -33,9 +34,17 @@ namespace TrainingProject.DomainLogic.Managers
             throw new NotImplementedException();
         }
 
-        public Task<bool> RegisterUser(RegisterDTO user)
+        public async Task<bool> RegisterUser(RegisterDTO user)
         {
-            throw new NotImplementedException();
+            if (await _appContext.Users.AnyAsync(u => u.Login == user.Login))
+            {
+                return false;
+            }
+            User newUser = _mapper.Map<User>(user);
+            newUser.RoleId = (await _appContext.Roles.FirstOrDefaultAsync(r => r.Name == "User"))?.Id;
+            await _appContext.Users.AddAsync(newUser);
+            await _appContext.SaveChangesAsync(default);
+            return true;
         }
 
         public Task Login(LoginDTO user)
@@ -43,24 +52,63 @@ namespace TrainingProject.DomainLogic.Managers
             throw new NotImplementedException();
         }
 
-        public Task UpdateUser(UserUpdateDTO user)
+        public async Task UpdateUser(UserUpdateDTO user)
         {
-            throw new NotImplementedException();
+            User updatedUser = await _appContext.Users.FindAsync(user.Id);
+            if (updatedUser != null)
+            {
+                _mapper.Map(user, updatedUser);
+            }
+            await _appContext.SaveChangesAsync(default);
         }
 
-        public Task DeleteUser(int userId, bool force)
+        public async Task DeleteUser(int userId, bool force)
         {
-            throw new NotImplementedException();
+            var user = await _appContext.Users.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+            if (user != null)
+            {
+                if (force)
+                {
+                    _appContext.Users.Remove(user);
+                }
+                else
+                {
+                    user.IsDeleted = true;
+                }
+                await _appContext.SaveChangesAsync(default);
+            }
         }
 
-        public Task BanUser(int userId, int days)
+        public async Task BanUser(int userId, int? days, int? hours)
         {
-            throw new NotImplementedException();
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user != null)
+            {
+                user.UnlockTime = DateTime.Now.AddDays(days ?? 0);
+                user.UnlockTime = DateTime.Now.AddHours(hours ?? 0);
+            }
+            await _appContext.SaveChangesAsync(default);
         }
 
-        public Task ChangeRole(int userId, int roleId)
+        public async Task UnbanUser(int userId)
         {
-            throw new NotImplementedException();
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user != null)
+            {
+                user.UnlockTime = DateTime.Now;
+            }
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task ChangeRole(int userId, int roleId)
+        {
+            var user = await _appContext.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.RoleId = roleId;
+            }
+            await _appContext.SaveChangesAsync(default);
         }
     }
 }

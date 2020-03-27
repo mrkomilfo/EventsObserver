@@ -28,13 +28,14 @@ namespace TrainingProject.DomainLogic.Helpers
 
             CreateMap<User, UserFullDTO>()
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
-                .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime==null | m.UnlockTime<DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"));
+                .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime==null | m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"));
             CreateMap<User, UserLiteDTO>()
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
                 .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime == null | m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"));
             CreateMap<UserUpdateDTO, User>();
             CreateMap<RegisterDTO, User>()
-                .ForMember(m => m.Password, opt => opt.MapFrom(m => HashGenerator.Encrypt(m.Password)));
+                .ForMember(m => m.Password, opt => opt.MapFrom(m => HashGenerator.Encrypt(m.Password)))
+                .ForMember(m => m.RegistrationDate, opt => opt.MapFrom(m => DateTime.Now));
         }
     }
 }

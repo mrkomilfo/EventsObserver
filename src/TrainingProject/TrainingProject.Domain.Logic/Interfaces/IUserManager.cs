@@ -16,7 +16,8 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task Login(LoginDTO user);
         Task UpdateUser(UserUpdateDTO user);
         Task DeleteUser(int userId, bool force);
-        Task BanUser(int userId, int days);
+        Task BanUser(int userId, int? days, int? hours);
+        Task UnbanUser(int userId);
         Task ChangeRole(int userId, int roleId);
     }
 }

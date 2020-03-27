@@ -16,6 +16,7 @@ using TrainingProject.DomainLogic;
 using TrainingProject.Data.Interfaces;
 using TrainingProject.Data;
 using TrainingProject.Data.Repositories;
+using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Managers;
 using AppContext = TrainingProject.Data.AppContext;
@@ -40,14 +41,21 @@ namespace TrainingProject.Web
             
             services.AddOpenApiDocument();
             services.AddControllers();
-            services.AddAutoMapper(typeof(Startup));
+            //services.AddAutoMapper(typeof(Startup));
+
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
 
             services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<ICategoryManager, CategoryManager>();
             services.AddScoped<IEventManager, EventManager>();
-            services.AddSingleton<IWebHostEnvironment>(Environment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

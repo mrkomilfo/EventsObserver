@@ -86,14 +86,21 @@ namespace TrainingProject.DomainLogic.Managers
             throw new NotImplementedException();
         }
 
-        public Task SignUp(int userId, int eventId)
+        public async Task SignUp(int userId, int eventId)
         {
-            throw new NotImplementedException();
+            var eu = new EventsUsers { ParticipantId = userId, EventId = eventId};
+            await _appContext.EventsUsers.AddAsync(eu);
+            await _appContext.SaveChangesAsync(default);
         }
 
-        public Task Unsubscribe(int userId, int eventId)
+        public async Task Unsubscribe(int userId, int eventId)
         {
-            throw new NotImplementedException();
+            var eu = await _appContext.EventsUsers.FindAsync(eventId, userId);
+            if (eu != null)
+            {
+                _appContext.EventsUsers.Remove(eu);
+            }
+            await _appContext.SaveChangesAsync(default);
         }
     }
 }
