@@ -5,9 +5,9 @@ using AutoMapper;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
-using TrainingProject.DomainLogic.Models.Events;
 using Microsoft.EntityFrameworkCore;
 using TrainingProject.DomainLogic.Models.Categories;
+using CSharpFunctionalExtensions;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -61,6 +61,10 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
+        public async Task<Maybe<Category>> GetCategory(int categoryId)
+        {
+            return await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+        }
         public async Task<ICollection<CategoryLiteDTO>> GetCategories()
         {
             return await _appContext.Categories.Select(c=> new CategoryLiteDTO{Id=c.Id, Name = c.Name}).ToListAsync();

@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using TrainingProject.Data;
 using TrainingProject.Domain;
+using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Users;
@@ -23,15 +28,26 @@ namespace TrainingProject.DomainLogic.Managers
             _mapper = mapper;
         }
 
-        public Task<UserFullDTO> GetUser(string userId)
+        public async Task<Maybe<UserFullDTO>> GetUser(int userId, string hostRoot)
         {
-            //организованные, посещённые события и фото вручную
-            throw new NotImplementedException();
+            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u=>u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
+            var user = _mapper.Map<UserFullDTO>(DBUser);
+            user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
+
+            string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
+            string path = $"{hostRoot}/img/users/{imageName}.jpg";
+            user.Photo = path;
+
+            return user;
         }
 
-        public Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize)
+        public async Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize)
         {
-            throw new NotImplementedException();
+            var result = new Page<UserLiteDTO>() { CurrentPage = index, PageSize = pageSize };
+            var query = _appContext.Users.Include(e => e.Role).AsQueryable();
+            result.TotalRecords = await query.CountAsync();
+            result.Records = await _mapper.ProjectTo<UserLiteDTO>(query).ToListAsync(default);
+            return result;
         }
 
         public async Task<bool> RegisterUser(RegisterDTO user)
@@ -45,11 +61,6 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.Users.AddAsync(newUser);
             await _appContext.SaveChangesAsync(default);
             return true;
-        }
-
-        public Task Login(LoginDTO user)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task UpdateUser(UserUpdateDTO user)
@@ -109,6 +120,52 @@ namespace TrainingProject.DomainLogic.Managers
                 user.RoleId = roleId;
             }
             await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task<Maybe<LoginResponseDTO>> Login(LoginDTO model)
+        {
+            var identity = await GetIdentity(model.Login, model.Password);
+            if (identity == null)
+            {
+                return null;
+            }
+
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: identity.Claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            var response = new LoginResponseDTO
+            {
+                AccessToken = encodedJwt,
+                Name = identity.Name,
+                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()
+            };
+            return response;
+        }
+        private async Task<ClaimsIdentity> GetIdentity(string login, string password)
+        {
+            ClaimsIdentity identity = null;
+            var user = await _appContext.Users.Include(u=>u.Role).FirstOrDefaultAsync(u => u.Login == login);
+            if (user != null)
+            {
+                var passwordHash = HashGenerator.Encrypt(password);
+                if (passwordHash == user.Password)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
+                        new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
+                    };
+                    identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                }
+            }
+            return identity;
         }
     }
 }

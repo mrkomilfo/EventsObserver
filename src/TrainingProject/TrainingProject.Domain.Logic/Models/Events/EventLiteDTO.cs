@@ -18,5 +18,6 @@ namespace TrainingProject.DomainLogic.Models.Events
         public int Fee { get; set; } //0 - unlimited
         public ICollection<string> Tags { get; set; }
         public bool HasPhoto { get; set; }
+        public string Photo { get; set; }
     }
 }
