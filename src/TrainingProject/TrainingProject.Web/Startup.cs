@@ -18,23 +18,25 @@ using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Managers;
 using AppContext = TrainingProject.Data.AppContext;
+using TrainingProject.Web.Interfaces;
+using TrainingProject.Web.Services;
 
 namespace TrainingProject.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddDomainServices();
-            
+        {            
             services.AddOpenApiDocument();
             services.AddControllers();
 
@@ -50,6 +52,8 @@ namespace TrainingProject.Web
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<ICategoryManager, CategoryManager>();
             services.AddScoped<IEventManager, EventManager>();
+            services.AddScoped<IHostServices, HostServices>();
+            services.AddSingleton<IWebHostEnvironment>(Environment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -28,7 +28,7 @@ namespace TrainingProject.DomainLogic.Managers
             _mapper = mapper;
         }
 
-        public async Task<Maybe<UserFullDTO>> GetUser(int userId, string hostRoot)
+        public async Task<Maybe<UserFullDTO>> GetUser(Guid userId, string hostRoot)
         {
             var DBUser = await _appContext.Users.Include(u => u.Role).Include(u=>u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
             var user = _mapper.Map<UserFullDTO>(DBUser);
@@ -73,7 +73,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task DeleteUser(int userId, bool force)
+        public async Task DeleteUser(Guid userId, bool force)
         {
             var user = await _appContext.Users.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -91,7 +91,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public async Task BanUser(int userId, int? days, int? hours)
+        public async Task BanUser(Guid userId, int? days, int? hours)
         {
             var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
@@ -102,7 +102,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UnbanUser(int userId)
+        public async Task UnbanUser(Guid userId)
         {
             var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
@@ -112,7 +112,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task ChangeRole(int userId, int roleId)
+        public async Task ChangeRole(Guid userId, int roleId)
         {
             var user = await _appContext.Users.FindAsync(userId);
             if (user != null)
@@ -121,13 +121,28 @@ namespace TrainingProject.DomainLogic.Managers
             }
             await _appContext.SaveChangesAsync(default);
         }
-
+        public DateTime? GetUnlockTime(Guid userId)
+        {
+            return _appContext.Users.FirstOrDefault(u => u.Id == userId)?.UnlockTime;
+        }
         public async Task<Maybe<LoginResponseDTO>> Login(LoginDTO model)
         {
             var identity = await GetIdentity(model.Login, model.Password);
             if (identity == null)
             {
-                return null;
+                return new LoginResponseDTO
+                {
+                    Status = Status.WrongLoginOrPassword
+                };
+            }
+            var unlockTime = GetUnlockTime(Guid.Parse(identity.Name));
+            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
+            {
+                return new LoginResponseDTO
+                {
+                    Status = Status.Blocked,
+                    Blocking = unlockTime ?? DateTime.Now,
+                };
             }
 
             var now = DateTime.UtcNow;
@@ -144,7 +159,8 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 AccessToken = encodedJwt,
                 Name = identity.Name,
-                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()
+                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault(),
+                Status = Status.Ok
             };
             return response;
         }
@@ -159,7 +175,7 @@ namespace TrainingProject.DomainLogic.Managers
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
                         new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
                     };
                     identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);

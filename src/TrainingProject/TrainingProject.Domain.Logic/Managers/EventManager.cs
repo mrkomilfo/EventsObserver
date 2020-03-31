@@ -124,7 +124,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostRoot, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
-            bool vacancies, int? organizer, int? participant)
+            bool vacancies, Guid organizer, Guid participant)
         {
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
@@ -184,16 +184,16 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task SignUp(int userId, int eventId)
+        public async Task SignUp(Guid userId, int eventId)
         {
             var eu = new EventsUsers { ParticipantId = userId, EventId = eventId};
             await _appContext.EventsUsers.AddAsync(eu);
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task Unsubscribe(int userId, int eventId)
+        public async Task Unsubscribe(Guid userId, int eventId)
         {
-            var eu = await _appContext.EventsUsers.FindAsync(eventId, userId);
+            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu=>eu.EventId == eventId && eu.ParticipantId == userId);
             if (eu != null)
             {
                 _appContext.EventsUsers.Remove(eu);
