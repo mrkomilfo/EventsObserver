@@ -23,7 +23,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
         public async Task<bool> AddCategory(CategoryCreateDTO category)
         {
-            if (await _appContext.Categories.AnyAsync(c => c.Name == category.Name))
+            if (await _appContext.Categories.AnyAsync(c => c.Name.ToLower() == category.Name.ToLower()))
             {
                 return false;
             }
@@ -61,9 +61,10 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public async Task<Maybe<Category>> GetCategory(int categoryId)
+        public async Task<Maybe<CategoryFullDTO>> GetCategory(int categoryId)
         {
-            return await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            var category = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            return _mapper.Map<CategoryFullDTO>(category);
         }
         public async Task<ICollection<CategoryLiteDTO>> GetCategories()
         {

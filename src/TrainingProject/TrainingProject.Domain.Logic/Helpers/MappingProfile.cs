@@ -13,6 +13,7 @@ namespace TrainingProject.DomainLogic.Helpers
         {
             CreateMap<CategoryCreateDTO, Category>();
             CreateMap<Category, CategoryLiteDTO>();
+            CreateMap<Category, CategoryFullDTO>();
 
             CreateMap<EventCreateDTO, Event>()
                 .ForMember(m => m.HasPhoto, opt => opt.MapFrom(m => m.Image != null))

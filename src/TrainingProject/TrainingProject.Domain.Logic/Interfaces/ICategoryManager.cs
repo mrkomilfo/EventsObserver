@@ -11,7 +11,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<bool> AddCategory(CategoryCreateDTO category);
         Task UpdateCategory(Category category);
         Task DeleteCategory(int categoryId, bool force);
-        Task<Maybe<Category>> GetCategory(int categoryId);
+        Task<Maybe<CategoryFullDTO>> GetCategory(int categoryId);
         Task<ICollection<CategoryLiteDTO>> GetCategories();
     }
 }

@@ -2,8 +2,10 @@
 
 namespace TrainingProject.DomainLogic.Models.Categories
 {
-    public class CategoryCreateDTO
+    public class CategoryFullDTO
     {
+        [Required]
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }

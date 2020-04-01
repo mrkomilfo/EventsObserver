@@ -20,7 +20,7 @@ namespace TrainingProject.Domain
         public string Place { get; set; }
         public int Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
-        public Guid OrganizerId { get; set; }
+        public Guid? OrganizerId { get; set; }
         public User Organizer { get; set; }
         public ICollection<User> Participants { get; set; }
         public ICollection<Tag> Tags { get; set; }

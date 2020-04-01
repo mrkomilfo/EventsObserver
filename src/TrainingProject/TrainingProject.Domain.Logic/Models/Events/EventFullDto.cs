@@ -20,7 +20,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public int? OrganizerId { get; set; }
         public string Organizer { get; set; }
-        public Dictionary<Guid, string> Participants { get; set; }
+        public Dictionary<Guid?, string> Participants { get; set; }
         public ICollection<string> Tags { get; set; }
         public DateTime PublicationTime { get; set; }
         public string Photo { get; set; }
