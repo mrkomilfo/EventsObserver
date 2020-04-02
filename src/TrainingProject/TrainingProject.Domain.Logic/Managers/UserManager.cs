@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -63,17 +64,24 @@ namespace TrainingProject.DomainLogic.Managers
             return true;
         }
 
-        public async Task UpdateUser(UserUpdateDTO user)
+        public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
         {
             User updatedUser = await _appContext.Users.FindAsync(user.Id);
             if (updatedUser != null)
             {
                 _mapper.Map(user, updatedUser);
+                if (user.Photo != null)
+                {
+                    string path = $"{hostRoot}/img/users/{updatedUser.Id}.jpg";
+                    await using var fileStream = new FileStream(path, FileMode.Create);
+                    await user.Photo.CopyToAsync(fileStream);
+                }
             }
+
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task DeleteUser(Guid userId, bool force)
+        public async Task DeleteUser(Guid userId, bool force, string hostRoot)
         {
             var user = await _appContext.Users.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -82,6 +90,8 @@ namespace TrainingProject.DomainLogic.Managers
                 if (force)
                 {
                     _appContext.Users.Remove(user);
+                    string path = $"{hostRoot}/img/users/{userId}.jpg";
+                    File.Delete(path);
                 }
                 else
                 {
@@ -91,13 +101,13 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public async Task BanUser(Guid userId, int? days, int? hours)
+        public async Task BanUser(BanDTO banDTO)
         {
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(banDTO.UserId));
             if (user != null)
             {
-                user.UnlockTime = DateTime.Now.AddDays(days ?? 0);
-                user.UnlockTime = DateTime.Now.AddHours(hours ?? 0);
+                user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
+                user.UnlockTime = DateTime.Now.AddHours(banDTO?.Hours ?? 0);
             }
             await _appContext.SaveChangesAsync(default);
         }
@@ -158,8 +168,8 @@ namespace TrainingProject.DomainLogic.Managers
             var response = new LoginResponseDTO
             {
                 AccessToken = encodedJwt,
-                Name = identity.Name,
-                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault(),
+                //Name = identity.Name,
+                //Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault(),
                 Status = Status.Ok
             };
             return response;

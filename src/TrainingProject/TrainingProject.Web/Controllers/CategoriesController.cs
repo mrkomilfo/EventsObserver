@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,14 +32,14 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<CategoryLiteDTO>> Details([FromQuery] int categoryId)
         {
             return await _categoryManager.GetCategory(categoryId)
-                .ToResult("Category not found")
+                .ToResult(NotFound($"Category with id = {categoryId} was not found"))
                 .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         [Route("Create")]
-        public async Task<ActionResult> Create([FromForm] CategoryCreateDTO categoryCreateDTO)
+        public async Task<ActionResult> Create([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             if (ModelState.IsValid)
             {
@@ -49,9 +50,9 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         [Route("Update")]
-        public async Task<ActionResult> Update([FromForm] Category category)
+        public async Task<ActionResult> Update([FromBody] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -61,9 +62,10 @@ namespace TrainingProject.Web.Controllers
             return BadRequest("Model state is not valid");
         }
 
-        [HttpDelete]
+        [HttpDelete("{categoryId}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Delete([FromQuery] int categoryId)
+        [Route("Delete")]
+        public ActionResult Delete(int categoryId)
         {
             _categoryManager.DeleteCategory(categoryId, false);
             return Ok();

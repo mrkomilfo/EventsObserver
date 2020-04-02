@@ -12,8 +12,8 @@ namespace TrainingProject.DomainLogic.Models.Users
     public class LoginResponseDTO
     {
         public string AccessToken { get; set; }
-        public string Name { get; set; }
-        public Claim Role { get; set; }
+        //public string Name { get; set; }
+        //public Claim Role { get; set; }
         public Status Status { get; set; } 
         public DateTime Blocking { get; set; }
     }

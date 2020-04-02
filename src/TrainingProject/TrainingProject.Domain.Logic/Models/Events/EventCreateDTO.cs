@@ -25,7 +25,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         [Required]
         public int ParticipantsLimit { get; set; } //0 - unlimited
         [Required]
-        public int? OrganizerId { get; set; }
+        public Guid? OrganizerId { get; set; }
         public ICollection<string> Tags { get; set; }
         public IFormFile Image { get; set; }
     }

@@ -12,7 +12,7 @@ namespace TrainingProject.Domain
             VisitedEvents = new HashSet<Event>();
         }
 
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string UserName { get; set; }
         [Index("INDEX_LOGIN", IsClustered = true, IsUnique = true)]
         public string Login { get; set; }

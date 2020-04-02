@@ -7,7 +7,7 @@ namespace TrainingProject.DomainLogic.Models.Users
     public class UserUpdateDTO
     {
         [Required]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         [Required]
         public string UserName { get; set; }
         public string ContactEmail { get; set; }

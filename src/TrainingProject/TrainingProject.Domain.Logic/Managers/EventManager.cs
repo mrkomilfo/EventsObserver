@@ -124,7 +124,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostRoot, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
-            bool vacancies, Guid organizer, Guid participant)
+            bool vacancies, Guid? organizer, Guid? participant)
         {
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
@@ -199,6 +199,11 @@ namespace TrainingProject.DomainLogic.Managers
                 _appContext.EventsUsers.Remove(eu);
             }
             await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task<Guid?> GetEventOrganizerId(int eventId)
+        {
+            return (await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId))?.OrganizerId;
         }
     }
 }

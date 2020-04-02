@@ -21,6 +21,7 @@ namespace TrainingProject.DomainLogic.Managers
             _appContext = appContext;
             _mapper = mapper;
         }
+
         public async Task<bool> AddCategory(CategoryCreateDTO category)
         {
             if (await _appContext.Categories.AnyAsync(c => c.Name.ToLower() == category.Name.ToLower()))

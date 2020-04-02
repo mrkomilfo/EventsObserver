@@ -12,9 +12,9 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize);
         Task<bool> RegisterUser(RegisterDTO user);
         Task<Maybe<LoginResponseDTO>> Login(LoginDTO user);
-        Task UpdateUser(UserUpdateDTO user);
-        Task DeleteUser(Guid userId, bool force);
-        Task BanUser(Guid userId, int? days, int? hours);
+        Task UpdateUser(UserUpdateDTO user, string hostRoot);
+        Task DeleteUser(Guid userId, bool force, string hostRoot);
+        Task BanUser(BanDTO banDTO);
         Task UnbanUser(Guid userId);
         Task ChangeRole(Guid userId, int roleId);
     }

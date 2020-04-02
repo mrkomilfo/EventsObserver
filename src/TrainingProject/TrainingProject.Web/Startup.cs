@@ -36,7 +36,7 @@ namespace TrainingProject.Web
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             services.AddOpenApiDocument();
             services.AddControllers();
 
@@ -55,19 +55,16 @@ namespace TrainingProject.Web
             services.AddScoped<IHostServices, HostServices>();
             services.AddSingleton<IWebHostEnvironment>(Environment);
 
-            services.AddOpenApiDocument();
+            services.AddSwaggerDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseOpenApi();
-            app.UseSwaggerUi3();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseOpenApi().UseSwaggerUi3();
+                app.UseOpenApi().UseSwaggerUi3().UseReDoc();
             }
 
             app.UseHttpsRedirection();
