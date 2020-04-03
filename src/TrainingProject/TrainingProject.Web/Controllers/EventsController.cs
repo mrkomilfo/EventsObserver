@@ -31,7 +31,7 @@ namespace TrainingProject.Web.Controllers
             bool vacancies = false, string organizer = null, string participant = null)
         {
             Guid? organizerGuid;
-            if (Guid.TryParse(organizer, out _)){
+            if (Guid.TryParse(organizer, out _)) {
                 organizerGuid = Guid.Parse(organizer);
             }
             else {
@@ -72,6 +72,24 @@ namespace TrainingProject.Web.Controllers
                 return Ok();
             }
             return BadRequest("Model state is not valid");
+        }
+
+        [HttpGet("{eventId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Route("Update")]
+        public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
+        {
+            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            var organizerId = await _eventManager.GetEventOrganizerId(eventId);
+            if (role != "Admin" && Guid.Parse(userId) != organizerId)
+            {
+                return Forbid("Access denied");
+            }
+            var hostRoot = _hostServices.GetHostPath();
+            return await _eventManager.GetEventToUpdate(eventId, hostRoot)
+                .ToResult(NotFound($"Event with id = {eventId} was not found"))
+                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
         }
 
         [HttpPut]

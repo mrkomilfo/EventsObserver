@@ -3,12 +3,12 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class BanDTO
+    public class ChangeRoleDTO
     {
         [Required]
         [ValidGuid]
         public string UserId { get; set; }
-        public int? Days { get; set; }
-        public int? Hours { get; set; }
+        [Required]
+        public int RoleId { get; set; }
     }
 }

@@ -20,6 +20,9 @@ using TrainingProject.DomainLogic.Managers;
 using AppContext = TrainingProject.Data.AppContext;
 using TrainingProject.Web.Interfaces;
 using TrainingProject.Web.Services;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TrainingProject.Web
 {
@@ -39,6 +42,26 @@ namespace TrainingProject.Web
         {
             services.AddOpenApiDocument();
             services.AddControllers();
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = AuthOptions.ISSUER,
+                    ValidAudience = AuthOptions.AUDIENCE,
+                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
@@ -64,13 +87,14 @@ namespace TrainingProject.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseOpenApi().UseSwaggerUi3().UseReDoc();
+                app.UseOpenApi().UseSwaggerUi3();
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

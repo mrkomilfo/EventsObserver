@@ -81,6 +81,24 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
+        public async Task<Maybe<EventToUpdateDTO>> GetEventToUpdate(int eventId, string hostRoot)
+        {
+            var @event = await _appContext.Events.Include(e=>e.Tags).FirstOrDefaultAsync(e => e.Id == eventId);
+            if (@event == null)
+            {
+                return null;
+            }
+            EventToUpdateDTO eventToUpdate = _mapper.Map<EventToUpdateDTO>(@event);
+
+            if (@event.HasPhoto)
+            {
+                eventToUpdate.Image = $"{hostRoot}/img/events/{eventId}.jpg";
+            }
+            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
+            eventToUpdate.Tags = tags;
+            return eventToUpdate;
+        }
+
         public async Task DeleteEvent(int eventId, bool force, string hostRoot)
         {
             var @event = await _appContext.Events.IgnoreQueryFilters()
@@ -112,10 +130,10 @@ namespace TrainingProject.DomainLogic.Managers
             var participants = await _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).ToListAsync();
             foreach (var participant in participants)
             {
-                eventFullDTO.Participants.Add(participant.Id, participant.UserName);
+                eventFullDTO.Participants.Add(participant.Id.ToString(), participant.UserName);
             }
-            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag);
-            eventFullDTO.Tags = await _mapper.ProjectTo<string>(tags).ToListAsync(default);
+            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
+            eventFullDTO.Tags = tags;
 
             string imageName = DBEvent.HasPhoto ? eventId.ToString() : "default";
             string path = $"{hostRoot}/img/events/{imageName}.jpg";

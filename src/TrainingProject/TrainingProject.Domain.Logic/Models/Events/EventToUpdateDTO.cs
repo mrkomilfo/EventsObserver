@@ -1,34 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
-using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventCreateDTO
+    public class EventToUpdateDTO
     {
-        public EventCreateDTO()
+        public EventToUpdateDTO()
         {
             Tags = new HashSet<string>();
         }
-        [Required]
+        public int Id { get; set; }
         public string Name { get; set; }
-        [Required]
         public int? CategoryId { get; set; }
         public string Description { get; set; }
-        [Required]
         public DateTime Start { get; set; }
-        [Required]
         public string Place { get; set; }
-        [Required]
         public int Fee { get; set; }
-        [Required]
         public int ParticipantsLimit { get; set; } //0 - unlimited
-        [Required]
-        [ValidGuid]
-        public string OrganizerId { get; set; }
         public ICollection<string> Tags { get; set; }
-        public IFormFile Image { get; set; }
+        public string Image { get; set; }
+        public bool HasPhoto { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet("{categoryId}")]
         [Route("Details")]
-        public async Task<ActionResult<CategoryLiteDTO>> Details([FromQuery] int categoryId)
+        public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
         {
             return await _categoryManager.GetCategory(categoryId)
                 .ToResult(NotFound($"Category with id = {categoryId} was not found"))

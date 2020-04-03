@@ -10,6 +10,7 @@ namespace TrainingProject.DomainLogic.Interfaces
     {
         Task AddEvent(EventCreateDTO @event, string hostRoot);
         Task UpdateEvent(EventUpdateDTO @event, string hostRoot);
+        Task<Maybe<EventToUpdateDTO>> GetEventToUpdate(int eventId, string hostRoot);
         Task DeleteEvent(int eventId, bool force, string hostRoot);
         Task<Maybe<EventFullDTO>> GetEvent(int eventId, string hostRoot);
         Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostPath, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, Guid? organizer, Guid? participant);

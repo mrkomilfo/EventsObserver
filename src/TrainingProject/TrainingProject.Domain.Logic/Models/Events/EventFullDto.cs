@@ -18,9 +18,9 @@ namespace TrainingProject.DomainLogic.Models.Events
         public string Place { get; set; }
         public int Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
-        public Guid? OrganizerId { get; set; }
+        public string OrganizerId { get; set; }
         public string Organizer { get; set; }
-        public Dictionary<Guid?, string> Participants { get; set; }
+        public Dictionary<string, string> Participants { get; set; }
         public ICollection<string> Tags { get; set; }
         public DateTime PublicationTime { get; set; }
         public string Photo { get; set; }

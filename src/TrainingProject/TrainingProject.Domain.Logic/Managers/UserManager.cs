@@ -31,7 +31,11 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Maybe<UserFullDTO>> GetUser(Guid userId, string hostRoot)
         {
-            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u=>u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
+            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
+            if (DBUser == null)
+            {
+                return null;
+            }
             var user = _mapper.Map<UserFullDTO>(DBUser);
             user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
 
@@ -81,6 +85,21 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
+        public async Task<Maybe<UserToUpdateDTO>> GetUserToUpdate(Guid userId, string hostRoot)
+        {
+            User user = await _appContext.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+            UserToUpdateDTO userToUpdate = _mapper.Map<UserToUpdateDTO>(user);
+            if (userToUpdate.HasPhoto)
+            {
+                userToUpdate.Photo = $"{hostRoot}/img/users/{userId}.jpg";
+            }
+            return userToUpdate;
+        }
+
         public async Task DeleteUser(Guid userId, bool force, string hostRoot)
         {
             var user = await _appContext.Users.IgnoreQueryFilters()
@@ -122,12 +141,12 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task ChangeRole(Guid userId, int roleId)
+        public async Task ChangeRole(ChangeRoleDTO changeRoleDTO)
         {
-            var user = await _appContext.Users.FindAsync(userId);
+            var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDTO.UserId));
             if (user != null)
             {
-                user.RoleId = roleId;
+                user.RoleId = changeRoleDTO.RoleId;
             }
             await _appContext.SaveChangesAsync(default);
         }
@@ -177,7 +196,7 @@ namespace TrainingProject.DomainLogic.Managers
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
         {
             ClaimsIdentity identity = null;
-            var user = await _appContext.Users.Include(u=>u.Role).FirstOrDefaultAsync(u => u.Login == login);
+            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Login == login);
             if (user != null)
             {
                 var passwordHash = HashGenerator.Encrypt(password);
@@ -192,6 +211,27 @@ namespace TrainingProject.DomainLogic.Managers
                 }
             }
             return identity;
+        }
+
+        public async Task<IEnumerable<Role>> GetRoles()
+        {
+            return await _appContext.Roles.ToListAsync();
+        }
+
+        public async Task<Maybe<UserRoleDTO>> GetUserWithRole(Guid userId)
+        {
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return null;
+            }
+            UserRoleDTO userRoleDTO = _mapper.Map<UserRoleDTO>(user);
+            return userRoleDTO;
+        }
+
+        public async Task<Role> GetUserRole(Guid userId)
+        {
+            return await _appContext.Users.Include(u => u.Role).Where(u => u.Id == userId).Select(u => u.Role).FirstOrDefaultAsync();
         }
     }
 }

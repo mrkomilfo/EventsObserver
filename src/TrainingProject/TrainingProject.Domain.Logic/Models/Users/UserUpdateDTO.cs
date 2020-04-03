@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
 using System.ComponentModel.DataAnnotations;
+using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
     public class UserUpdateDTO
     {
         [Required]
+        [ValidGuid]
         public string Id { get; set; }
         [Required]
         public string UserName { get; set; }
