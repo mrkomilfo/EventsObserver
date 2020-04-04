@@ -40,7 +40,7 @@ namespace TrainingProject.DomainLogic.Managers
             user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
 
             string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
-            string path = $"{hostRoot}/img/users/{imageName}.jpg";
+            string path = $"{hostRoot}\\wwroot\\img\\users\\{imageName}.jpg";
             user.Photo = path;
 
             return user;
@@ -76,7 +76,7 @@ namespace TrainingProject.DomainLogic.Managers
                 _mapper.Map(user, updatedUser);
                 if (user.Photo != null)
                 {
-                    string path = $"{hostRoot}/img/users/{updatedUser.Id}.jpg";
+                    string path = $"{hostRoot}\\wwroot\\img\\users\\{updatedUser.Id}.jpg";
                     await using var fileStream = new FileStream(path, FileMode.Create);
                     await user.Photo.CopyToAsync(fileStream);
                 }
@@ -95,7 +95,7 @@ namespace TrainingProject.DomainLogic.Managers
             UserToUpdateDTO userToUpdate = _mapper.Map<UserToUpdateDTO>(user);
             if (userToUpdate.HasPhoto)
             {
-                userToUpdate.Photo = $"{hostRoot}/img/users/{userId}.jpg";
+                userToUpdate.Photo = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
             }
             return userToUpdate;
         }
@@ -109,7 +109,7 @@ namespace TrainingProject.DomainLogic.Managers
                 if (force)
                 {
                     _appContext.Users.Remove(user);
-                    string path = $"{hostRoot}/img/users/{userId}.jpg";
+                    string path = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
                     File.Delete(path);
                 }
                 else

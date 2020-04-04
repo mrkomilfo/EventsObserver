@@ -31,7 +31,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.Image != null)
             {
-                string path = $"{hostRoot}/img/events/{newEvent.Id}.jpg";
+                string path = $"{hostRoot}\\wwroot\\img\\events\\{newEvent.Id}.jpg";
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
@@ -41,7 +41,7 @@ namespace TrainingProject.DomainLogic.Managers
                 var tag = await _appContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName);
                 if (tag == null)
                 {
-                    tag = _mapper.Map<string, Tag>(tagName.ToLower());
+                    tag = _mapper.Map<string, Tag>(tagName);
                     await _appContext.Tags.AddAsync(tag);
                     await _appContext.SaveChangesAsync(default);
                 }
@@ -61,7 +61,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.Image != null)
             {
-                string path = $"{hostRoot}/img/events/{update.Id}.jpg";
+                string path = $"{hostRoot}\\wwroot\\img\\events\\{update.Id}.jpg";
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
@@ -72,7 +72,7 @@ namespace TrainingProject.DomainLogic.Managers
                 var tag = await _appContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName);
                 if (tag == null)
                 {
-                    tag = _mapper.Map<string, Tag>(tagName.ToLower());
+                    tag = _mapper.Map<string, Tag>(tagName);
                     await _appContext.Tags.AddAsync(tag);
                     await _appContext.SaveChangesAsync(default);
                 }
@@ -92,7 +92,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.HasPhoto)
             {
-                eventToUpdate.Image = $"{hostRoot}/img/events/{eventId}.jpg";
+                eventToUpdate.Image = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
             }
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
             eventToUpdate.Tags = tags;
@@ -108,7 +108,7 @@ namespace TrainingProject.DomainLogic.Managers
                 if (force)
                 {
                     _appContext.Events.Remove(@event);
-                    string path = $"{hostRoot}/img/events/{eventId}.jpg";
+                    string path = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
                     File.Delete(path);
                 }
                 else
@@ -127,17 +127,20 @@ namespace TrainingProject.DomainLogic.Managers
                 return null;
             }
             var eventFullDTO = _mapper.Map<EventFullDTO>(DBEvent);
+
             var participants = await _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).ToListAsync();
             foreach (var participant in participants)
             {
                 eventFullDTO.Participants.Add(participant.Id.ToString(), participant.UserName);
             }
-            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
+            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag.Name).ToHashSet();
             eventFullDTO.Tags = tags;
 
-            string imageName = DBEvent.HasPhoto ? eventId.ToString() : "default";
-            string path = $"{hostRoot}/img/events/{imageName}.jpg";
-            eventFullDTO.Photo = path;
+            if (DBEvent.HasPhoto)
+            {
+                eventFullDTO.Photo = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
+            }
+
             return eventFullDTO;
         }
 
@@ -188,16 +191,19 @@ namespace TrainingProject.DomainLogic.Managers
                 query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
             }
             result.TotalRecords = await query.CountAsync();
-
             result.Records = await _mapper.ProjectTo<EventLiteDTO>(query).ToListAsync(default);
+           
             for (int i = 0; i < result.TotalRecords; i++)
             {
-                var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == result.Records[i].Id).Select(et => et.Tag);
-                result.Records[i].Tags = await _mapper.ProjectTo<string>(tags).ToListAsync(default);
+                var tags = await _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == result.Records[i].Id).Select(et => et.Tag.Name).ToListAsync();
+                result.Records[i].Tags = tags;
 
-                string imageName = result.Records[i].HasPhoto ? result.Records[i].Id.ToString() : "default";
-                string path = $"{hostRoot}/img/events/{imageName}.jpg";
-                result.Records[i].Photo = path;
+                if (result.Records[i].HasPhoto)
+                {
+                    string path = $"{hostRoot}\\wwwroot\\img\\events\\{result.Records[i].Id}.jpg";
+                    result.Records[i].Photo = path;
+                }
+
             }
             return result;
         }

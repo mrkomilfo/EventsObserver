@@ -20,21 +20,27 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.HasPhoto, opt => opt.MapFrom(m => m.Image != null))
                 .ForMember(m => m.PublicationTime, opt => opt.MapFrom(m => DateTime.Now));
             CreateMap<string, Tag>()
-                .ForMember(m => m.Name, opt => opt.MapFrom(m => m));
+                .ForMember(m => m.Name, opt => opt.MapFrom(m => m.ToLower()));
+            CreateMap<Tag, string>()
+               .ConvertUsing(source => source.Name ?? string.Empty);
             CreateMap<EventUpdateDTO, Event>();
-            CreateMap<Event, EventToUpdateDTO>();
+            CreateMap<Event, EventToUpdateDTO>()
+                .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventFullDTO>()
                 .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
                 .ForMember(m => m.Organizer, opt => opt.MapFrom(m => m.Organizer.UserName))
-                .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()));
+                .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()))
+                .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventLiteDTO>()
-                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name));
+                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
+                .ForMember(m => m.Tags, opt => opt.Ignore());
 
             CreateMap<User, UserFullDTO>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
                 .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime == null | m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"))
-                .ForMember(m => m.OrganizedEvents, opt => opt.MapFrom(m => m.OrganizedEvents.Count));
+                .ForMember(m => m.OrganizedEvents, opt => opt.MapFrom(m => m.OrganizedEvents.Count))
+                .ForMember(m => m.VisitedEvents, opt => opt.Ignore());
             CreateMap<User, UserLiteDTO>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))

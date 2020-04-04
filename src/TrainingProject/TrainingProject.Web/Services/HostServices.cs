@@ -12,7 +12,7 @@ namespace TrainingProject.Web.Services
         }
         public string GetHostPath()
         {
-            return _environment.WebRootPath;
+            return _environment.ContentRootPath;
         }
     }
 }
