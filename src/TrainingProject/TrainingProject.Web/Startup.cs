@@ -92,19 +92,19 @@ namespace TrainingProject.Web
             }
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}");
             });
 
             app.UseSpa(spa =>

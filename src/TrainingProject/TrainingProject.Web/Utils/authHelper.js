@@ -27,7 +27,7 @@
 
     getRole: () => {
         let item = sessionStorage.getItem(constants.tokenKey);
-        let role = '';
+        let role = 'Guest';
         if (item) {
             role = JSON.parse(item).role;
         }
