@@ -32,7 +32,7 @@ export class NavMenu extends Component {
     render () {
         let Events = 
             <NavItem>
-                <NavLink tag={Link} to="/">События</NavLink>
+                <NavLink tag={Link} to="/events">События</NavLink>
             </NavItem>;
 
         let NewEvent = this.state.role != 'Guest' ?
@@ -83,4 +83,4 @@ export class NavMenu extends Component {
         </header>
         );
     }
-    }
+}

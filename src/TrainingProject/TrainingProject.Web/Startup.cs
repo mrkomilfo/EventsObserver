@@ -43,6 +43,10 @@ namespace TrainingProject.Web
         {
             services.AddOpenApiDocument();
             services.AddControllers();
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "EventsObserver/build";
+            });
 
             services.AddAuthentication(x =>
             {
@@ -96,7 +100,7 @@ namespace TrainingProject.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles(); 
 
             app.UseRouting();
             app.UseAuthorization();
