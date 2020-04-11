@@ -27,7 +27,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet]
         [Route("Index")]
-        public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 12, string search = null, byte? categoryId = null, string tag = null, bool? upComing = true, bool onlyFree = false,
+        public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 12, string search = null, int? categoryId = null, string tag = null, bool? upComing = true, bool onlyFree = false,
             bool vacancies = false, string organizer = null, string participant = null)
         {
             Guid? organizerGuid;
@@ -47,7 +47,7 @@ namespace TrainingProject.Web.Controllers
                 participantGuid = null;
             }
             var hostRoot = _hostServices.GetHostPath();
-            return Ok(await _eventManager.GetEvents(index, pageSize, hostRoot, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
+            return Ok(await _eventManager.GetEvents(page, pageSize, hostRoot, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
         }
 
         [HttpGet("{eventId}")]

@@ -23,12 +23,12 @@ namespace TrainingProject.DomainLogic.Models.Events
         [Required]
         public string Place { get; set; }
         [Required]
-        public int Fee { get; set; }
+        public decimal Fee { get; set; }
         [Required]
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public ICollection<string> Tags { get; set; }
         public IFormFile Image { get; set; }
         [Required]
-        public bool HasPhoto { get; set; }
+        public bool HasImage { get; set; }
     }
 }

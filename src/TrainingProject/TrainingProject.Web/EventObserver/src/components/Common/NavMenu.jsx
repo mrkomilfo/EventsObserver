@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../../../Utils/authHelper.js'
+import AuthHelper from '../../Utils/authHelper.js';
 
-export class NavMenu extends Component {
+export default class NavMenu extends Component {
     static displayName = NavMenu.name;
 
     constructor (props) {
@@ -32,7 +32,7 @@ export class NavMenu extends Component {
     render () {
         let Events = 
             <NavItem>
-                <NavLink tag={Link} to="/events">События</NavLink>
+                <NavLink tag={Link} to="/">События</NavLink>
             </NavItem>;
 
         let NewEvent = this.state.role != 'Guest' ?
@@ -56,7 +56,7 @@ export class NavMenu extends Component {
                     <NavLink tag={Link} to="/register">Регистрация</NavLink>
                 </NavItem>
                 <NavItem>
-                    <NavLink tag={Link} to="/signIn">Регистрация</NavLink>
+                    <NavLink tag={Link} to="/signIn">Вход</NavLink>
                 </NavItem>
             </> :
             <NavItem>

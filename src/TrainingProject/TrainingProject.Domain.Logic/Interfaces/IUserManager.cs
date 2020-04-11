@@ -13,12 +13,13 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Maybe<UserFullDTO>> GetUser(Guid userId, string hostRoot);
         Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize);
         Task<bool> RegisterUser(RegisterDTO user);
-        Task<Maybe<LoginResponseDTO>> Login(LoginDTO user);
         Task UpdateUser(UserUpdateDTO user, string hostRoot);
         Task<Maybe<UserToUpdateDTO>> GetUserToUpdate(Guid userId, string hostRoot);
         Task DeleteUser(Guid userId, bool force, string hostRoot);
         Task BanUser(BanDTO banDTO);
         Task UnbanUser(Guid userId);
+        DateTime? GetUnlockTime(Guid userId);
+        Task<Maybe<LoginResponseDTO>> Login(LoginDTO model);
         Task ChangeRole(ChangeRoleDTO changeRoleDTO);
         Task<IEnumerable<Role>> GetRoles();
         Task<Maybe<UserRoleDTO>> GetUserWithRole(Guid userId);

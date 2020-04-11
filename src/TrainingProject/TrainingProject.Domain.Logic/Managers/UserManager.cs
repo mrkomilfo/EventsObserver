@@ -15,6 +15,7 @@ using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Users;
+using TrainingProject.Web.Helpers;
 
 namespace TrainingProject.DomainLogic.Managers
 {

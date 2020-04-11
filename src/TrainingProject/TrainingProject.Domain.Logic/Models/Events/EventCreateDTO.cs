@@ -22,7 +22,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         [Required]
         public string Place { get; set; }
         [Required]
-        public int Fee { get; set; }
+        public decimal Fee { get; set; }
         [Required]
         public int ParticipantsLimit { get; set; } //0 - unlimited
         [Required]

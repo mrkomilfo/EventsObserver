@@ -5,19 +5,14 @@ namespace TrainingProject.DomainLogic.Models.Events
 {
     public sealed class EventLiteDTO
     {
-        public EventLiteDTO()
-        {
-            Tags = new HashSet<string>();
-        }
         public int Id { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }
         public string Category { get; set; }
         public DateTime Start { get; set; }
         public string Place { get; set; }
-        public int Fee { get; set; } //0 - unlimited
-        public ICollection<string> Tags { get; set; }
-        public bool HasPhoto { get; set; }
-        public string Photo { get; set; }
+        public decimal Fee { get; set; } //0 - unlimited
+        public bool HasImage { get; set; }
+        public string Image { get; set; }
     }
 }

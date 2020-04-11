@@ -1,14 +1,14 @@
-﻿import React from 'react';
+﻿import React, { Component } from 'react';
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
 
-export class EventsPaginator extends Component {
+export default class EventsPaginator extends Component {
     render() {
         let pagePath = '/events?page='
 
-        let params = queryString.parse(location.search);
+        let params = queryString.parse(window.location.search);
         let queryTrailer = '';
         if (params.pageSize){
             queryTrailer += `&pageSize=${params.pageSize}`
@@ -41,18 +41,18 @@ export class EventsPaginator extends Component {
         let leftArrows = this.props.currentPage == 0 ? 
         <>
             <PaginationItem disabled>
-                <PaginationLink first href="#" />
+                <PaginationLink>«</PaginationLink>
             </PaginationItem>
             <PaginationItem disabled>
-                <PaginationLink previous href="#" />
+                    <PaginationLink>‹</PaginationLink>
             </PaginationItem>
         </> :
         <>
             <PaginationItem>
-                <PaginationLink first tag={Link} to={`${pagePath}${0}${queryTrailer}`} />
+                    <PaginationLink tag={Link} to={`${pagePath}${0}${queryTrailer}`}>«</PaginationLink>
             </PaginationItem>
             <PaginationItem>
-                <PaginationLink previous tag={Link} to={`${pagePath}${this.props.currentPage - 1}${queryTrailer}`} />
+                    <PaginationLink tag={Link} to={`${pagePath}${this.props.currentPage - 1}${queryTrailer}`}>‹</PaginationLink>
             </PaginationItem>
         </>;
         let prevprev = this.props.currentPage - 2 >= 0 ?
@@ -73,33 +73,33 @@ export class EventsPaginator extends Component {
             {this.props.currentPage + 1}
             </PaginationLink>
          </PaginationItem>;
-         let next = this.props.currentPage + 2 <= this.props.pages ?
+         let next = this.props.currentPage + 2 <= this.props.totalPages ?
          <PaginationItem>
              <PaginationLink tag={Link} to={`${pagePath}${this.props.currentPage + 1}${queryTrailer}`}>
              {this.props.currentPage + 2}
              </PaginationLink>
          </PaginationItem> : null;
-        let nextnext = this.props.currentPage + 3 <= this.props.pages ?
+        let nextnext = this.props.currentPage + 3 <= this.props.totalPages ?
         <PaginationItem>
             <PaginationLink tag={Link} to={`${pagePath}${this.props.currentPage + 2}${queryTrailer}`}>
             {this.props.currentPage + 3}
             </PaginationLink>
         </PaginationItem> : null;
-        let rightArrows = this.props.currentPage >= this.props.pages-1 ? 
+        let rightArrows = this.props.currentPage >= this.props.totalPages-1 ? 
         <>
             <PaginationItem disabled>
-                <PaginationLink first href="#" />
+                <PaginationLink>›</PaginationLink>
             </PaginationItem>
             <PaginationItem disabled>
-                <PaginationLink previous href="#" />
+                    <PaginationLink>»</PaginationLink>
             </PaginationItem>
         </> :
         <>
             <PaginationItem>
-                <PaginationLink next tag={Link} to={`${pagePath}${this.props.currentPage + 1}${queryTrailer}`} />
+                <PaginationLink tag={Link} to={`${pagePath}${this.props.currentPage + 1}${queryTrailer}`}>›</PaginationLink>
             </PaginationItem>
             <PaginationItem>
-                <PaginationLink last tag={Link} to={`${pagePath}${this.props.pages - 1}${queryTrailer}`} />
+                <PaginationLink tag={Link} to={`${pagePath}${this.props.totalPages - 1}${queryTrailer}`}>»</PaginationLink>
             </PaginationItem>
         </>;
         return (
@@ -116,7 +116,7 @@ export class EventsPaginator extends Component {
     }
 }
 
-EventPaginator.propTypes = {
+EventsPaginator.propTypes = {
     currentPage: PropTypes.number.isRequired,
-    pages: PropTypes.number.isRequired
+    totalPages: PropTypes.number.isRequired
 };

@@ -138,13 +138,13 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (DBEvent.HasPhoto)
             {
-                eventFullDTO.Photo = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
+                eventFullDTO.Image = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
             }
 
             return eventFullDTO;
         }
 
-        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostRoot, string search, byte? categoryId, string tag, bool? upComing, bool onlyFree,
+        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostRoot, string search, int? categoryId, string tag, bool? upComing, bool onlyFree,
             bool vacancies, Guid? organizer, Guid? participant)
         {
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
@@ -195,13 +195,10 @@ namespace TrainingProject.DomainLogic.Managers
            
             for (int i = 0; i < result.TotalRecords; i++)
             {
-                var tags = await _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == result.Records[i].Id).Select(et => et.Tag.Name).ToListAsync();
-                result.Records[i].Tags = tags;
-
-                if (result.Records[i].HasPhoto)
+                if (result.Records[i].HasImage)
                 {
                     string path = $"{hostRoot}\\wwwroot\\img\\events\\{result.Records[i].Id}.jpg";
-                    result.Records[i].Photo = path;
+                    result.Records[i].Image = path;
                 }
 
             }

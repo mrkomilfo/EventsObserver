@@ -32,8 +32,7 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventLiteDTO>()
-                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
-                .ForMember(m => m.Tags, opt => opt.Ignore());
+                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name));
 
             CreateMap<User, UserFullDTO>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))

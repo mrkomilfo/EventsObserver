@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TrainingProject.DomainLogic;
 using TrainingProject.Data;
 using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
@@ -24,6 +23,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using TrainingProject.Web.Helpers;
 
 namespace TrainingProject.Web
 {

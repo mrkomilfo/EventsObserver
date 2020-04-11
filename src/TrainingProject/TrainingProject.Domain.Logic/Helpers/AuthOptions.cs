@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace TrainingProject.DomainLogic.Helpers
+namespace TrainingProject.Web.Helpers
 {
 	public class AuthOptions
 	{

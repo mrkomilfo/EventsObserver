@@ -1,30 +1,32 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
-import { Layout } from './components/Common/Layout';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import Layout from './components/Common/Layout';
+import Events from './components/Events/Events';
 
 export default class App extends Component {
-  static displayName = App.name;
-
   render () {
     return (
-      <Layout>
-        <Route exact path='/' component={Events} />
-        <Route path='/event' component={Event} />
-        <Route path='/newEvent' component={NewEvent} />
-        <Route path='/editEvent' component={EditEvent} />
+        <Layout>
+            <Switch>
+            <Route path='/events' component={Events} />
+            <Route exact path='/' render={() => (<Redirect to='/events' />)} />
+            {/*<Route path='/event' component={Event} />
+            <Route path='/newEvent' component={NewEvent} />
+            <Route path='/editEvent' component={EditEvent} />
 
-        <Route path='/users' component={Users} />
-        <Route path='/profile' component={Profile} />
-        <Route path='/register' component={Register} />
-        <Route path='/signIn' component={SignIn} />
-        <Route path='/editProfile' component={editProfile} />
-        <Route path='/roles' component={Roles} />
+            <Route path='/users' component={Users} />
+            <Route path='/profile' component={Profile} />
+            <Route path='/register' component={Register} />
+            <Route path='/signIn' component={SignIn} />
+            <Route path='/editProfile' component={editProfile} />
+            <Route path='/roles' component={Roles} />
 
-        <Route path='/categories' component={Categories} />
-        <Route path='/category' component={Category} />
-        <Route path='/newCategory' component={NewCategory} />
-        <Route path='/editCategory' component={EditCategory} />
-      </Layout>
+            <Route path='/categories' component={Categories} />
+            <Route path='/category' component={Category} />
+            <Route path='/newCategory' component={NewCategory} />
+            <Route path='/editCategory' component={EditCategory} />*/}
+            </Switch>
+        </Layout>
     );
   }
 }

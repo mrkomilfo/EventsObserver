@@ -6,7 +6,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render(
-  <BrowserRouter basename="EventsObserver">
+  <BrowserRouter>
     <App />
   </BrowserRouter>,
   document.getElementById('root'));

@@ -1,6 +1,6 @@
 {
-  "short_name": "TestReact",
-  "name": "TestReact",
+  "short_name": "EventsObserver",
+  "name": "EventsObserver",
   "icons": [
     {
       "src": "favicon.ico",

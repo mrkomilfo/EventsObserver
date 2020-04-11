@@ -1,14 +1,14 @@
 ﻿export default {
     saveAuth: (id, token, role) => {
-        sessionStorage.setItem(constants.tokenKey, JSON.stringify({ userId: id, access_token: token, role: role }));
+        sessionStorage.setItem('tokenKey', JSON.stringify({ userId: id, access_token: token, role: role }));
     },
 
     clearAuth: () => {
-        sessionStorage.removeItem(constants.tokenKey);
+        sessionStorage.removeItem('tokenKey');
     },
 
     getId: () => {
-        let item = sessionStorage.getItem(constants.tokenKey);
+        let item = sessionStorage.getItem('tokenKey');
         let id = '';
         if (item) {
             id = JSON.parse(item).userId;
@@ -17,7 +17,7 @@
     },
 
     isLogged: () => {
-        let item = sessionStorage.getItem(constants.tokenKey);
+        let item = sessionStorage.getItem('tokenKey');
         if (item) {
             return true;
         } else {
@@ -26,7 +26,7 @@
     },
 
     getRole: () => {
-        let item = sessionStorage.getItem(constants.tokenKey);
+        let item = sessionStorage.getItem('tokenKey');
         let role = 'Guest';
         if (item) {
             role = JSON.parse(item).role;
@@ -35,7 +35,7 @@
     },
 
     getToken: () => {
-        let item = sessionStorage.getItem(constants.tokenKey);
+        let item = sessionStorage.getItem('tokenKey');
         let token = null;
         if (item) {
             token = JSON.parse(item).access_token;

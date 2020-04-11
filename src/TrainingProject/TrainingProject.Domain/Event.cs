@@ -18,7 +18,7 @@ namespace TrainingProject.Domain
         public string Description { get; set; }
         public DateTime Start { get; set; }
         public string Place { get; set; }
-        public int Fee { get; set; }
+        public decimal Fee { get; set; }
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public Guid? OrganizerId { get; set; }
         public User Organizer { get; set; }
