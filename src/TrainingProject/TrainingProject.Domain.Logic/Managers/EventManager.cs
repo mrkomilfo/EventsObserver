@@ -90,7 +90,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             EventToUpdateDTO eventToUpdate = _mapper.Map<EventToUpdateDTO>(@event);
 
-            if (@event.HasPhoto)
+            if (@event.HasImage)
             {
                 eventToUpdate.Image = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
             }
@@ -136,7 +136,7 @@ namespace TrainingProject.DomainLogic.Managers
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag.Name).ToHashSet();
             eventFullDTO.Tags = tags;
 
-            if (DBEvent.HasPhoto)
+            if (DBEvent.HasImage)
             {
                 eventFullDTO.Image = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
             }
@@ -144,7 +144,7 @@ namespace TrainingProject.DomainLogic.Managers
             return eventFullDTO;
         }
 
-        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string hostRoot, string search, int? categoryId, string tag, bool? upComing, bool onlyFree,
+        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree,
             bool vacancies, Guid? organizer, Guid? participant)
         {
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
@@ -197,7 +197,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 if (result.Records[i].HasImage)
                 {
-                    string path = $"{hostRoot}\\wwwroot\\img\\events\\{result.Records[i].Id}.jpg";
+                    string path = $"img\\events\\{result.Records[i].Id}.jpg";
                     result.Records[i].Image = path;
                 }
 

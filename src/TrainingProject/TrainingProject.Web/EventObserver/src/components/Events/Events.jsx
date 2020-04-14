@@ -2,6 +2,7 @@
 import queryString from 'query-string';
 import EventMedia from './EventMedia';
 import EventsPaginator from './EventsPaginator';
+import EventsSideBar from './EventsSideBar';
 
 export default class Events extends Component {
     constructor(props) {
@@ -16,26 +17,45 @@ export default class Events extends Component {
 
     renderEventsList(events){
         return(
-        <div>
-            <p>{`Найдено событий: ${this.state.totalRecords}`}</p>
-            <ul>
-                {this.state.events.map(e => <li key={e.id}><EventMedia event={e}/><hr/></li>)}
-            </ul>
-            <EventsPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>
-        </div>
+
+            <div>
+                <p>{`Найдено событий: ${this.state.totalRecords}`}</p>
+                <ul>
+                    {this.state.events.map(e => <li style={{listStyleType: 'none'}} key={e.id}><EventMedia event={e}/><hr/></li>)}
+                </ul>
+                <EventsPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>
+            </div>             
         )
     }
 
     render() {
+        const pageStyle = {
+            display: 'flex'
+            
+        }
+        const contentStyle = {
+            width: '100%'
+        }
+        const filterStyle = {
+            float: 'right',
+            width: '240px',
+            margin: '0px 0px 0px 32px'
+        }
+
         let contents = this.state.loading
           ? <p><em>Loading...</em></p>
           : this.renderEventsList(this.state.events);
     
         return (
-          <div>
-            <h1 id="tabelLabel">События в Минске</h1>
-            {contents}
-          </div>
+            <div style={pageStyle}>
+                <div style={contentStyle}>
+                    <h1 id="tabelLabel">События в Минске</h1>
+                    {contents}
+                </div>
+                <div style={filterStyle}>
+                <EventsSideBar />
+                </div>
+            </div>
         );
     }
 

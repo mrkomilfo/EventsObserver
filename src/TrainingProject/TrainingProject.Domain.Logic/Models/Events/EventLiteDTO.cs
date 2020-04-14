@@ -9,7 +9,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public string Name { get; set; }
         public int? CategoryId { get; set; }
         public string Category { get; set; }
-        public DateTime Start { get; set; }
+        public string Start { get; set; }
         public string Place { get; set; }
         public decimal Fee { get; set; } //0 - unlimited
         public bool HasImage { get; set; }

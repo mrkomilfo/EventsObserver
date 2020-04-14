@@ -54,11 +54,12 @@ namespace TrainingProject.Data
                         CategoryId = categories.ElementAtOrDefault(1)?.Id,
                         Description = "Лекция на тему привязанностей от магистранта факультета психологии БГУ",
                         Place = "Октябрьская 16",
-                        Start = new DateTime(2020, 03, 20, 15, 0, 0),
+                        Start = DateTime.Now.AddDays(30),
                         Fee = 0,
                         ParticipantsLimit = 20,
                         OrganizerId = context.Users.Select(u => u.Id).FirstOrDefault(),
                         PublicationTime = new DateTime(2020, 03, 10, 15, 0, 0),
+                        HasImage = true
                     },
                     new Event()
                     {
@@ -66,7 +67,7 @@ namespace TrainingProject.Data
                         CategoryId = categories.ElementAtOrDefault(1)?.Id,
                         Description = "Лекция на тему изменения климата",
                         Place = "Октябрьская 16",
-                        Start = new DateTime(2020, 03, 30, 15, 0, 0),
+                        Start = DateTime.Now.AddDays(30),
                         Fee = 0,
                         ParticipantsLimit = 20,
                         OrganizerId = context.Users.Select(u => u.Id).FirstOrDefault(),

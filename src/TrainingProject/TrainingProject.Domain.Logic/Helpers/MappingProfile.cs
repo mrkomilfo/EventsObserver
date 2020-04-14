@@ -17,7 +17,7 @@ namespace TrainingProject.DomainLogic.Helpers
 
             CreateMap<EventCreateDTO, Event>()
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => Guid.Parse(m.OrganizerId)))
-                .ForMember(m => m.HasPhoto, opt => opt.MapFrom(m => m.Image != null))
+                .ForMember(m => m.HasImage, opt => opt.MapFrom(m => m.Image != null))
                 .ForMember(m => m.PublicationTime, opt => opt.MapFrom(m => DateTime.Now));
             CreateMap<string, Tag>()
                 .ForMember(m => m.Name, opt => opt.MapFrom(m => m.ToLower()));
@@ -32,7 +32,8 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventLiteDTO>()
-                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name));
+                .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
+                .ForMember(m => m.Start, opt => opt.MapFrom(m => m.Start.ToString("f")));
 
             CreateMap<User, UserFullDTO>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))

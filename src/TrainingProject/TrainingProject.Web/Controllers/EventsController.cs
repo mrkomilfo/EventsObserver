@@ -47,7 +47,7 @@ namespace TrainingProject.Web.Controllers
                 participantGuid = null;
             }
             var hostRoot = _hostServices.GetHostPath();
-            return Ok(await _eventManager.GetEvents(page, pageSize, hostRoot, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
+            return Ok(await _eventManager.GetEvents(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
         }
 
         [HttpGet("{eventId}")]

@@ -25,7 +25,7 @@ namespace TrainingProject.Domain
         public ICollection<User> Participants { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public DateTime PublicationTime { get; set; }
-        public bool HasPhoto { get; set; }
+        public bool HasImage { get; set; }
         public bool IsDeleted { get; set; }
     }
 }
