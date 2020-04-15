@@ -151,7 +151,7 @@ namespace TrainingProject.DomainLogic.Managers
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
             if (search != null)
             {
-                query = query.Where(e => e.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(e => e.Name.ToLower().Contains(search.ToLower()));
             }
             if (categoryId != null)
             {
@@ -171,7 +171,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             if (vacancies)
             {
-                query = query.Where(e => e.ParticipantsLimit == 0 || e.Participants.Count() < e.ParticipantsLimit);
+                query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Where(eu => eu.EventId == e.Id).Count() < e.ParticipantsLimit);
             }
             if (organizer != null)
             {

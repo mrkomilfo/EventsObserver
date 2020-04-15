@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import Layout from './components/Common/Layout';
 import Events from './components/Events/Events';
+import SignUp from './components/Users/SignUp';
+import SignIn from './components/Users/SignIn';
 
 export default class App extends Component {
   render () {
@@ -15,10 +17,10 @@ export default class App extends Component {
             <Route path='/editEvent' component={EditEvent} />
 
             <Route path='/users' component={Users} />
-            <Route path='/profile' component={Profile} />
-            <Route path='/register' component={Register} />
+            <Route path='/profile' component={Profile} />*/}
+            <Route path='/signUp' component={SignUp} />
             <Route path='/signIn' component={SignIn} />
-            <Route path='/editProfile' component={editProfile} />
+            {/*<Route path='/editProfile' component={editProfile} />
             <Route path='/roles' component={Roles} />
 
             <Route path='/categories' component={Categories} />

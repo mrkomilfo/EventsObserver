@@ -53,7 +53,7 @@ export default class NavMenu extends Component {
         let Identity = this.state.role == 'Guest' ?
             <>
                 <NavItem>
-                    <NavLink tag={Link} to="/register">Регистрация</NavLink>
+                    <NavLink tag={Link} to="/signUp">Регистрация</NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink tag={Link} to="/signIn">Вход</NavLink>

@@ -7,7 +7,7 @@ import EventsSideBar from './EventsSideBar';
 export default class Events extends Component {
     constructor(props) {
         super(props);
-        this.state = { events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true };
+        this.state = { query: window.location.search, events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true };
         this.renderEventsList = this.renderEventsList.bind(this);
     }
 
@@ -15,9 +15,15 @@ export default class Events extends Component {
         this.populateEventsData();
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.state.query != window.location.search) {
+            this.setState({ query: window.location.search });
+            this.populateEventsData();
+        }
+    }
+
     renderEventsList(events){
         return(
-
             <div>
                 <p>{`Найдено событий: ${this.state.totalRecords}`}</p>
                 <ul>
@@ -31,7 +37,6 @@ export default class Events extends Component {
     render() {
         const pageStyle = {
             display: 'flex'
-            
         }
         const contentStyle = {
             width: '100%'
@@ -49,11 +54,11 @@ export default class Events extends Component {
         return (
             <div style={pageStyle}>
                 <div style={contentStyle}>
-                    <h1 id="tabelLabel">События в Минске</h1>
+                    <h2 id="tabelLabel">События в Минске</h2>
                     {contents}
                 </div>
                 <div style={filterStyle}>
-                <EventsSideBar />
+                    <EventsSideBar />
                 </div>
             </div>
         );
