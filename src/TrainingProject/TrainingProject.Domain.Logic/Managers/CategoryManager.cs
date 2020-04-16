@@ -8,6 +8,7 @@ using TrainingProject.DomainLogic.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using TrainingProject.DomainLogic.Models.Categories;
 using CSharpFunctionalExtensions;
+using System;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -24,7 +25,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<bool> AddCategory(CategoryCreateDTO category)
         {
-            if (await _appContext.Categories.AnyAsync(c => c.Name.ToLower() == category.Name.ToLower()))
+            if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name, category.Name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 return false;
             }

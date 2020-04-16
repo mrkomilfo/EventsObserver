@@ -38,7 +38,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             foreach (var tagName in @event.Tags)
             {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName);
+                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name, tagName, StringComparison.CurrentCultureIgnoreCase));
                 if (tag == null)
                 {
                     tag = _mapper.Map<string, Tag>(tagName);
@@ -69,7 +69,7 @@ namespace TrainingProject.DomainLogic.Managers
             _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
             foreach (var tagName in @event.Tags)
             {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName);
+                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name, tagName, StringComparison.CurrentCultureIgnoreCase));
                 if (tag == null)
                 {
                     tag = _mapper.Map<string, Tag>(tagName);
@@ -119,7 +119,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public async Task<Maybe<EventFullDTO>> GetEvent(int eventId, string hostRoot)
+        public async Task<Maybe<EventFullDTO>> GetEvent(int eventId)
         {
             var DBEvent = await _appContext.Events.Include(e=>e.Organizer).Include(e=>e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
             if (DBEvent == null)
@@ -138,7 +138,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (DBEvent.HasImage)
             {
-                eventFullDTO.Image = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
+                eventFullDTO.Image = $"img\\events\\{eventId}.jpg";
             }
 
             return eventFullDTO;

@@ -58,7 +58,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<bool> RegisterUser(RegisterDTO user)
         {
-            if (await _appContext.Users.AnyAsync(u => u.Login == user.Login))
+            if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login, user.Login, StringComparison.CurrentCultureIgnoreCase)))
             {
                 return false;
             }

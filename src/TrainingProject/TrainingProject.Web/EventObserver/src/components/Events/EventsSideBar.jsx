@@ -101,7 +101,7 @@ export default class EventsSideBar extends Component {
                     <Label for="name">Название</Label>
                     <Input type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup> 
                     <Label for="category">Категория</Label>
                     <Input type="select" name="category" id="category" value={this.state.category} onChange={this.handleInputChange}>
                         {renderCategories}
@@ -152,7 +152,7 @@ export default class EventsSideBar extends Component {
     }
 
     async populateCategories() {
-        const response = await fetch('api/Categories/Index');
+        const response = await fetch('api/Categories');
         const data = await response.json();
         data.unshift({id: 0, name: 'Не выбрано'})
         this.setState({ categories: data });

@@ -28,7 +28,6 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Index")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<Page<UserLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 12)
         {
@@ -41,7 +40,6 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Route("Details")]
         public async Task<ActionResult<UserFullDTO>> Details([FromQuery] string userId)
         {
             var hostRoot = _hostServices.GetHostPath();
@@ -52,7 +50,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("Register")]
         public async Task<ActionResult> Create([FromBody] RegisterDTO registerDTO)
         {
             if (ModelState.IsValid)
@@ -65,7 +62,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet("{userId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Update")]
+        [Route("update")]
         public async Task<ActionResult<UserToUpdateDTO>> Update(string userId)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -82,7 +79,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Update")]
         public async Task<ActionResult> Update([FromBody] UserUpdateDTO userUpdateDTO)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -102,7 +98,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpDelete("{userId}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("Delete")]
         public async Task<ActionResult> Delete(string userId)
         {
             var hostRoot = _hostServices.GetHostPath();
@@ -112,7 +107,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Ban")]
+        [Route("ban")]
         public async Task<ActionResult> Ban(BanDTO banDTO)
         {
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -131,7 +126,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut("{userId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Unban")]
+        [Route("unban")]
         public async Task<ActionResult> Unban(string userId)
         {
             if (!Guid.TryParse(userId, out Guid userGuid))
@@ -150,7 +145,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("Roles")]
+        [Route("roles")]
         public async Task<ActionResult<IEnumerable<Role>>> Roles()
         {
             return Ok(await _userManager.GetRoles());
@@ -158,7 +153,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet("{userId}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("ChangeRole")]
+        [Route("role")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
             return await _userManager.GetUserWithRole(Guid.Parse(userId))
@@ -168,7 +163,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut("{userId}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("ChangeRole")]
+        [Route("role")]
         public async Task<ActionResult> ChangeRole([FromBody] ChangeRoleDTO changeRoleDTO)
         {
             if (ModelState.IsValid)

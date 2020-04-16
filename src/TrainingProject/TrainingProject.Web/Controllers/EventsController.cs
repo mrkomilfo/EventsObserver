@@ -26,7 +26,6 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Index")]
         public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 12, string search = null, int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizer = null, string participant = null)
         {
@@ -50,18 +49,15 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet("{eventId}")]
-        [Route("Details")]
         public async Task<ActionResult<EventFullDTO>> Details([FromQuery] int eventId)
         {
-            var hostRoot = _hostServices.GetHostPath();
-            return await _eventManager.GetEvent(eventId, hostRoot)
+            return await _eventManager.GetEvent(eventId)
                 .ToResult(NotFound($"Event with id = {eventId} was not found"))
                 .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Create")]
         public async Task<ActionResult> Create([FromBody] EventCreateDTO eventCreateDTO)
         {
             if (ModelState.IsValid)
@@ -75,7 +71,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet("{eventId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Update")]
+        [Route("update")]
         public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -93,7 +89,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Update")]
         public async Task<ActionResult> Update([FromBody] EventUpdateDTO eventUpdateDTO)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -114,7 +109,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpDelete("{eventId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("Delete")]
         public async Task<ActionResult> Delete(int eventId)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;

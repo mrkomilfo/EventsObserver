@@ -21,14 +21,12 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Index")]
         public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> Index()
         {
             return Ok(await _categoryManager.GetCategories());
         }
 
         [HttpGet("{categoryId}")]
-        [Route("Details")]
         public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
         {
             return await _categoryManager.GetCategory(categoryId)
@@ -38,7 +36,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        [Route("Create")]
         public async Task<ActionResult> Create([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             if (ModelState.IsValid)
@@ -51,7 +48,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        [Route("Update")]
         public async Task<ActionResult> Update([FromBody] Category category)
         {
             if (ModelState.IsValid)
@@ -64,7 +60,6 @@ namespace TrainingProject.Web.Controllers
 
         [HttpDelete("{categoryId}")]
         [Authorize(Roles = "Admin")]
-        [Route("Delete")]
         public ActionResult Delete(int categoryId)
         {
             _categoryManager.DeleteCategory(categoryId, false);
