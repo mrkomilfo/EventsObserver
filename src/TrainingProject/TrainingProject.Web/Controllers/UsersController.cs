@@ -43,9 +43,7 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<UserFullDTO>> Details([FromQuery] string userId)
         {
             var hostRoot = _hostServices.GetHostPath();
-            return await _userManager.GetUser(Guid.Parse(userId), hostRoot)
-                .ToResult(NotFound($"User with id = {userId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _userManager.GetUser(Guid.Parse(userId)));
         }
 
         [HttpPost]
@@ -71,9 +69,7 @@ namespace TrainingProject.Web.Controllers
                 return Forbid("Access denied");
             }
             var hostRoot = _hostServices.GetHostPath();
-            return await _userManager.GetUserToUpdate(Guid.Parse(userId), hostRoot)
-                .ToResult(NotFound($"User with id = {userId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _userManager.GetUserToUpdate(Guid.Parse(userId)));
         }
 
         [HttpPut]
@@ -152,9 +148,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
-            return await _userManager.GetUserWithRole(Guid.Parse(userId))
-                .ToResult(NotFound($"User with id = {userId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _userManager.GetUserWithRole(Guid.Parse(userId)));
         }
 
         [HttpPut("role")]

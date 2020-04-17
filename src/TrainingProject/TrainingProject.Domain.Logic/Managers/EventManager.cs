@@ -9,7 +9,6 @@ using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
-using CSharpFunctionalExtensions;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -53,10 +52,11 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task UpdateEvent(EventUpdateDTO @event, string hostRoot)
         {
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
-            if (update != null)
+            if (update == null)
             {
-                _mapper.Map(@event, update);
+                throw new NullReferenceException($"Event with id={@event.Id} not found");
             }
+            _mapper.Map(@event, update);
             await _appContext.SaveChangesAsync(default);
 
             if (@event.Image != null)
@@ -81,18 +81,18 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<Maybe<EventToUpdateDTO>> GetEventToUpdate(int eventId, string hostRoot)
+        public async Task<EventToUpdateDTO> GetEventToUpdate(int eventId)
         {
             var @event = await _appContext.Events.Include(e=>e.Tags).FirstOrDefaultAsync(e => e.Id == eventId);
             if (@event == null)
             {
-                return null;
+                throw new NullReferenceException($"Event with id={eventId} not found");
             }
             EventToUpdateDTO eventToUpdate = _mapper.Map<EventToUpdateDTO>(@event);
 
             if (@event.HasImage)
             {
-                eventToUpdate.Image = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
+                eventToUpdate.Image = $"img\\events\\{eventId}.jpg";
             }
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
             eventToUpdate.Tags = tags;
@@ -103,28 +103,29 @@ namespace TrainingProject.DomainLogic.Managers
         {
             var @event = await _appContext.Events.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(c => c.Id == eventId);
-            if (@event != null)
+            if (@event == null)
             {
-                if (force)
-                {
-                    _appContext.Events.Remove(@event);
-                    string path = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
-                    File.Delete(path);
-                }
-                else
-                {
-                    @event.IsDeleted = true;
-                }
-                await _appContext.SaveChangesAsync(default);
+                throw new NullReferenceException($"Event with id={eventId} not found");
             }
+            if (force)
+            {
+                _appContext.Events.Remove(@event);
+                string path = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
+                File.Delete(path);
+            }
+            else
+            {
+                @event.IsDeleted = true;
+            }
+            await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<Maybe<EventFullDTO>> GetEvent(int eventId)
+        public async Task<EventFullDTO> GetEvent(int eventId)
         {
             var DBEvent = await _appContext.Events.Include(e=>e.Organizer).Include(e=>e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
             if (DBEvent == null)
             {
-                return null;
+                throw new NullReferenceException($"Event with id={eventId} not found");
             }
             var eventFullDTO = _mapper.Map<EventFullDTO>(DBEvent);
 
@@ -200,13 +201,32 @@ namespace TrainingProject.DomainLogic.Managers
                     string path = $"img\\events\\{result.Records[i].Id}.jpg";
                     result.Records[i].Image = path;
                 }
-
             }
             return result;
         }
 
         public async Task SignUp(Guid userId, int eventId)
         {
+            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            {
+                throw new NullReferenceException($"User with id={userId} not found");
+            }
+            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
+            {
+                throw new NullReferenceException($"Event with id={eventId} not found");
+            }
+            if (await _appContext.EventsUsers.AnyAsync(eu => eu.ParticipantId == userId && eu.EventId == eventId))
+            {
+                throw new ArgumentException($"User(id={userId}) is already signed up on event(id={eventId})");
+            }
+            if (await _appContext.EventsUsers.Where(eu => eu.EventId == eventId).CountAsync() >= (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit)
+            {
+                throw new ArgumentException($"No vacancies on event(id={eventId})");
+            }
+            if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
+            {
+                throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
+            }
             var eu = new EventsUsers { ParticipantId = userId, EventId = eventId};
             await _appContext.EventsUsers.AddAsync(eu);
             await _appContext.SaveChangesAsync(default);
@@ -214,7 +234,24 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task Unsubscribe(Guid userId, int eventId)
         {
-            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu=>eu.EventId == eventId && eu.ParticipantId == userId);
+            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            {
+                throw new NullReferenceException($"User with id={userId} not found");
+            }
+            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
+            {
+                throw new NullReferenceException($"Event with id={eventId} not found");
+            }
+            if (!await _appContext.EventsUsers.AnyAsync(eu => eu.ParticipantId == userId && eu.EventId == eventId))
+            {
+                throw new NullReferenceException($"User(id={userId}) is not signed up on event(id={eventId})");
+            }
+            if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
+            {
+                throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
+            }
+
+            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu => eu.EventId == eventId && eu.ParticipantId == userId);
             if (eu != null)
             {
                 _appContext.EventsUsers.Remove(eu);
@@ -224,6 +261,10 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Guid?> GetEventOrganizerId(int eventId)
         {
+            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
+            {
+                throw new NullReferenceException($"Event with id={eventId} not found");
+            }
             return (await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId))?.OrganizerId;
         }
     }

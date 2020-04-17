@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TrainingProject.Data;
@@ -30,18 +29,18 @@ namespace TrainingProject.DomainLogic.Managers
             _mapper = mapper;
         }
 
-        public async Task<Maybe<UserFullDTO>> GetUser(Guid userId, string hostRoot)
+        public async Task<UserFullDTO> GetUser(Guid userId)
         {
             var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
             if (DBUser == null)
             {
-                return null;
+                throw new NullReferenceException($"User with id={userId} not found");
             }
             var user = _mapper.Map<UserFullDTO>(DBUser);
             user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
 
             string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
-            string path = $"{hostRoot}\\wwroot\\img\\users\\{imageName}.jpg";
+            string path = $"img\\users\\{imageName}.jpg";
             user.Photo = path;
 
             return user;
@@ -56,47 +55,46 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task<bool> RegisterUser(RegisterDTO user)
+        public async Task RegisterUser(RegisterDTO user)
         {
             if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login, user.Login, StringComparison.CurrentCultureIgnoreCase)))
             {
-                return false;
+                throw new ArgumentException($"User with login \"{user.Login}\" is already exist");
             }
             User newUser = _mapper.Map<User>(user);
             newUser.RoleId = (await _appContext.Roles.FirstOrDefaultAsync(r => r.Name == "User"))?.Id;
             await _appContext.Users.AddAsync(newUser);
             await _appContext.SaveChangesAsync(default);
-            return true;
         }
 
         public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
         {
             User updatedUser = await _appContext.Users.FindAsync(user.Id);
-            if (updatedUser != null)
+            if (updatedUser == null)
             {
-                _mapper.Map(user, updatedUser);
-                if (user.Photo != null)
-                {
-                    string path = $"{hostRoot}\\wwroot\\img\\users\\{updatedUser.Id}.jpg";
-                    await using var fileStream = new FileStream(path, FileMode.Create);
-                    await user.Photo.CopyToAsync(fileStream);
-                }
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
-
+            _mapper.Map(user, updatedUser);
+            if (user.Photo != null)
+            {
+                string path = $"{hostRoot}\\wwroot\\img\\users\\{updatedUser.Id}.jpg";
+                await using var fileStream = new FileStream(path, FileMode.Create);
+                await user.Photo.CopyToAsync(fileStream);
+            }
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<Maybe<UserToUpdateDTO>> GetUserToUpdate(Guid userId, string hostRoot)
+        public async Task<UserToUpdateDTO> GetUserToUpdate(Guid userId)
         {
             User user = await _appContext.Users.FindAsync(userId);
             if (user == null)
             {
-                return null;
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
             UserToUpdateDTO userToUpdate = _mapper.Map<UserToUpdateDTO>(user);
             if (userToUpdate.HasPhoto)
             {
-                userToUpdate.Photo = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
+                userToUpdate.Photo = $"img\\users\\{userId}.jpg";
             }
             return userToUpdate;
         }
@@ -105,57 +103,69 @@ namespace TrainingProject.DomainLogic.Managers
         {
             var user = await _appContext.Users.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(u => u.Id == userId);
-            if (user != null)
+            if (user == null)
             {
-                if (force)
-                {
-                    _appContext.Users.Remove(user);
-                    string path = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
-                    File.Delete(path);
-                }
-                else
-                {
-                    user.IsDeleted = true;
-                }
-                await _appContext.SaveChangesAsync(default);
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
+            if (force)
+            {
+                _appContext.Users.Remove(user);
+                string path = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
+                File.Delete(path);
+            }
+            else
+            {
+                user.IsDeleted = true;
+            }
+            await _appContext.SaveChangesAsync(default);
         }
 
         public async Task BanUser(BanDTO banDTO)
         {
             var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(banDTO.UserId));
-            if (user != null)
+            if (user == null)
             {
-                user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
-                user.UnlockTime = DateTime.Now.AddHours(banDTO?.Hours ?? 0);
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
+            user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
+            user.UnlockTime = DateTime.Now.AddHours(banDTO?.Hours ?? 0);
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task UnbanUser(Guid userId)
         {
             var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user != null)
+            if (user == null)
             {
-                user.UnlockTime = DateTime.Now;
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
+            user.UnlockTime = DateTime.Now;
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task ChangeRole(ChangeRoleDTO changeRoleDTO)
         {
             var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDTO.UserId));
-            if (user != null)
+            if (user == null)
             {
-                user.RoleId = changeRoleDTO.RoleId;
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
+            if (!await _appContext.Roles.AnyAsync(r => r.Id == changeRoleDTO.RoleId))
+            {
+                throw new NullReferenceException($"Role with id={changeRoleDTO.RoleId} not found");
+            }
+            user.RoleId = changeRoleDTO.RoleId;
             await _appContext.SaveChangesAsync(default);
         }
-        public DateTime? GetUnlockTime(Guid userId)
+        public async Task<DateTime?> GetUnlockTime(Guid userId)
         {
-            return _appContext.Users.FirstOrDefault(u => u.Id == userId)?.UnlockTime;
+            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            {
+                throw new NullReferenceException($"User with id={userId} not found");
+            }
+            return (await _appContext.Users.FirstAsync(u => Guid.Equals(u.Id, userId))).UnlockTime;
         }
-        public async Task<Maybe<LoginResponseDTO>> Login(LoginDTO model)
+        public async Task<LoginResponseDTO> Login(LoginDTO model)
         {
             var identity = await GetIdentity(model.Login, model.Password);
             if (identity == null)
@@ -165,7 +175,7 @@ namespace TrainingProject.DomainLogic.Managers
                     Status = Status.WrongLoginOrPassword
                 };
             }
-            var unlockTime = GetUnlockTime(Guid.Parse(identity.Name));
+            var unlockTime = await GetUnlockTime(Guid.Parse(identity.Name));
             if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
             {
                 return new LoginResponseDTO
@@ -197,19 +207,20 @@ namespace TrainingProject.DomainLogic.Managers
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
         {
             ClaimsIdentity identity = null;
-            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Login == login);
-            if (user != null)
+            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => string.Equals(u.Login, login));
+            if (user == null)
             {
-                var passwordHash = HashGenerator.Encrypt(password);
-                if (passwordHash == user.Password)
+                throw new NullReferenceException($"User with id={user.Id} not found");
+            }
+            var passwordHash = HashGenerator.Encrypt(password);
+            if (passwordHash == user.Password)
+            {
+                var claims = new List<Claim>
                 {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
-                        new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
-                    };
-                    identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-                }
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
+                };
+                identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             }
             return identity;
         }
@@ -219,12 +230,12 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Roles.ToListAsync();
         }
 
-        public async Task<Maybe<UserRoleDTO>> GetUserWithRole(Guid userId)
+        public async Task<UserRoleDTO> GetUserWithRole(Guid userId)
         {
-            User user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, userId));
             if (user == null)
             {
-                return null;
+                throw new NullReferenceException($"User with id={user.Id} not found");
             }
             UserRoleDTO userRoleDTO = _mapper.Map<UserRoleDTO>(user);
             return userRoleDTO;
@@ -232,6 +243,10 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Role> GetUserRole(Guid userId)
         {
+            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            {
+                throw new NullReferenceException($"Event with id={userId} not found");
+            }
             return await _appContext.Users.Include(u => u.Role).Where(u => u.Id == userId).Select(u => u.Role).FirstOrDefaultAsync();
         }
     }

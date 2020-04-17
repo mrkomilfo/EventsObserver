@@ -29,9 +29,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{categoryId}")]
         public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
         {
-            return await _categoryManager.GetCategory(categoryId)
-                .ToResult(NotFound($"Category with id = {categoryId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _categoryManager.GetCategory(categoryId));
         }
 
         [HttpPost]
@@ -40,8 +38,8 @@ namespace TrainingProject.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isOk = await _categoryManager.AddCategory(categoryCreateDTO);
-                return isOk ? (ActionResult)Ok() : BadRequest("This category already existы");
+                await _categoryManager.AddCategory(categoryCreateDTO);
+                return Ok();
             }
             return BadRequest("Model state is not valid");
         }

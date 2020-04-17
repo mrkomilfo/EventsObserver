@@ -51,9 +51,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventFullDTO>> Details([FromQuery] int eventId)
         {
-            return await _eventManager.GetEvent(eventId)
-                .ToResult(NotFound($"Event with id = {eventId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _eventManager.GetEvent(eventId));
         }
 
         [HttpPost]
@@ -81,9 +79,7 @@ namespace TrainingProject.Web.Controllers
                 return Forbid("Access denied");
             }
             var hostRoot = _hostServices.GetHostPath();
-            return await _eventManager.GetEventToUpdate(eventId, hostRoot)
-                .ToResult(NotFound($"Event with id = {eventId} was not found"))
-                .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
+            return Ok(await _eventManager.GetEventToUpdate(eventId));
         }
 
         [HttpPut]
