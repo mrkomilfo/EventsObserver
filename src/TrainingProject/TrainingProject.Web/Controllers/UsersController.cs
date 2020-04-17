@@ -60,9 +60,8 @@ namespace TrainingProject.Web.Controllers
             return BadRequest("Model state is not valid");
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("{userId}/update")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("update")]
         public async Task<ActionResult<UserToUpdateDTO>> Update(string userId)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -105,10 +104,9 @@ namespace TrainingProject.Web.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("ban")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("ban")]
-        public async Task<ActionResult> Ban(BanDTO banDTO)
+        public async Task<ActionResult> Ban([FromBody] BanDTO banDTO)
         {
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userRole = (await _userManager.GetUserRole(Guid.Parse(banDTO.UserId))).ToString();
@@ -124,9 +122,8 @@ namespace TrainingProject.Web.Controllers
             return BadRequest("Model state is not valid");
         }
 
-        [HttpPut("{userId}")]
+        [HttpPut("{userId}/unban")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("unban")]
         public async Task<ActionResult> Unban(string userId)
         {
             if (!Guid.TryParse(userId, out Guid userGuid))
@@ -151,9 +148,8 @@ namespace TrainingProject.Web.Controllers
             return Ok(await _userManager.GetRoles());
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("{userId}/role")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("role")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
             return await _userManager.GetUserWithRole(Guid.Parse(userId))
@@ -161,9 +157,8 @@ namespace TrainingProject.Web.Controllers
                 .Finally(result => result.IsSuccess ? (ActionResult)Ok(result.Value) : BadRequest(result.Error));
         }
 
-        [HttpPut("{userId}")]
+        [HttpPut("role")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
-        [Route("role")]
         public async Task<ActionResult> ChangeRole([FromBody] ChangeRoleDTO changeRoleDTO)
         {
             if (ModelState.IsValid)

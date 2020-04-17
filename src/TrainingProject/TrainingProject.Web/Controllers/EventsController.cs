@@ -69,9 +69,8 @@ namespace TrainingProject.Web.Controllers
             return BadRequest("Model state is not valid");
         }
 
-        [HttpGet("{eventId}")]
+        [HttpGet("{eventId}/update")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Route("update")]
         public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
         {
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
