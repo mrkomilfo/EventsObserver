@@ -205,7 +205,7 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task SignUp(Guid userId, int eventId)
+        public async Task Subscribe(Guid userId, int eventId)
         {
             if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
             {

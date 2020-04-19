@@ -28,12 +28,15 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 12, string search = null, int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizer = null, string participant = null)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 Guid? organizerGuid;
-                if (Guid.TryParse(organizer, out _)) {
+                if (Guid.TryParse(organizer, out _))
+                {
                     organizerGuid = Guid.Parse(organizer);
                 }
-                else {
+                else
+                {
                     organizerGuid = null;
                 }
                 Guid? participantGuid;
@@ -52,7 +55,8 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventFullDTO>> Details(int eventId)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 return Ok(await _eventManager.GetEvent(eventId));
             });
         }
@@ -61,7 +65,8 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Create([FromBody] EventCreateDTO eventCreateDTO)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 if (ModelState.IsValid)
                 {
                     var hostRoot = _hostServices.GetHostPath();
@@ -76,7 +81,8 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
                 var organizerId = await _eventManager.GetEventOrganizerId(eventId);
@@ -93,7 +99,8 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Update([FromBody] EventUpdateDTO eventUpdateDTO)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
                 var organizerId = await _eventManager.GetEventOrganizerId(eventUpdateDTO.Id);
@@ -115,7 +122,8 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Delete(int eventId)
         {
-            return await HandleExceptions(async () => {
+            return await HandleExceptions(async () =>
+            {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
                 var organizerId = await _eventManager.GetEventOrganizerId(eventId);
@@ -125,6 +133,30 @@ namespace TrainingProject.Web.Controllers
                 }
                 var hostRoot = _hostServices.GetHostPath();
                 await _eventManager.DeleteEvent(eventId, false, hostRoot);
+                return Ok();
+            });
+        }
+
+        [HttpPut("{eventId}/subscribe")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult> Subscribe(int eventId)
+        {
+            return await HandleExceptions(async () =>
+            {
+                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+                await _eventManager.Subscribe(Guid.Parse(userId), eventId);
+                return Ok();
+            });
+        }
+
+        [HttpPut("{eventId}/unsubscribe")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult> Unsubscribe(int eventId)
+        {
+            return await HandleExceptions(async () =>
+            {
+                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+                await _eventManager.Unsubscribe(Guid.Parse(userId), eventId);
                 return Ok();
             });
         }

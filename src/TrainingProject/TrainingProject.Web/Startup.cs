@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using TrainingProject.Web.Helpers;
-using Newtonsoft.Json;
 
 namespace TrainingProject.Web
 {
