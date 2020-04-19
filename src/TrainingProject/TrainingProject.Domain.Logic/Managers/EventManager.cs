@@ -122,7 +122,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<EventFullDTO> GetEvent(int eventId)
         {
-            var DBEvent = await _appContext.Events.Include(e=>e.Organizer).Include(e=>e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
+            var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
             if (DBEvent == null)
             {
                 throw new NullReferenceException($"Event with id={eventId} not found");
