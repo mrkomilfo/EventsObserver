@@ -159,7 +159,7 @@ export default class SignUp extends Component {
             body: JSON.stringify(data)
         }).then((response) => {
             if (response.ok){
-                window.history.push("/signIn");
+                this.props.history.push("/signIn");
             }
             else if (response.status == 409)
             {
