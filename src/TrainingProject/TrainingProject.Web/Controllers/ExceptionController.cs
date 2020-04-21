@@ -8,7 +8,8 @@ namespace TrainingProject.Web.Controllers
     {
         public async Task<ActionResult> HandleExceptions(Func<Task<ActionResult>> action)
         {
-            try {
+            try
+            {
                 return await action.Invoke();
             }
             catch (NullReferenceException ex)
@@ -22,6 +23,10 @@ namespace TrainingProject.Web.Controllers
             catch (ArgumentException ex)
             {
                 return StatusCode(409, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Unhandled error: {ex.Message}");
             }
         }
     }

@@ -57,9 +57,9 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task RegisterUser(RegisterDTO user)
         {
-            if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login, user.Login, StringComparison.CurrentCultureIgnoreCase)))
+            if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
             {
-                throw new ArgumentException($"User with login \"{user.Login}\" is already exist");
+                throw new ArgumentException($"User with login \"{user.Login}\" already exist");
             }
             User newUser = _mapper.Map<User>(user);
             newUser.RoleId = (await _appContext.Roles.FirstOrDefaultAsync(r => r.Name == "User"))?.Id;

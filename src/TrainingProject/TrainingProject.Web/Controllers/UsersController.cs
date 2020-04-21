@@ -52,7 +52,6 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult> Create([FromBody] RegisterDTO registerDTO)
         {
             return await HandleExceptions(async () =>
