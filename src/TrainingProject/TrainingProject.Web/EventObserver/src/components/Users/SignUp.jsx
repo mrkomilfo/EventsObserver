@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import { useHistory } from "react-router-dom";
 
 export default class SignUp extends Component {
     constructor(props) {
@@ -158,22 +157,17 @@ export default class SignUp extends Component {
             },
             body: JSON.stringify(data)
         }).then((response) => {
+            debugger;
             if (response.ok){
                 this.props.history.push("/signIn");
             }
-            else if (response.status == 409)
-            {
-                this.setState({errorMessage: "Пользователь с таким логином уже существует"});
+            else {
+                return response.json();
             }
-            else if (response.status == 400)
-            {
-                this.setState({errorMessage: "Форма не валидна"});
-            }
-            else{
-                this.setState({errorMessage: "Ошибка регистрации"});
-            }
+        }).then((data) => {
+            this.setState({errorMessage: data.message});
         }).catch((ex) => {
-            this.setState({errorMessage: "Ошибка регистрации"});
+            this.setState({errorMessage: ex.toString()});
         });
     }
 }

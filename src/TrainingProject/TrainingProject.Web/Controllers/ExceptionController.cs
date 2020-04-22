@@ -14,19 +14,23 @@ namespace TrainingProject.Web.Controllers
             }
             catch (NullReferenceException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
             catch (ArgumentException ex)
             {
-                return StatusCode(409, ex.Message);
+                return StatusCode(409, new { ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(401, new { ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Unhandled error: {ex.Message}");
+                return BadRequest(new { message = $"Unhandled error: {ex.Message}" });
             }
         }
     }

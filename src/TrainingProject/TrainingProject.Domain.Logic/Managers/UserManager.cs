@@ -170,19 +170,12 @@ namespace TrainingProject.DomainLogic.Managers
             var identity = await GetIdentity(model.Login, model.Password);
             if (identity == null)
             {
-                return new LoginResponseDTO
-                {
-                    Status = Status.WrongLoginOrPassword
-                };
+                throw new NullReferenceException($"Wrong login or password");
             }
             var unlockTime = await GetUnlockTime(Guid.Parse(identity.Name));
             if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
             {
-                return new LoginResponseDTO
-                {
-                    Status = Status.Blocked,
-                    Blocking = unlockTime ?? DateTime.Now,
-                };
+                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
             }
 
             var now = DateTime.UtcNow;
@@ -198,9 +191,8 @@ namespace TrainingProject.DomainLogic.Managers
             var response = new LoginResponseDTO
             {
                 AccessToken = encodedJwt,
-                //Name = identity.Name,
-                //Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault(),
-                Status = Status.Ok
+                Name = identity.Name,
+                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
             };
             return response;
         }

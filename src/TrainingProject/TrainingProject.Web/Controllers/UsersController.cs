@@ -194,5 +194,19 @@ namespace TrainingProject.Web.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("signIn")]
+        public async Task<ActionResult> SignIn([FromBody] LoginDTO loginDTO)
+        {
+            return await HandleExceptions(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    return Ok(await _userManager.Login(loginDTO));
+                }
+                return BadRequest("Model state is not valid");
+            });
+
+        }
     }
 }

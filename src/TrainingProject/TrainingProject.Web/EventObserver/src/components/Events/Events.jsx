@@ -106,7 +106,6 @@ export default class Events extends Component {
         }
 
         const response = await fetch('api/Events' + queryTrailer);
-        debugger;
         const data = await response.json();
         this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
             totalRecords: data.totalRecords, loading: false });
