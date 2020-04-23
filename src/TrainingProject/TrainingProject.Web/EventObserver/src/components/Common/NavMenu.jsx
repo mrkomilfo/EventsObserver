@@ -11,9 +11,13 @@ export default class NavMenu extends Component {
 
         this.toggleNavbar = this.toggleNavbar.bind(this);
         this.state = {
-        collapsed: true,
-        role: AuthHelper.getRole()
+            collapsed: true,
+            role: AuthHelper.getRole()
         };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({ role: AuthHelper.getRole() });
     }
 
     toggleNavbar () {
