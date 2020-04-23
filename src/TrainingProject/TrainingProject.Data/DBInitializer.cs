@@ -86,6 +86,14 @@ namespace TrainingProject.Data
                 };
                 context.EventsTags.AddRange(eventTags);
                 await context.SaveChangesAsync(default);
+
+                IEnumerable<EventsUsers> eventUsers = new List<EventsUsers>()
+                {
+                    new EventsUsers{EventId = (int)events.ElementAtOrDefault(0)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "admin")).Select(u => u.Id).FirstOrDefault() },
+                    new EventsUsers{EventId = (int)events.ElementAtOrDefault(1)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "user")).Select(u => u.Id).FirstOrDefault() }
+                };
+                context.EventsUsers.AddRange(eventUsers);
+                await context.SaveChangesAsync(default);
             }
         }
 

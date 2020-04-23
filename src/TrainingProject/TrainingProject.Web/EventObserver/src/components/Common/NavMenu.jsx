@@ -17,12 +17,14 @@ export default class NavMenu extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ role: AuthHelper.getRole() });
+        this.setState({ 
+            role: AuthHelper.getRole() 
+        });
     }
 
     toggleNavbar () {
         this.setState({
-        collapsed: !this.state.collapsed
+            collapsed: !this.state.collapsed
         });
     }
 
