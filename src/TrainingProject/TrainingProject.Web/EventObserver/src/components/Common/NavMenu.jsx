@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, 
+    Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import AuthHelper from '../../Utils/authHelper.js';
 
@@ -10,8 +11,12 @@ export default class NavMenu extends Component {
         super(props);
 
         this.toggleNavbar = this.toggleNavbar.bind(this);
+        this.toggleLogoutModal = this.toggleLogoutModal.bind(this);
+        this.logout = this.logout.bind(this);
+
         this.state = {
             collapsed: true,
+            logoutModal: false,
             role: AuthHelper.getRole()
         };
     }
@@ -28,35 +33,42 @@ export default class NavMenu extends Component {
         });
     }
 
+    toggleLogoutModal(){
+        this.setState({
+            logoutModal: !this.state.logoutModal
+        });
+    }
+
     logout(){
         AuthHelper.clearAuth();
         this.setState({
-            role: 'Guest'
+            role: 'Guest',
+            logoutModal: false
         });
     }
 
     render () {
-        let Events = 
+        const events = 
             <NavItem>
                 <NavLink tag={Link} to="/">События</NavLink>
             </NavItem>;
 
-        let NewEvent = this.state.role != 'Guest' ?
+        const newEvent = this.state.role != 'Guest' ?
             <NavItem>
                 <NavLink tag={Link} to="/newEvent">Добавить событие</NavLink>
             </NavItem> : null;
 
-        let Users = (this.state.role == 'Admin' || this.state.role == 'AccountManager') ?
+        const users = (this.state.role == 'Admin' || this.state.role == 'Account manager') ?
             <NavItem>
                 <NavLink tag={Link} to="/users">Пользователи</NavLink>
             </NavItem> : null;
 
-        let Categories = this.state.role == 'Admin' ?
+        const categories = this.state.role == 'Admin' ?
             <NavItem>
                 <NavLink tag={Link} to="/categories">Категории</NavLink>
             </NavItem> : null;
 
-        let Identity = this.state.role == 'Guest' ?
+        const identity = this.state.role == 'Guest' ?
             <>
                 <NavItem>
                     <NavLink tag={Link} to="/signUp">Регистрация</NavLink>
@@ -66,27 +78,40 @@ export default class NavMenu extends Component {
                 </NavItem>
             </> :
             <NavItem>
-                <NavLink tag={Link} to="/signIn" onClick={()=>this.logout()}>Выход</NavLink>
+                <NavLink onClick={this.toggleLogoutModal}>Выход</NavLink>
             </NavItem>;
 
+        const logoutModal = 
+            <Modal isOpen={this.state.logoutModal} toggle={this.toggleLogoutModal}>
+                <ModalHeader toggle={this.toggleLogoutModal}>Подтвердите действие</ModalHeader>
+                <ModalBody>
+                    Вы действительно хотите выйти из аккаунта?
+                </ModalBody>
+                <ModalFooter>
+                <Button tag={Link} to="/signIn" color="primary" onClick={this.logout}>Подтвердить</Button>{' '}
+                <Button color="secondary" onClick={this.toggleLogoutModal}>Отмена</Button>
+                </ModalFooter>
+            </Modal>
+
         return (
-        <header>
-            <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
-            <Container>
-                <NavbarBrand tag={Link} to="/">EventsObserver</NavbarBrand>
-                <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
-                <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
-                <ul className="navbar-nav flex-grow">
-                    {Events}
-                    {NewEvent}
-                    {Users}
-                    {Categories}
-                    {Identity}
-                </ul>
-                </Collapse>
-            </Container>
-            </Navbar>
-        </header>
+            <header>
+                <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
+                <Container>
+                    <NavbarBrand tag={Link} to="/">EventsObserver</NavbarBrand>
+                    <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
+                    <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
+                    <ul className="navbar-nav flex-grow">
+                        {events}
+                        {newEvent}
+                        {users}
+                        {categories}
+                        {identity}
+                        {logoutModal}
+                    </ul>
+                    </Collapse>
+                </Container>
+                </Navbar>
+            </header>
         );
     }
 }

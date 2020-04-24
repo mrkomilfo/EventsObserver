@@ -39,7 +39,7 @@ export default class Events extends Component {
     }
 
     render() {
-        const errorBaner = this.state.errorMessage ? 
+        const errorBaner = this.state.error ? 
         <Alert color="danger">
             {this.state.errorMessage}
         </Alert> : null;
@@ -118,21 +118,21 @@ export default class Events extends Component {
         }
 
         fetch('api/Events' + queryTrailer)
-        .then((response) => {
-            if (!response.ok) {
-                this.setState({error: true});
-            }
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({errorMessage: data.message});
-            }
-            else {
-                this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
-                    totalRecords: data.totalRecords, loading: false });
-            }
-        }).catch((ex) => {
-            this.setState({errorMessage: ex.toString()});
-        });
+            .then((response) => {
+                if (!response.ok) {
+                    this.setState({error: true});
+                }
+                return response.json();
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({errorMessage: data.message});
+                }
+                else {
+                    this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
+                        totalRecords: data.totalRecords, loading: false });
+                }
+            }).catch((ex) => {
+                this.setState({errorMessage: ex.toString()});
+            });
     }
 }
