@@ -3,11 +3,15 @@ import queryString from 'query-string';
 import EventMedia from './EventMedia';
 import EventsPaginator from './EventsPaginator';
 import EventsSideBar from './EventsSideBar';
+import { Alert } from 'reactstrap';
 
 export default class Events extends Component {
     constructor(props) {
         super(props);
-        this.state = { query: window.location.search, events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true };
+        this.state = { 
+            query: window.location.search, events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true, 
+            error: false, errorMessage: '' 
+        };
         this.renderEventsList = this.renderEventsList.bind(this);
     }
 
@@ -35,6 +39,15 @@ export default class Events extends Component {
     }
 
     render() {
+        const errorBaner = this.state.errorMessage ? 
+        <Alert color="danger">
+            {this.state.errorMessage}
+        </Alert> : null;
+
+        const contents = this.state.loading
+            ? <p><em>Loading...</em></p>
+            : this.renderEventsList(this.state.events);
+
         const pageStyle = {
             display: 'flex'
         }
@@ -46,12 +59,10 @@ export default class Events extends Component {
             width: '240px',
             margin: '0px 0px 0px 32px'
         }
-
-        let contents = this.state.loading
-          ? <p><em>Loading...</em></p>
-          : this.renderEventsList(this.state.events);
     
         return (
+            <>
+            {errorBaner}
             <div style={pageStyle}>
                 <div style={contentStyle}>
                     <h2 id="tabelLabel">События в Минске</h2>
@@ -61,6 +72,7 @@ export default class Events extends Component {
                     <EventsSideBar />
                 </div>
             </div>
+            </>
         );
     }
 
@@ -105,9 +117,22 @@ export default class Events extends Component {
             queryTrailer += `&participant=${participant}`
         }
 
-        const response = await fetch('api/Events' + queryTrailer);
-        const data = await response.json();
-        this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
-            totalRecords: data.totalRecords, loading: false });
+        fetch('api/Events' + queryTrailer)
+        .then((response) => {
+            if (!response.ok) {
+                this.setState({error: true});
+            }
+            return response.json();
+        }).then((data) => {
+            if (this.state.error){
+                this.setState({errorMessage: data.message});
+            }
+            else {
+                this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
+                    totalRecords: data.totalRecords, loading: false });
+            }
+        }).catch((ex) => {
+            this.setState({errorMessage: ex.toString()});
+        });
     }
 }

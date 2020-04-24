@@ -66,7 +66,7 @@ export default class NavMenu extends Component {
                 </NavItem>
             </> :
             <NavItem>
-                <NavLink tag={Link} to="/" onClick={()=>this.logout()}>Выход</NavLink>
+                <NavLink tag={Link} to="/signIn" onClick={()=>this.logout()}>Выход</NavLink>
             </NavItem>;
 
         return (

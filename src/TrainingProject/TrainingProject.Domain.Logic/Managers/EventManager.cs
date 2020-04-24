@@ -134,8 +134,11 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 eventFullDTO.Participants.Add(participant.Id.ToString(), participant.UserName);
             }
-            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag.Name).ToHashSet();
-            eventFullDTO.Tags = tags;
+            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag).ToHashSet();
+            foreach (var tag in tags)
+            {
+                eventFullDTO.Tags.Add(tag.Id.ToString(), tag.Name);
+            }
 
             if (DBEvent.HasImage)
             {

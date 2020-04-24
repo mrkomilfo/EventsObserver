@@ -3,8 +3,6 @@ import { Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
 
 export default class EventMedia extends Component {
-
-
     render() {
         const imgStyle = {
             objectFit: 'cover',
@@ -22,7 +20,7 @@ export default class EventMedia extends Component {
             {image}
             <Media body>
                 <Media heading>
-                    <Link to={`/event?eventId=${this.props.event.id}`}>{this.props.event.name}</Link>                  
+                    <Link to={`/event?id=${this.props.event.id}`}>{this.props.event.name}</Link>                  
                 </Media>
                 {`Категория:`} <Link to={`/events?categoryId=${this.props.event.categoryId}`}>{this.props.event.category}</Link>
                 <br/>

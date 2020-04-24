@@ -165,9 +165,13 @@ export default class SignUp extends Component {
                 return response.json();
             }
         }).then((data) => {
-            this.setState({errorMessage: data.message});
+            this.setState({
+                errorMessage: data.message
+            });
         }).catch((ex) => {
-            this.setState({errorMessage: ex.toString()});
+            this.setState({
+                errorMessage: ex.toString()
+            });
         });
     }
 }

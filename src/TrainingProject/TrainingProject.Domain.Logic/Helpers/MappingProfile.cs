@@ -30,6 +30,8 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
                 .ForMember(m => m.Organizer, opt => opt.MapFrom(m => m.Organizer.UserName))
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()))
+                .ForMember(m => m.Start, opt => opt.MapFrom(m => m.Start.ToString("f")))
+                .ForMember(m => m.PublicationTime, opt => opt.MapFrom(m => m.PublicationTime.ToString("f")))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventLiteDTO>()
                 .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
