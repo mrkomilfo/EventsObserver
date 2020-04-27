@@ -64,7 +64,8 @@ export default class SignUp extends Component {
             default:
                 break;
         }
-        this.setState({formErrors: fieldValidationErrors,
+        this.setState({
+            formErrors: fieldValidationErrors,
             nameValid: nameValid,
             emailValid: emailValid,
             phoneValid: phoneValid,
@@ -75,7 +76,9 @@ export default class SignUp extends Component {
     }
 
     validateForm() {
-        this.setState({formValid: this.state.nameValid &&
+        this.setState({
+            formValid: 
+            this.state.nameValid &&
             this.state.emailValid &&
             this.state.phoneValid &&
             this.state.loginValid &&
@@ -102,32 +105,32 @@ export default class SignUp extends Component {
                 <FormGroup>
                     <Label for="name">Имя пользователя</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.name}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.name}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="email">Email</Label>
                     <Input invalid={!this.state.emailValid} type="email" name="email" id="email" value={this.state.email} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.email}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.email}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="phone">Телефон</Label>
                     <Input invalid={!this.state.phoneValid} type="tel" name="phone" id="phone" value={this.state.phone} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.phone}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.phone}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="login">Логин</Label>
                     <Input invalid={!this.state.loginValid} required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.login}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.login}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="password">Пароль</Label>
                     <Input invalid={!this.state.passwordValid} required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.password}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.password}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="passwordConfirm">Повторите пароль</Label>
                     <Input invalid={!this.state.passwordConfirmValid} required type="password" name="passwordConfirm" id="passwordConfirm" value={this.state.passwordConfirm} onChange={this.handleInputChange}/>
-                    <FormFeedback invalid>{this.state.formErrors.passwordConfirm}</FormFeedback>
+                    <FormFeedback>{this.state.formErrors.passwordConfirm}</FormFeedback>
                 </FormGroup>
                 <Button color="primary" disabled = {!this.state.formValid} onClick={() => this.register()}>Зарегистрироваться</Button>
             </Form>
@@ -138,7 +141,9 @@ export default class SignUp extends Component {
     register(){
         if (!this.state.formValid)
         {
-            this.setState({errorMessage: 'Форма не валидна'})
+            this.setState({
+                errorMessage: 'Форма не валидна'
+            })
             return;
         }
         var data = {
@@ -157,7 +162,6 @@ export default class SignUp extends Component {
             },
             body: JSON.stringify(data)
         }).then((response) => {
-            debugger;
             if (response.ok){
                 this.props.history.push("/signIn");
             }

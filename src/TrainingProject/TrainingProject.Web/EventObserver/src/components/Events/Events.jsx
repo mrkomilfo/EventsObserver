@@ -12,7 +12,7 @@ export default class Events extends Component {
             query: window.location.search, events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true, 
             error: false, errorMessage: '' 
         };
-        this.renderEventsList = this.renderEventsList.bind(this);
+        debugger;
     }
 
     componentDidMount() {

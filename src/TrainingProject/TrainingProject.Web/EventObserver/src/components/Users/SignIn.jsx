@@ -54,7 +54,6 @@ export default class SignUp extends Component {
             login: this.state.login,
             password: this.state.password
         };
-        debugger;
         fetch('api/Users/signIn', {
             method: 'POST',
             headers: {
@@ -63,19 +62,25 @@ export default class SignUp extends Component {
             body: JSON.stringify(data)
         }).then((response) => {
             if (!response.ok) {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
             }
             return response.json();
         }).then((data) => {
             if (this.state.error){
-                this.setState({errorMessage: data.message});
+                this.setState({
+                    errorMessage: data.message
+                });
             }
             else {
                 AuthHelper.saveAuth(data.name, data.accessToken, data.role);
                 this.props.history.push("/events");
             }
         }).catch((ex) => {
-            this.setState({errorMessage: ex.toString()});
+            this.setState({
+                errorMessage: ex.toString()
+            });
         });
     }
 }

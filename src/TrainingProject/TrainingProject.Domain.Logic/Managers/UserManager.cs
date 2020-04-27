@@ -77,7 +77,7 @@ namespace TrainingProject.DomainLogic.Managers
             _mapper.Map(user, updatedUser);
             if (user.Photo != null)
             {
-                string path = $"{hostRoot}\\wwroot\\img\\users\\{updatedUser.Id}.jpg";
+                string path = $"{hostRoot}\\wwwroot\\img\\users\\{updatedUser.Id}.jpg";
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await user.Photo.CopyToAsync(fileStream);
             }

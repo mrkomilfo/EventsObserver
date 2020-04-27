@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import Layout from './components/Common/Layout';
 import Events from './components/Events/Events';
 import EventDetail from './components/Events/EventDetail';
+import NewEvent from './components/Events/NewEvent';
 import SignUp from './components/Users/SignUp';
 import SignIn from './components/Users/SignIn';
 
@@ -14,8 +15,8 @@ export default class App extends Component {
             <Route path='/events' component={Events} />
             <Route exact path='/' render={() => (<Redirect to='/events' />)} />
             <Route path='/event' component={EventDetail} />
-            {/*<Route path='/newEvent' component={NewEvent} />
-            <Route path='/editEvent' component={EditEvent} />
+            <Route path='/newEvent' component={NewEvent} />
+            {/*<Route path='/editEvent' component={EditEvent} />
 
             <Route path='/users' component={Users} />
             <Route path='/profile' component={Profile} />*/}

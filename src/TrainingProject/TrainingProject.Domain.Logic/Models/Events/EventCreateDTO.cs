@@ -8,17 +8,13 @@ namespace TrainingProject.DomainLogic.Models.Events
 {
     public class EventCreateDTO
     {
-        public EventCreateDTO()
-        {
-            Tags = new HashSet<string>();
-        }
         [Required]
         public string Name { get; set; }
         [Required]
         public int? CategoryId { get; set; }
         public string Description { get; set; }
         [Required]
-        public DateTime Start { get; set; }
+        public string Start { get; set; }
         [Required]
         public string Place { get; set; }
         [Required]
@@ -28,7 +24,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         [Required]
         [ValidGuid]
         public string OrganizerId { get; set; }
-        public ICollection<string> Tags { get; set; }
+        public string Tags { get; set; }
         public IFormFile Image { get; set; }
     }
 }

@@ -9,6 +9,8 @@ using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
+using System.Text.Json;
+using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -30,14 +32,14 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.Image != null)
             {
-                string path = $"{hostRoot}\\wwroot\\img\\events\\{newEvent.Id}.jpg";
+                string path = $"{hostRoot}\\wwwroot\\img\\events\\{newEvent.Id}.jpg";
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
-
-            foreach (var tagName in @event.Tags)
+            var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+            foreach (var tagName in tags)
             {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name, tagName, StringComparison.CurrentCultureIgnoreCase));
+                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
                 if (tag == null)
                 {
                     tag = _mapper.Map<string, Tag>(tagName);
@@ -61,7 +63,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.Image != null)
             {
-                string path = $"{hostRoot}\\wwroot\\img\\events\\{update.Id}.jpg";
+                string path = $"{hostRoot}\\wwwroot\\img\\events\\{update.Id}.jpg";
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
@@ -69,7 +71,7 @@ namespace TrainingProject.DomainLogic.Managers
             _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
             foreach (var tagName in @event.Tags)
             {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name, tagName, StringComparison.CurrentCultureIgnoreCase));
+                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
                 if (tag == null)
                 {
                     tag = _mapper.Map<string, Tag>(tagName);
@@ -110,7 +112,7 @@ namespace TrainingProject.DomainLogic.Managers
             if (force)
             {
                 _appContext.Events.Remove(@event);
-                string path = $"{hostRoot}\\wwroot\\img\\events\\{eventId}.jpg";
+                string path = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
                 File.Delete(path);
             }
             else
@@ -185,7 +187,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.Where(e => e.Participants.Any(p => p.Id == participant));
             }
-
+            result.TotalRecords = await query.CountAsync();
             if (upComing != null && (bool)upComing)
             {
                 query = query.OrderBy(e => e.Start).Skip(index * pageSize).Take(pageSize);
@@ -194,10 +196,9 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
             }
-            result.TotalRecords = await query.CountAsync();
             result.Records = await _mapper.ProjectTo<EventLiteDTO>(query).ToListAsync(default);
            
-            for (int i = 0; i < result.TotalRecords; i++)
+            for (int i = 0; i < result.Records.Count; i++)
             {
                 if (result.Records[i].HasImage)
                 {

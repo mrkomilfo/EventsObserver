@@ -7,7 +7,8 @@ export default class EventMedia extends Component {
         const imgStyle = {
             objectFit: 'cover',
             maxHeight: 140,
-            maxWidth: 256
+            maxWidth: 256,
+            marginRight: '10px'
         }
 
         let image = this.props.event.image ? 

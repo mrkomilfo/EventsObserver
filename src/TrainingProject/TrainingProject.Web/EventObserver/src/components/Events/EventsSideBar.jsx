@@ -6,9 +6,7 @@ export default class EventsSideBar extends Component {
     constructor(props) {
         super(props);
         this.state = { categories: [], name: '', category: 0, tag: '', free: false, vacancies: false, upComing: null };
-        this.populateCategories = this.populateCategories.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.getQuerryTrailer = this.getQuerryTrailer.bind(this);
     }
 
     handleInputChange(event) {
@@ -86,72 +84,71 @@ export default class EventsSideBar extends Component {
     }
 
     componentDidMount() {
-        this.populateCategories();
+        this.loadCategories();
     }
 
     render() {
         const actualityStyle = {
             marginTop: '16px'
-        }
-
-    let renderCategories = this.state.categories.map(c => <option value={c.id}>{c.name}</option>)
-        return (
-            <Form>
-                <FormGroup>
-                    <Label for="name">Название</Label>
-                    <Input type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                </FormGroup>
-                <FormGroup> 
-                    <Label for="category">Категория</Label>
-                    <Input type="select" name="category" id="category" value={this.state.category} onChange={this.handleInputChange}>
-                        {renderCategories}
-                    </Input>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="tag">Тег</Label>
-                    <Input type="text" name="tag" id="tag" value={this.state.tag} onChange={this.handleInputChange}/>
-                </FormGroup>
-                <FormGroup check>
-                    <Label check>
-                    <Input type="checkbox" name="free" id="free" checked={this.state.free} onChange={this.handleInputChange}/>{' '}
-                    Только бесплатные
-                    </Label>
-                </FormGroup>
-                <FormGroup check>
-                    <Label check>
-                    <Input type="checkbox" name="vacancies" id="vacancies" checked={this.state.vacancies} onChange={this.handleInputChange}/>{' '}
-                    Есть свободные места
-                    </Label>
-                </FormGroup>
-                <FormGroup tag="fieldset" style={actualityStyle}>
-                    <Label>
-                    Актуальность
-                    <FormGroup check>
-                        <Label check>
-                            <Input type="radio" name="upComing" value={'true'} checked={this.state.upComing === true} onChange={this.handleInputChange}/>{' '}                               
-                            Предстоящие
-                        </Label>
-                    </FormGroup>
-                    <FormGroup check>
-                        <Label check>
-                            <Input type="radio" name="upComing" value={'false'} checked={this.state.upComing === false} onChange={this.handleInputChange}/>{' '}
-                            Прошедшие
-                        </Label>
-                    </FormGroup>
-                    <FormGroup check>
-                        <Label check>
-                            <Input type="radio" name="upComing" value={'null'} checked={this.state.upComing === null} onChange={this.handleInputChange}/>{' '}
-                            Все
-                        </Label>
-                    </FormGroup>
-                    </Label> 
-                </FormGroup>
-                <Button tag={Link} to={`/events${this.getQuerryTrailer()}`}>Поиск</Button>
-            </Form>
-        )
     }
 
-    async populateCategories() {
+    const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()}value={c.id}>{c.name}</option>)
+    return (
+        <Form>
+            <FormGroup>
+                <Label for="name">Название</Label>
+                <Input type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
+            </FormGroup>
+            <FormGroup> 
+                <Label for="category">Категория</Label>
+                <Input type="select" name="category" id="category" value={this.state.category} onChange={this.handleInputChange}>
+                    {categoriesSelect}
+                </Input>
+            </FormGroup>
+            <FormGroup>
+                <Label for="tag">Тег</Label>
+                <Input type="text" name="tag" id="tag" value={this.state.tag} onChange={this.handleInputChange}/>
+            </FormGroup>
+            <FormGroup check>
+                <Label check>
+                <Input type="checkbox" name="free" id="free" checked={this.state.free} onChange={this.handleInputChange}/>{' '}
+                Только бесплатные
+                </Label>
+            </FormGroup>
+            <FormGroup check>
+                <Label check>
+                <Input type="checkbox" name="vacancies" id="vacancies" checked={this.state.vacancies} onChange={this.handleInputChange}/>{' '}
+                Есть свободные места
+                </Label>
+            </FormGroup>
+            <FormGroup tag="fieldset" style={actualityStyle}>
+                <Label>
+                Актуальность
+                <FormGroup check>
+                    <Label check>
+                        <Input type="radio" name="upComing" value={'true'} checked={this.state.upComing === true} onChange={this.handleInputChange}/>{' '}                               
+                        Предстоящие
+                    </Label>
+                </FormGroup>
+                <FormGroup check>
+                    <Label check>
+                        <Input type="radio" name="upComing" value={'false'} checked={this.state.upComing === false} onChange={this.handleInputChange}/>{' '}
+                        Прошедшие
+                    </Label>
+                </FormGroup>
+                <FormGroup check>
+                    <Label check>
+                        <Input type="radio" name="upComing" value={'null'} checked={this.state.upComing === null} onChange={this.handleInputChange}/>{' '}
+                        Все
+                    </Label>
+                </FormGroup>
+                </Label> 
+            </FormGroup>
+            <Button color="primary" tag={Link} to={`/events${this.getQuerryTrailer()}`}>Поиск</Button>
+        </Form>
+    )}
+
+    async loadCategories() {
         const response = await fetch('api/Categories');
         const data = await response.json();
         data.unshift({id: 0, name: 'Не выбрано'})

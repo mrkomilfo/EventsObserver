@@ -115,7 +115,7 @@ namespace TrainingProject.Data
                     new User
                     {
                         Login = "accountManager",
-                        Password = "YIMMU3jl8cYYVN8TGTunenCKof4NfTmY8D0/quh0WU4=",
+                        Password = "YIMMU3jl8cYYVN8TGTunenCKof4NfTmY8D0/quh0WU4=", //accountManager
                         UserName = "AccountManager",
                         RoleId = roles.ElementAtOrDefault(0)?.Id,
                         RegistrationDate = DateTime.Now,
@@ -123,7 +123,7 @@ namespace TrainingProject.Data
                     new User
                     {
                         Login = "admin",
-                        Password = "jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=",
+                        Password = "jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=", //admin
                         UserName = "Administrator",
                         RoleId = roles.ElementAtOrDefault(1)?.Id,
                         RegistrationDate = DateTime.Now,
@@ -131,7 +131,7 @@ namespace TrainingProject.Data
                     new User
                     {
                         Login = "user",
-                        Password = "BPiZbadjt6lpsQKO4wB1aerzpjVIbdqyEdUSyFud+Ps=",
+                        Password = "BPiZbadjt6lpsQKO4wB1aerzpjVIbdqyEdUSyFud+Ps=", //user
                         UserName = "User",
                         RoleId = roles.ElementAtOrDefault(2)?.Id,
                         RegistrationDate = DateTime.Now,
