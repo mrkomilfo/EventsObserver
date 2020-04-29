@@ -58,6 +58,11 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new NullReferenceException($"Event with id={@event.Id} not found");
             }
+            int subscribesCount = await _appContext.EventsUsers.Where(eu => eu.EventId == @event.Id).CountAsync();
+            if (@event.ParticipantsLimit < subscribesCount)
+            {
+                throw new ArgumentException($"Сurrent number of participants({subscribesCount}) is greater than the new limit({@event.ParticipantsLimit})");
+            }
             _mapper.Map(@event, update);
             await _appContext.SaveChangesAsync(default);
 
@@ -69,7 +74,8 @@ namespace TrainingProject.DomainLogic.Managers
             }
 
             _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
-            foreach (var tagName in @event.Tags)
+            var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+            foreach (var tagName in tags)
             {
                 var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
                 if (tag == null)
@@ -85,7 +91,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<EventToUpdateDTO> GetEventToUpdate(int eventId)
         {
-            var @event = await _appContext.Events.Include(e=>e.Tags).FirstOrDefaultAsync(e => e.Id == eventId);
+            var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
             if (@event == null)
             {
                 throw new NullReferenceException($"Event with id={eventId} not found");
@@ -96,8 +102,8 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 eventToUpdate.Image = $"img\\events\\{eventId}.jpg";
             }
-            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.TagId == eventId).Select(et => et.Tag.Name).ToHashSet();
-            eventToUpdate.Tags = tags;
+            var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag.Name).ToHashSet();
+            eventToUpdate.Tags = String.Join(", ", tags);
             return eventToUpdate;
         }
 

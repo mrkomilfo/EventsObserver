@@ -1,23 +1,32 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
+import queryString from 'query-string';
 import AuthHelper from '../../Utils/authHelper'
 
-export default class NewEvent extends Component {
+export default class EditEvent extends Component{
     constructor(props) {
         super(props);
         this.state = { 
+            loading: true,
+
+            error: false,
+            errorMessage: '',
+
+            id: null,
             name: '', 
             category: '', 
             description: '', 
             place: '', 
-            date: null, 
-            time: null, 
+            date: '', 
+            time: '', 
             fee: 0, 
             participantsLimit: 0,
             tags: '', 
             imagePath: '', 
             fileURL: '', 
             imageFile: null,
+            hasImage: false,
+            image: '',
             formErrors: { 
                 name: '', 
                 category: '', 
@@ -28,24 +37,31 @@ export default class NewEvent extends Component {
                 fee: 0,
                 participantsLimit: 0
             },
-            formValid: false,
-            nameValid: false, 
-            categoryValid: false, 
-            descriptionValid: false, 
-            placeValid: false, 
-            dateValid: false, 
-            timeValid: false, 
+            formValid: true,
+            nameValid: true, 
+            categoryValid: true, 
+            descriptionValid: true, 
+            placeValid: true, 
+            dateValid: true, 
+            timeValid: true, 
             feeValid: true,
             participantsLimitValid: true,
             tagsValid: true,
 
-            error: false,
-            errorMessage: '',
             categories: [],
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
-        this.createEvent = this.createEvent.bind(this);
+        this.editEvent = this.editEvent.bind(this);
+        this.cancel = this.cancel.bind(this);
+    }
+
+    componentDidMount() {
+        const parsed = queryString.parse(window.location.search);
+        if (parsed) {
+            this.loadEvent(parsed['id']);
+        }
+        this.loadCategories();
     }
 
     handleInputChange(event) {
@@ -63,7 +79,8 @@ export default class NewEvent extends Component {
         {
             this.setState({
                 imagePath: value,
-                imageFile: target.files[0]
+                imageFile: target.files[0],
+                hasImage: true
             }); 
         }
     }
@@ -115,7 +132,7 @@ export default class NewEvent extends Component {
                 fieldValidationErrors.participantsLimit = participantsLimitValid ? '' : 'Количество участников указано неверно';
                 break;
             case 'tags':
-                tagsValid = value.match(/^[\d\s\w\,]*$/u)
+                tagsValid = value.match(/^[\d\s\w\,а-я]*$/i)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
                 break;
             default:
@@ -153,15 +170,19 @@ export default class NewEvent extends Component {
     {
         this.setState({
             imagePath: '', 
-            imageFile: null
+            imageFile: null,
+            hasImage: false,
+            image: ''
         })
     }
 
-    componentDidMount() {
-        this.loadCategories();
+    cancel()
+    {
+        this.props.history.push(`/event?id=${this.state.id}`);
     }
 
-    render(){
+    renderEvent()
+    {
         const imageStyle = {
             maxWidth: '420px',
             maxHeight: '420px',
@@ -173,19 +194,21 @@ export default class NewEvent extends Component {
             textDecoration: 'underline'
         }
 
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
         const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()} value={c.id}>{c.name}</option>)
-        const imageBlock = this.state.imageFile ? <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" onClick={(e) => this.removeImage()}/> : null;
+        let imageBlock;
+        if (this.state.imagePath)
+        {
+            imageBlock = <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" onClick={(e) => this.removeImage()}/>
+        }
+        else if (this.state.image)
+        {
+            imageBlock = <img style={imageStyle} src={this.state.image} alt="event image" onClick={(e) => this.removeImage()}/>
+        }
+        else imageBlock = null
 
         return(
-            <>
-            {errorBaner}
             <Form>
-                <h2>Новое мероприятие</h2>
+                <h2>Редактирование информации о мероприятии</h2>
                 <FormGroup>
                     <Label for="name">Название мероприятия</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
@@ -210,12 +233,12 @@ export default class NewEvent extends Component {
                 </FormGroup>
                 <FormGroup>
                     <Label for="date">Дата</Label>
-                    <Input invalid={!this.state.dateValid} required type="date" name="date" id="date" onChange={this.handleInputChange}/>
+                    <Input invalid={!this.state.dateValid} required type="date" name="date" id="date" value={this.state.date} onChange={this.handleInputChange}/>
                     <FormFeedback>{this.state.formErrors.date}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="time">Время</Label>
-                    <Input invalid={!this.state.timeValid} required type="time" name="time" id="time" onChange={this.handleInputChange}/>
+                    <Input invalid={!this.state.timeValid} required type="time" name="time" id="time" value={this.state.time} onChange={this.handleInputChange}/>
                     <FormFeedback>{this.state.formErrors.time}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
@@ -250,8 +273,28 @@ export default class NewEvent extends Component {
                     <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.imagePath} onChange={this.handleInputChange}/>
                     {imageBlock}
                 </FormGroup>
-                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>
+                <div>
+                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.editEvent()}>Сохранить</Button>{' '}
+                    <Button disabled = {!this.state.formValid} color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                </div>
             </Form>
+        )
+    }
+
+    render(){
+        const errorBaner = this.state.errorMessage ? 
+        <Alert color="danger">
+            {this.state.errorMessage}
+        </Alert> : null;
+
+        const content = this.state.loading
+            ? <p><em>Loading...</em></p>
+            : this.renderEvent();
+
+        return(
+            <>
+                {errorBaner}
+                {content}
             </>
         )
     }
@@ -285,7 +328,51 @@ export default class NewEvent extends Component {
             });
     }
 
-    createEvent()
+    loadEvent(eventId) {
+        const token = AuthHelper.getToken();
+        fetch('api/Events/' + eventId + '/update', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        }).then((response) => {
+            if (!response.ok) {
+                this.setState({
+                    error: true
+                });
+            }
+            return response.json();
+        }).then((data) => {
+            if (this.state.error){
+                this.setState({ 
+                    errorMessage: data.message 
+                });
+            }
+            else {
+                this.setState({ 
+                    id: data.id,
+                    name: data.name,
+                    category: data.categoryId,
+                    description: data.description,
+                    date: data.date,
+                    time: data.time,
+                    place: data.place,
+                    fee: data.fee,
+                    participantsLimit: data.participantsLimit,
+                    tags: data.tags,
+                    image: data.image,
+                    hasImage: !!data.image,
+                    loading: false
+                });
+            }
+        }).catch((ex) => {
+            this.setState({
+                errorMessage: ex.toString()
+            });
+        });
+    }
+
+    editEvent()
     {
         if (!this.state.formValid)
         {
@@ -295,6 +382,7 @@ export default class NewEvent extends Component {
             return;
         }
         let formdata = new FormData();
+        formdata.append('id', this.state.id);
         formdata.append('name', this.state.name);
         formdata.append('categoryId', this.state.category);
         formdata.append('description', this.state.description);
@@ -304,7 +392,7 @@ export default class NewEvent extends Component {
         formdata.append('place', this.state.place);
         formdata.append('fee', parseFloat(this.state.fee));
         formdata.append('participantsLimit', this.state.participantsLimit);
-        formdata.append('organizerId', AuthHelper.getId());
+        formdata.append('hasImage', this.state.hasImage);
         if (this.state.tags)
         {
             const allTags = this.state.tags ? this.state.tags.split(',').map((tag) => tag.trim().toLowerCase()) : null;
@@ -317,7 +405,7 @@ export default class NewEvent extends Component {
         }
         const token = AuthHelper.getToken();
         fetch('api/Events', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Authorization': 'Bearer ' + token
             },

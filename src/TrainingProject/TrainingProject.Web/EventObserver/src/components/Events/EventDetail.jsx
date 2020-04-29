@@ -48,7 +48,7 @@ export default class EventMedia extends Component {
         {
             return(
                 <div>
-                    <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.evntId}`}>Редактировать</Button>{' '}
+                    <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>Редактировать</Button>{' '}
                     <Button color="danger" onClick={this.deleteEvent}>Удалить</Button>
                 </div>
             )
@@ -124,10 +124,12 @@ export default class EventMedia extends Component {
                 {image}
                 <p>{this.state.description}</p>
                 <table cellPadding='8px'>
+                    <tbody>
                     <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>
                     <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
                     <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
                     <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +'BYN' : 'Бесплатно'}</td></tr>
+                    </tbody>
                 </table>
                 <br/>
                 <div style={inlineStyle}>
@@ -182,7 +184,7 @@ export default class EventMedia extends Component {
             }
             else {
                 this.setState({ 
-                    eventId: data.id,
+                    id: data.id,
                     name: data.name,
                     categoryId: data.categoryId,
                     category: data.category,
@@ -209,7 +211,7 @@ export default class EventMedia extends Component {
 
     deleteEvent() {
         const token = AuthHelper.getToken();
-        fetch('api/Events/' + this.state.eventId, {
+        fetch('api/Events/' + this.state.id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -235,7 +237,7 @@ export default class EventMedia extends Component {
 
     subscribe() {
         const token = AuthHelper.getToken();
-        fetch(`api/Events/${this.state.eventId}/subscribe`, {
+        fetch(`api/Events/${this.state.id}/subscribe`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -261,7 +263,7 @@ export default class EventMedia extends Component {
 
     unsubscribe() {
         const token = AuthHelper.getToken();
-        fetch(`api/Events/${this.state.eventId}/unsubscribe`, {
+        fetch(`api/Events/${this.state.id}/unsubscribe`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
