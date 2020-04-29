@@ -23,8 +23,8 @@ export default class EventMedia extends Component {
             participantsLimit: 0,
             organizerId: '',
             organizer: '',
-            participants: {},
-            tags: {},
+            participants: [],
+            tags: [],
             publicationTime: '',
             image: '',
             userRole: AuthHelper.getRole(),
@@ -105,7 +105,7 @@ export default class EventMedia extends Component {
 
         const participantsTableRows = Object.keys(this.state.participants).map((key, index) => {
             return (
-                <tr> 
+                <tr key={key}> 
                     <th scope="row">{index+1}</th>
                     <td><Link to={`/user?id=${key}`}>{this.state.participants[key]}</Link></td>
                 </tr>

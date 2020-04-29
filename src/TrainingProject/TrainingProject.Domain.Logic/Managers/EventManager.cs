@@ -36,18 +36,23 @@ namespace TrainingProject.DomainLogic.Managers
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
-            var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
-            foreach (var tagName in tags)
+
+            if (@event.Tags != null)
             {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
-                if (tag == null)
+                var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+                foreach (var tagName in tags)
                 {
-                    tag = _mapper.Map<string, Tag>(tagName);
-                    await _appContext.Tags.AddAsync(tag);
-                    await _appContext.SaveChangesAsync(default);
+                    var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
+                    if (tag == null)
+                    {
+                        tag = _mapper.Map<string, Tag>(tagName);
+                        await _appContext.Tags.AddAsync(tag);
+                        await _appContext.SaveChangesAsync(default);
+                    }
+                    await _appContext.EventsTags.AddAsync(new EventsTags { EventId = newEvent.Id, TagId = tag.Id });
                 }
-                await _appContext.EventsTags.AddAsync(new EventsTags {EventId = newEvent.Id, TagId = tag.Id});
             }
+            
             await _appContext.SaveChangesAsync(default);
         }
 
@@ -66,6 +71,23 @@ namespace TrainingProject.DomainLogic.Managers
             _mapper.Map(@event, update);
             await _appContext.SaveChangesAsync(default);
 
+            _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
+            if (@event.Tags != null)
+            {
+                var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+                foreach (var tagName in tags)
+                {
+                    var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
+                    if (tag == null)
+                    {
+                        tag = _mapper.Map<string, Tag>(tagName);
+                        await _appContext.Tags.AddAsync(tag);
+                        await _appContext.SaveChangesAsync(default);
+                    }
+                    await _appContext.EventsTags.AddAsync(new EventsTags { EventId = update.Id, TagId = tag.Id });
+                }
+            }
+
             if (@event.Image != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{update.Id}.jpg";
@@ -73,19 +95,6 @@ namespace TrainingProject.DomainLogic.Managers
                 await @event.Image.CopyToAsync(fileStream);
             }
 
-            _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
-            var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
-            foreach (var tagName in tags)
-            {
-                var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
-                if (tag == null)
-                {
-                    tag = _mapper.Map<string, Tag>(tagName);
-                    await _appContext.Tags.AddAsync(tag);
-                    await _appContext.SaveChangesAsync(default);
-                }
-                await _appContext.EventsTags.AddAsync(new EventsTags { EventId = update.Id, TagId = tag.Id });
-            }
             await _appContext.SaveChangesAsync(default);
         }
 

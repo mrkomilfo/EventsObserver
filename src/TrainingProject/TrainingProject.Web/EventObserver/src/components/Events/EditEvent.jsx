@@ -328,7 +328,7 @@ export default class EditEvent extends Component{
             });
     }
 
-    loadEvent(eventId) {
+    async loadEvent(eventId) {
         const token = AuthHelper.getToken();
         fetch('api/Events/' + eventId + '/update', {
             method: 'GET',

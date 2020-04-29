@@ -298,19 +298,23 @@ export default class NewEvent extends Component {
         formdata.append('name', this.state.name);
         formdata.append('categoryId', this.state.category);
         formdata.append('description', this.state.description);
+
         const dateTime = new Date(this.state.date + " " + this.state.time);
         const start = `${dateTime.getDate()}/${dateTime.getMonth()+1}/${dateTime.getFullYear()} ${dateTime.getHours()}:${dateTime.getMinutes()}`
         formdata.append('start', start);
+
         formdata.append('place', this.state.place);
         formdata.append('fee', parseFloat(this.state.fee));
         formdata.append('participantsLimit', this.state.participantsLimit);
         formdata.append('organizerId', AuthHelper.getId());
+
         if (this.state.tags)
         {
-            const allTags = this.state.tags ? this.state.tags.split(',').map((tag) => tag.trim().toLowerCase()) : null;
-            const uniqueTags = allTags ? allTags.filter((item, pos) => { return allTags.indexOf(item) == pos; }) : null;  
+            const allTags = this.state.tags.split(',').map((tag) => tag.trim().toLowerCase());
+            const uniqueTags = allTags.filter((item, pos) => { return allTags.indexOf(item) == pos; });  
             formdata.append('tags', JSON.stringify(uniqueTags));
         }
+
         if (this.state.imagePath)
         {
             formdata.append('image', this.state.imageFile);

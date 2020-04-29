@@ -13,7 +13,7 @@ export default class EventMedia extends Component {
 
         let image = this.props.event.image ? 
         <Media left>
-                <Media object src={this.props.event.image} alt="Image" style={imgStyle}/>
+            <Media object src={this.props.event.image} alt="Image" style={imgStyle}/>
         </Media> : null;
         
         return(
