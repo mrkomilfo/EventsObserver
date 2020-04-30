@@ -180,7 +180,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             if (tag != null)
             {
-                query = query.Where(e => _appContext.EventsTags.Include(e=>e.Tag).Where(et=>et.EventId==e.Id).Any(et => et.Tag.Name == tag));
+                query = query.Where(e => _appContext.EventsTags.Include(et => et.Tag).Where(et => String.Equals(et.EventId, e.Id)).Any(et => String.Equals(et.Tag.Name, tag)));
             }
             if (upComing != null)
             {
@@ -196,11 +196,11 @@ namespace TrainingProject.DomainLogic.Managers
             }
             if (organizer != null)
             {
-                query = query.Where(e => e.OrganizerId == organizer);
+                query = query.Where(e => Guid.Equals(e.OrganizerId, organizer));
             }
             if (participant != null)
             {
-                query = query.Where(e => e.Participants.Any(p => p.Id == participant));
+                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Guid.Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participant)));
             }
             result.TotalRecords = await query.CountAsync();
             if (upComing != null && (bool)upComing)

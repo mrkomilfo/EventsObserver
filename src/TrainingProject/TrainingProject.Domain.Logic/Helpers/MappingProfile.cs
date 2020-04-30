@@ -48,6 +48,7 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
                 .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime == null | m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"))
+                .ForMember(m => m.RegistrationDate, opt => opt.MapFrom(m => m.RegistrationDate.ToString("f")))
                 .ForMember(m => m.OrganizedEvents, opt => opt.MapFrom(m => m.OrganizedEvents.Count))
                 .ForMember(m => m.VisitedEvents, opt => opt.Ignore());
             CreateMap<User, UserLiteDTO>()
