@@ -38,7 +38,7 @@ export default class Events extends Component {
     }
 
     render() {
-        const errorBaner = this.state.error ? 
+        const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
         </Alert> : null;

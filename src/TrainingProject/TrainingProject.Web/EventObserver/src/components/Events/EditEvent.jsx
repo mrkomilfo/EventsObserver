@@ -23,10 +23,9 @@ export default class EditEvent extends Component{
             participantsLimit: 0,
             tags: '', 
             imagePath: '', 
-            fileURL: '', 
             imageFile: null,
+            fileName: '',
             hasImage: false,
-            image: '',
             formErrors: { 
                 name: '', 
                 category: '', 
@@ -69,20 +68,21 @@ export default class EditEvent extends Component{
         const name = target.name;
         const value = target.value;
 
-        this.setState({
-                [name]: value
-            }, 
-            () => { this.validateField(name, value) }
-        );
-
-        if (name=='imageFile')
+        if (name == 'imageFile')
         {
             this.setState({
-                imagePath: value,
+                fileName: value,
                 imageFile: target.files[0],
                 hasImage: true
             }); 
         }
+        else{
+            this.setState({
+                [name]: value
+            }, 
+                () => { this.validateField(name, value) }
+            );
+        }   
     }
 
     validateField(fieldName, value){
@@ -169,10 +169,10 @@ export default class EditEvent extends Component{
     removeImage()
     {
         this.setState({
-            imagePath: '', 
             imageFile: null,
             hasImage: false,
-            image: ''
+            fileName: '',
+            imagePath: ''
         })
     }
 
@@ -196,13 +196,13 @@ export default class EditEvent extends Component{
 
         const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()} value={c.id}>{c.name}</option>)
         let imageBlock;
-        if (this.state.imagePath)
+        if (this.state.imageFile)
         {
             imageBlock = <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" onClick={(e) => this.removeImage()}/>
         }
-        else if (this.state.image)
+        else if (this.state.imagePath)
         {
-            imageBlock = <img style={imageStyle} src={this.state.image} alt="event image" onClick={(e) => this.removeImage()}/>
+            imageBlock = <img style={imageStyle} src={this.state.imagePath} alt="event image" onClick={(e) => this.removeImage()}/>
         }
         else imageBlock = null
 
@@ -270,12 +270,12 @@ export default class EditEvent extends Component{
                     <UncontrolledTooltip placement="right" target="imageTip">
                         Чтобы удалить картинку - просто кликните по ней
                     </UncontrolledTooltip>
-                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.imagePath} onChange={this.handleInputChange}/>
+                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
                     {imageBlock}
                 </FormGroup>
                 <div>
                     <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.editEvent()}>Сохранить</Button>{' '}
-                    <Button disabled = {!this.state.formValid} color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
         )
@@ -360,7 +360,7 @@ export default class EditEvent extends Component{
                     fee: data.fee,
                     participantsLimit: data.participantsLimit,
                     tags: data.tags,
-                    image: data.image,
+                    imagePath: data.image,
                     hasImage: !!data.image,
                     loading: false
                 });
@@ -399,7 +399,7 @@ export default class EditEvent extends Component{
             const uniqueTags = allTags ? allTags.filter((item, pos) => { return allTags.indexOf(item) == pos; }) : null;  
             formdata.append('tags', JSON.stringify(uniqueTags));
         }
-        if (this.state.imagePath)
+        if (this.state.imageFile)
         {
             formdata.append('image', this.state.imageFile);
         }
@@ -412,7 +412,7 @@ export default class EditEvent extends Component{
             body: formdata
         }).then((response) => {
             if (response.ok){
-                this.props.history.push("/events");
+                this.props.history.push(`/event?id=${this.state.id}`);
             }
             else {
                 return response.json();

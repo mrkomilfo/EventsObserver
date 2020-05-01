@@ -84,7 +84,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> Update([FromBody] UserUpdateDTO userUpdateDTO)
+        public async Task<ActionResult> Update([FromForm] UserUpdateDTO userUpdateDTO)
         {
             return await HandleExceptions(async () =>
             {

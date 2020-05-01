@@ -17,7 +17,8 @@ export default class NavMenu extends Component {
         this.state = {
             collapsed: true,
             logoutModal: false,
-            role: AuthHelper.getRole()
+            role: AuthHelper.getRole(),
+            id: AuthHelper.getId()
         };
     }
 
@@ -77,9 +78,14 @@ export default class NavMenu extends Component {
                     <NavLink tag={Link} to="/signIn">Вход</NavLink>
                 </NavItem>
             </> :
-            <NavItem>
-                <NavLink onClick={this.toggleLogoutModal}>Выход</NavLink>
-            </NavItem>;
+            <>
+                <NavItem>
+                    <NavLink tag={Link} to={`/user?id=${this.state.id}`}>Мой профиль</NavLink>
+                </NavItem>
+                <NavItem>  
+                    <NavLink style={{cursor: 'pointer'}} onClick={this.toggleLogoutModal}>Выход</NavLink>
+                </NavItem>
+            </>
 
         const logoutModal = 
             <Modal isOpen={this.state.logoutModal} toggle={this.toggleLogoutModal}>

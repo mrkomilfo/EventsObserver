@@ -150,7 +150,7 @@ export default class EventMedia extends Component {
 
     render()
     {
-        const errorBaner = this.state.error ? 
+        const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
         </Alert> : null;
@@ -222,12 +222,16 @@ export default class EventMedia extends Component {
                 this.props.history.push("/events");                   
             } 
             else {
+                this.setState({error: true})
                 return response.json()
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            })
+            if (this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                })
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()
@@ -245,15 +249,19 @@ export default class EventMedia extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();                  
+                window.location.reload();    
             } 
             else {
+                this.setState({error: true})
                 return response.json()
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            })
+            if (this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                })
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()
@@ -271,15 +279,19 @@ export default class EventMedia extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();                  
+                window.location.reload();             
             } 
             else {
+                this.setState({error: true})
                 return response.json()
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            })
+            if (this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                })
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()

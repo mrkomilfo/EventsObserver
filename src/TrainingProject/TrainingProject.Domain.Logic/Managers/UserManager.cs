@@ -69,7 +69,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
         {
-            User updatedUser = await _appContext.Users.FindAsync(user.Id);
+            User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(user.Id)));
             if (updatedUser == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");

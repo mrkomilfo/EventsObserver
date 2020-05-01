@@ -83,7 +83,7 @@ export default class Profile extends Component {
             case 'Account manager':
                 badge = <Badge style={bageStyle} color="success">Account manager</Badge>
                 break;
-            case 'Admin':
+            case 'Admin': 
                 badge = <Badge style={bageStyle} color="danger">Admin</Badge>
                 break;
             default:
@@ -117,7 +117,7 @@ export default class Profile extends Component {
 
     render()
     {
-        const errorBaner = this.state.error ? 
+        const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
         </Alert> : null;

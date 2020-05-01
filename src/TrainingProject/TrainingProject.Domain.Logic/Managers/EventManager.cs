@@ -238,7 +238,8 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new ArgumentException($"User(id={userId}) is already signed up on event(id={eventId})");
             }
-            if (await _appContext.EventsUsers.Where(eu => eu.EventId == eventId).CountAsync() >= (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit)
+            int participantsLimit = (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit;
+            if (await _appContext.EventsUsers.Where(eu => eu.EventId == eventId).CountAsync() >= participantsLimit && participantsLimit != 0)
             {
                 throw new ArgumentException($"No vacancies on event(id={eventId})");
             }

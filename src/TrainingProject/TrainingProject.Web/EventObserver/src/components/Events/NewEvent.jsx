@@ -14,10 +14,9 @@ export default class NewEvent extends Component {
             time: null, 
             fee: 0, 
             participantsLimit: 0,
-            tags: '', 
-            imagePath: '', 
-            fileURL: '', 
+            tags: '',
             imageFile: null,
+            fileName: '',
             formErrors: { 
                 name: '', 
                 category: '', 
@@ -53,19 +52,21 @@ export default class NewEvent extends Component {
         const name = target.name;
         const value = target.value;
 
-        this.setState({
-                [name]: value
-            }, 
-            () => { this.validateField(name, value) }
-        );
-
-        if (name=='imageFile')
+        if (name == 'imageFile')
         {
             this.setState({
-                imagePath: value,
-                imageFile: target.files[0]
+                fileName: value,
+                imageFile: target.files[0],
             }); 
         }
+
+        else{
+            this.setState({
+                [name]: value
+            }, 
+                () => { this.validateField(name, value) 
+            });
+        }        
     }
 
     validateField(fieldName, value){
@@ -152,7 +153,7 @@ export default class NewEvent extends Component {
     removeImage()
     {
         this.setState({
-            imagePath: '', 
+            fileName: '', 
             imageFile: null
         })
     }
@@ -247,7 +248,7 @@ export default class NewEvent extends Component {
                     <UncontrolledTooltip placement="right" target="imageTip">
                         Чтобы удалить картинку - просто кликните по ней
                     </UncontrolledTooltip>
-                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.imagePath} onChange={this.handleInputChange}/>
+                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
                     {imageBlock}
                 </FormGroup>
                 <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>
@@ -315,7 +316,7 @@ export default class NewEvent extends Component {
             formdata.append('tags', JSON.stringify(uniqueTags));
         }
 
-        if (this.state.imagePath)
+        if (this.state.imageFile)
         {
             formdata.append('image', this.state.imageFile);
         }

@@ -8,6 +8,7 @@ import EditEvent from './components/Events/EditEvent';
 import Profile from './components/Users/Profile';
 import SignUp from './components/Users/SignUp';
 import SignIn from './components/Users/SignIn';
+import EditProfile from './components/Users/EditProfile';
 
 export default class App extends Component {
   render () {
@@ -24,8 +25,8 @@ export default class App extends Component {
             <Route path='/user' component={Profile} />
             <Route path='/signUp' component={SignUp} />
             <Route path='/signIn' component={SignIn} />
-            {/*<Route path='/editProfile' component={EditProfile} />
-            <Route path='/changePassword' component={ChangePassword} />
+            <Route path='/editProfile' component={EditProfile} />
+            {/*<Route path='/changePassword' component={ChangePassword} />
             <Route path='/roles' component={Roles} />
             <Route path='/blocking' component={Blocking} />
 
