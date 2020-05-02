@@ -7,7 +7,7 @@ export default class EditProfile extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            userName: '', contactEmail: '', contactPhone: '', hasImage: false, imagePath: '', imageFile: null, fileName: '',
+            id: '', userName: '', contactEmail: '', contactPhone: '', hasImage: false, imagePath: '', imageFile: null, fileName: '',
             formErrors: { userName: '', contactEmail: '', contactPhone: ''},
             formValid: true, userNameValid: true, contactEmailValid: true, contactPhoneValid: true,
             error: false, errorMessage: ''
@@ -133,8 +133,9 @@ export default class EditProfile extends Component {
         }
 
         return(
+            <>           
+            <h2>Редактирование профиля</h2>
             <Form style={formStyle}>
-                <h2>Редактирование профиля</h2>
                 <FormGroup>
                     <Label for="userName">Имя пользователя</Label>
                     <Input invalid={!this.state.userNameValid} required type="text" name="userName" id="userName" value={this.state.userName} onChange={this.handleInputChange}/>
@@ -163,6 +164,7 @@ export default class EditProfile extends Component {
                     <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
+            </>
         )
     }
 
@@ -253,12 +255,16 @@ export default class EditProfile extends Component {
                 this.props.history.push(`/user?id=${this.state.id}`);
             }
             else {
+                this.setState({error: true})
                 return response.json();
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            });
+            if(this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                });
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()

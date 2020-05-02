@@ -207,8 +207,9 @@ export default class EditEvent extends Component{
         else imageBlock = null
 
         return(
+            <>
+            <h2>Редактирование информации о мероприятии</h2>
             <Form>
-                <h2>Редактирование информации о мероприятии</h2>
                 <FormGroup>
                     <Label for="name">Название мероприятия</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
@@ -278,6 +279,7 @@ export default class EditEvent extends Component{
                     <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
+            </>
         )
     }
 

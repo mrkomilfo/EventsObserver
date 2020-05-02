@@ -7,7 +7,7 @@ export default class SignUp extends Component {
         this.state = { 
             name: '', email: '', phone: '', login: '', password: '', passwordConfirm: '',
             formErrors: { name: '', email: '', phone: '', login: '', password: '', passwordConfirm: '' },
-            nameValid: false, emailValid: true, phoneValid: true, loginValid: false, passwordValid: false, passwordConfirmValid: false,
+            formValid: false, nameValid: false, emailValid: true, phoneValid: true, loginValid: false, passwordValid: false, passwordConfirmValid: false,
             errorMessage: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -93,15 +93,15 @@ export default class SignUp extends Component {
             {this.state.errorMessage}
         </Alert> : null;
 
-        const signUpStyle = {
+        const formStyle = {
             maxWidth: '256px'
         }
         
         return(
             <>
             {errorBaner}
-            <Form style={signUpStyle}>
-                <h2>Регистрация</h2>
+            <h2>Регистрация</h2>
+            <Form style={formStyle}>
                 <FormGroup>
                     <Label for="name">Имя пользователя</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
@@ -166,12 +166,16 @@ export default class SignUp extends Component {
                 this.props.history.push("/signIn");
             }
             else {
+                this.setState({error: true});
                 return response.json();
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            });
+            if(this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                });
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()

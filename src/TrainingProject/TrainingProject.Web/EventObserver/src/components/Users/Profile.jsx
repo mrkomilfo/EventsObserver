@@ -12,7 +12,7 @@ export default class Profile extends Component {
             loading: true,
             error: false,
             errorMessage: '',
-            id: null,
+            id: '',
             userName: '',
             role: '',
             status: '',
@@ -44,7 +44,7 @@ export default class Profile extends Component {
             return(
                 <div style={buttonPanelStyle}>
                     <Button color="primary" tag={Link} to={`/editProfile?id=${this.state.id}`}>Редактировать профиль</Button>{' '}
-                    <Button color="primary" tag={Link} to={`/changePassword?id=${this.state.id}`}>Сменить пароль</Button>
+                    <Button color="primary" tag={Link} to={`/changePassword`}>Сменить пароль</Button>
                 </div>
             )
         }

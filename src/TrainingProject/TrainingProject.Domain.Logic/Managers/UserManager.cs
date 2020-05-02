@@ -241,5 +241,20 @@ namespace TrainingProject.DomainLogic.Managers
             }
             return await _appContext.Users.Include(u => u.Role).Where(u => u.Id == userId).Select(u => u.Role).FirstOrDefaultAsync();
         }
+
+        public async Task ChangePassword(ChangePasswordDTO changePasswordDTO)
+        {
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));
+            if (user == null)
+            {
+                throw new NullReferenceException($"User with id={user.Id} not found");
+            }
+            if (!String.Equals(HashGenerator.Encrypt(changePasswordDTO.OldPassword), user.Password))
+            {
+                throw new ArgumentException("Wrong old password");
+            }
+            user.Password = HashGenerator.Encrypt(changePasswordDTO.NewPassword);
+            await _appContext.SaveChangesAsync(default);
+        }
     }
 }

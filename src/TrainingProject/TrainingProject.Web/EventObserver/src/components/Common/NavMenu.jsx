@@ -24,7 +24,8 @@ export default class NavMenu extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({ 
-            role: AuthHelper.getRole() 
+            role: AuthHelper.getRole(),
+            id: AuthHelper.getId()
         });
     }
 

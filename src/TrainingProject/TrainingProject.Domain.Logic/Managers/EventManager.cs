@@ -11,6 +11,7 @@ using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
 using System.Text.Json;
 using System.Collections.Generic;
+using TrainingProject.DomainLogic.Models.Users;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -64,7 +65,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new NullReferenceException($"Event with id={@event.Id} not found");
             }
             int subscribesCount = await _appContext.EventsUsers.Where(eu => eu.EventId == @event.Id).CountAsync();
-            if (@event.ParticipantsLimit < subscribesCount)
+            if (@event.ParticipantsLimit < subscribesCount && @event.ParticipantsLimit != 0)
             {
                 throw new ArgumentException($"Сurrent number of participants({subscribesCount}) is greater than the new limit({@event.ParticipantsLimit})");
             }

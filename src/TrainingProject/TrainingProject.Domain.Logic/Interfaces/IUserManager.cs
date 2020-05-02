@@ -23,5 +23,6 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<IEnumerable<Role>> GetRoles();
         Task<UserRoleDTO> GetUserWithRole(Guid userId);
         Task<Role> GetUserRole(Guid userId);
+        Task ChangePassword(ChangePasswordDTO changePasswordDTO);
     }
 }

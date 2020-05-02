@@ -208,5 +208,21 @@ namespace TrainingProject.Web.Controllers
             });
 
         }
+
+        [HttpPut]
+        [Route("changePassword")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult> ChangePassword([FromBody]ChangePasswordDTO changePasswordDTO)
+        {
+            return await HandleExceptions(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    await _userManager.ChangePassword(changePasswordDTO);
+                    return Ok();
+                }
+                return BadRequest("Model state is not valid");
+            });
+        }
     }
 }

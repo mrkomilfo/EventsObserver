@@ -9,6 +9,7 @@ import Profile from './components/Users/Profile';
 import SignUp from './components/Users/SignUp';
 import SignIn from './components/Users/SignIn';
 import EditProfile from './components/Users/EditProfile';
+import ChangePassword from './components/Users/ChangePassword';
 
 export default class App extends Component {
   render () {
@@ -26,8 +27,8 @@ export default class App extends Component {
             <Route path='/signUp' component={SignUp} />
             <Route path='/signIn' component={SignIn} />
             <Route path='/editProfile' component={EditProfile} />
-            {/*<Route path='/changePassword' component={ChangePassword} />
-            <Route path='/roles' component={Roles} />
+            <Route path='/changePassword' component={ChangePassword} />
+            {/*<Route path='/roles' component={Roles} />
             <Route path='/blocking' component={Blocking} />
 
             <Route path='/categories' component={Categories} />

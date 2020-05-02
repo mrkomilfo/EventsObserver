@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
+using TrainingProject.DomainLogic.Models.Users;
 using TrainingProject.Web.Interfaces;
 
 namespace TrainingProject.Web.Controllers

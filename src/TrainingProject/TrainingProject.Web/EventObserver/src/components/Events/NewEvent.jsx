@@ -185,8 +185,8 @@ export default class NewEvent extends Component {
         return(
             <>
             {errorBaner}
+            <h2>Новое мероприятие</h2>
             <Form>
-                <h2>Новое мероприятие</h2>
                 <FormGroup>
                     <Label for="name">Название мероприятия</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>

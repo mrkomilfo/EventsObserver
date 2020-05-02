@@ -33,8 +33,8 @@ export default class SignUp extends Component {
         return( 
             <>
             {errorBaner}
+            <h2>Вход</h2>  
             <Form style={signInStyle}>    
-                <h2>Вход</h2>            
                 <FormGroup>
                     <Label for="login">Логин</Label>
                     <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange}/>
