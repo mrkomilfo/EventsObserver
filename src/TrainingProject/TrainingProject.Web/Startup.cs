@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +14,6 @@ using TrainingProject.DomainLogic.Managers;
 using AppContext = TrainingProject.Data.AppContext;
 using TrainingProject.Web.Interfaces;
 using TrainingProject.Web.Services;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -41,7 +35,6 @@ namespace TrainingProject.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOpenApiDocument();
             services.AddControllers();
 
             services.AddSpaStaticFiles(configuration =>
@@ -83,8 +76,6 @@ namespace TrainingProject.Web
             services.AddScoped<IEventManager, EventManager>();
             services.AddScoped<IHostServices, HostServices>();
             services.AddSingleton<IWebHostEnvironment>(Environment);
-
-            services.AddSwaggerDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,12 +84,10 @@ namespace TrainingProject.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseOpenApi().UseSwaggerUi3();
             }
 
             app.UseAuthentication();
-            
-
+      
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles(); 

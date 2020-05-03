@@ -46,10 +46,14 @@ namespace TrainingProject.DomainLogic.Managers
             return user;
         }
 
-        public async Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize)
+        public async Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize, string search)
         {
             var result = new Page<UserLiteDTO>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Users.Include(e => e.Role).AsQueryable();
+            if (search != null)
+            {
+                query = query.Where(u => u.UserName.ToLower().Contains(search.ToLower()));
+            }
             result.TotalRecords = await query.CountAsync();
             result.Records = await _mapper.ProjectTo<UserLiteDTO>(query).ToListAsync(default);
             return result;

@@ -101,7 +101,7 @@ export default class EventsPaginator extends Component {
             <PaginationItem>
                 <PaginationLink tag={Link} to={`${pagePath}${this.props.totalPages - 1}${queryTrailer}`}>»</PaginationLink>
             </PaginationItem>
-        </>;
+        </>
         return (
             <Pagination aria-label="Events paginator">
                 {leftArrows}

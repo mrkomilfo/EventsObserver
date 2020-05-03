@@ -28,7 +28,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Page<UserLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 12)
+        public async Task<ActionResult<Page<UserLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 20, string search = null)
         {
             return await HandleExceptions(async () =>
             {
@@ -37,7 +37,7 @@ namespace TrainingProject.Web.Controllers
                 {
                     return Forbid("Access denied");
                 }
-                return Ok(await _userManager.GetUsers(index, pageSize));
+                return Ok(await _userManager.GetUsers(index, pageSize, search));
             });
         }
 

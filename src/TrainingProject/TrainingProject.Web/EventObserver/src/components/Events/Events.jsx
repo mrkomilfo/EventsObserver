@@ -9,8 +9,14 @@ export default class Events extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            query: window.location.search, events: [], currentPage: 0, pageSize: 12, totalRecords: 0, loading: true, 
-            error: false, errorMessage: '' 
+            loading: true,
+            query: window.location.search, 
+            events: [], 
+            currentPage: 0, 
+            pageSize: 8, 
+            totalRecords: 0,  
+            error: false, 
+            errorMessage: '' 
         };
     }
 
@@ -19,7 +25,7 @@ export default class Events extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.state.query != window.location.search) {
+        if (this.state.query !== window.location.search) {
             this.setState({ query: window.location.search });
             this.loadEvents();
         }
@@ -116,7 +122,7 @@ export default class Events extends Component {
             queryTrailer += `&participant=${participant}`
         }
 
-        fetch('api/Events' + queryTrailer)
+        fetch(`api/Events${queryTrailer}`)
             .then((response) => {
                 if (!response.ok) {
                     this.setState({error: true});
@@ -127,8 +133,13 @@ export default class Events extends Component {
                     this.setState({errorMessage: data.message});
                 }
                 else {
-                    this.setState({ events: data.records, currentPage: data.currentPage, pageSize: data.pageSize, 
-                        totalRecords: data.totalRecords, loading: false });
+                    this.setState({ 
+                        events: data.records, 
+                        currentPage: data.currentPage, 
+                        pageSize: data.pageSize, 
+                        totalRecords: data.totalRecords, 
+                        loading: false 
+                    });
                 }
             }).catch((ex) => {
                 this.setState({errorMessage: ex.toString()});

@@ -10,7 +10,7 @@ namespace TrainingProject.DomainLogic.Interfaces
     public interface IUserManager
     {
         Task<UserFullDTO> GetUser(Guid userId);
-        Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize);
+        Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize, string search);
         Task RegisterUser(RegisterDTO user);
         Task UpdateUser(UserUpdateDTO user, string hostRoot);
         Task<UserToUpdateDTO> GetUserToUpdate(Guid userId);

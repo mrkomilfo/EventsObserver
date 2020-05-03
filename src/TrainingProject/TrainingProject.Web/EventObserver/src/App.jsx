@@ -5,6 +5,7 @@ import Events from './components/Events/Events';
 import EventDetail from './components/Events/EventDetail';
 import NewEvent from './components/Events/NewEvent';
 import EditEvent from './components/Events/EditEvent';
+import Users from './components/Users/Users';
 import Profile from './components/Users/Profile';
 import SignUp from './components/Users/SignUp';
 import SignIn from './components/Users/SignIn';
@@ -26,9 +27,9 @@ export default class App extends Component {
               <Route exact path='/' render={() => (<Redirect to='/events' />)} />
               <Route path='/event' component={EventDetail} />
               {AuthHelper.getRole() !== 'Guest' && <Route path='/newEvent' component={NewEvent} />}
-              {AuthHelper.getRole() !== 'Guest' &&<Route path='/editEvent' component={EditEvent} />}
+              {AuthHelper.getRole() !== 'Guest' && <Route path='/editEvent' component={EditEvent} />}
 
-              {/*AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager' && <Route path='/users' component={Users} />*/}
+              {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') && <Route path='/users' component={Users} />}
               <Route path='/user' component={Profile} />
               <Route path='/signUp' component={SignUp} />
               <Route path='/signIn' component={SignIn} />
