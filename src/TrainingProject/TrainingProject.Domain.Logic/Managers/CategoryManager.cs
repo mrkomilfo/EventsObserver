@@ -24,7 +24,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task AddCategory(CategoryCreateDTO category)
         {
-            if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name, category.Name, StringComparison.CurrentCultureIgnoreCase)))
+            if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name.ToLower(), category.Name.ToLower())))
             {
                 throw new ArgumentException("Category with this name already exist");
             }
@@ -74,7 +74,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
         public async Task<ICollection<CategoryLiteDTO>> GetCategories()
         {
-            return await _appContext.Categories.Select(c => new CategoryLiteDTO{Id=c.Id, Name = c.Name}).ToListAsync();
+            return await _appContext.Categories.Select(c => new CategoryLiteDTO{ Id=c.Id, Name = c.Name }).ToListAsync();
         }
     }
 }

@@ -79,7 +79,7 @@ export class UsersPaginator extends Component {
             </PaginationItem>
         </>;
         return (
-            <Pagination aria-label="USers paginator">
+            <Pagination aria-label="Users paginator">
                 {leftArrows}
                 {prevprev}
                 {prev}
@@ -92,7 +92,7 @@ export class UsersPaginator extends Component {
     }
 }
 
-EventPaginator.propTypes = {
+UsersPaginator.propTypes = {
     currentPage: PropTypes.number.isRequired,
     pages: PropTypes.number.isRequired
 };

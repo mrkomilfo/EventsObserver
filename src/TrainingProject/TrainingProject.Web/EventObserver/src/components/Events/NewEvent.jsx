@@ -45,6 +45,7 @@ export default class NewEvent extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
         this.createEvent = this.createEvent.bind(this);
+        this.cancel = this.cancel.bind(this);
     }
 
     handleInputChange(event) {
@@ -158,6 +159,11 @@ export default class NewEvent extends Component {
         })
     }
 
+    cancel()
+    {
+        this.props.history.push(`/events`);
+    }
+
     componentDidMount() {
         this.loadCategories();
     }
@@ -251,7 +257,10 @@ export default class NewEvent extends Component {
                     <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
                     {imageBlock}
                 </FormGroup>
-                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>
+                <div>
+                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>
+                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                </div>
             </Form>
             </>
         )

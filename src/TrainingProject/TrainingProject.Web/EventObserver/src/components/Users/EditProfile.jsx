@@ -7,6 +7,7 @@ export default class EditProfile extends Component {
     constructor(props) {
         super(props);
         this.state = { 
+            loading: true,
             id: '', userName: '', contactEmail: '', contactPhone: '', hasImage: false, imagePath: '', imageFile: null, fileName: '',
             formErrors: { userName: '', contactEmail: '', contactPhone: ''},
             formValid: true, userNameValid: true, contactEmailValid: true, contactPhoneValid: true,

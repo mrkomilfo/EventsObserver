@@ -146,7 +146,7 @@ export default class SignUp extends Component {
             })
             return;
         }
-        var data = {
+        let data = {
             userName: this.state.name,
             contactEmail: this.state.email, 
             contactPhone: this.state.phone, 

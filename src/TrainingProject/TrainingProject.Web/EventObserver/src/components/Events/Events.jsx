@@ -15,13 +15,13 @@ export default class Events extends Component {
     }
 
     componentDidMount() {
-        this.populateEventsData();
+        this.loadEvents();
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.state.query != window.location.search) {
             this.setState({ query: window.location.search });
-            this.populateEventsData();
+            this.loadEvents();
         }
     }
 
@@ -43,7 +43,7 @@ export default class Events extends Component {
             {this.state.errorMessage}
         </Alert> : null;
 
-        const contents = this.state.loading
+        const content = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderEventsList(this.state.events);
 
@@ -65,7 +65,7 @@ export default class Events extends Component {
             <div style={pageStyle}>
                 <div style={contentStyle}>
                     <h2 id="tabelLabel">События в Минске</h2>
-                    {contents}
+                    {content}
                 </div>
                 <div style={filterStyle}>
                     <EventsSideBar />
@@ -75,7 +75,7 @@ export default class Events extends Component {
         );
     }
 
-    async populateEventsData() {
+    async loadEvents() {
         let page; let search; let categoryId; let tag; let upComing; let onlyFree; let vacancies; let organizer; let participant;
         const parsed = queryString.parse(window.location.search);
         if (parsed) {

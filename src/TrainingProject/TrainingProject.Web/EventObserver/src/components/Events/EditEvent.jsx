@@ -351,6 +351,7 @@ export default class EditEvent extends Component{
                 });
             }
             else {
+                debugger;
                 this.setState({ 
                     id: data.id,
                     name: data.name,
