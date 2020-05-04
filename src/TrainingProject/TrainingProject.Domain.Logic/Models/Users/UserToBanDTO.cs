@@ -3,12 +3,14 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class BanDTO
+    public class UserToBanDTO
     {
-        [Required]
         [ValidGuid]
+        [Required]
         public string Id { get; set; }
-        public int? Days { get; set; }
-        public int? Hours { get; set; }
+        [Required]
+        public string UserName { get; set; }
+        [Required]
+        public bool IsBanned { get; set; }
     }
 }

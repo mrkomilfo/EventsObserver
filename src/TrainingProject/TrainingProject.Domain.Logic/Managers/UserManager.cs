@@ -124,15 +124,26 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
+        public async Task<UserToBanDTO> GetUserToBan(Guid userId)
+        {
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, userId));
+            if (user == null)
+            {
+                throw new NullReferenceException($"User with id={user.Id} not found");
+            }
+            UserToBanDTO userToBan = _mapper.Map<UserToBanDTO>(user);
+            return userToBan;
+        }
+
         public async Task BanUser(BanDTO banDTO)
         {
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(banDTO.UserId));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(banDTO.Id)));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
             }
             user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
-            user.UnlockTime = DateTime.Now.AddHours(banDTO?.Hours ?? 0);
+            user.UnlockTime = user.UnlockTime?.AddHours(banDTO?.Hours ?? 0);
             await _appContext.SaveChangesAsync(default);
         }
 

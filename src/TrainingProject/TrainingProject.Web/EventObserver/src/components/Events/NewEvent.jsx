@@ -258,7 +258,7 @@ export default class NewEvent extends Component {
                     {imageBlock}
                 </FormGroup>
                 <div>
-                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>
+                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>{' '}
                     <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
@@ -269,9 +269,7 @@ export default class NewEvent extends Component {
     loadCategories() {
         fetch('api/Categories')
             .then((response) => {
-                if (!response.ok) {
-                    this.setState({error: true});
-                }
+                this.setState({error: !response.ok});
                 return response.json();
             }).then((data) => {
                 if (this.state.error){

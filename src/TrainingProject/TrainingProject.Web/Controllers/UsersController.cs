@@ -27,13 +27,13 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult<Page<UserLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 20, string search = null)
         {
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-                if (role != "Admin" && role != "AccountManager")
+                if (role != "Admin" && role != "Account manager")
                 {
                     return Forbid("Access denied");
                 }
@@ -105,7 +105,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpDelete("{userId}")]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult> Delete(string userId)
         {
             return await HandleExceptions(async () =>
@@ -116,17 +116,34 @@ namespace TrainingProject.Web.Controllers
             });
         }
 
-        [HttpPut("ban")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> Ban([FromBody] BanDTO banDTO)
+        [HttpGet("{userId}/ban")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
+        public async Task<ActionResult<UserToBanDTO>> Ban(string userId)
         {
             return await HandleExceptions(async () =>
             {
                 var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-                var userRole = (await _userManager.GetUserRole(Guid.Parse(banDTO.UserId))).ToString();
-                if (userRole == "AccountManager" || userRole == currentRole)
+                var userRole = (await _userManager.GetUserRole(Guid.Parse(userId))).ToString();
+                if (userRole == "Account manager" || userRole == currentRole)
                 {
-                    return Forbid("Access denied");
+                    return Forbid("Lack of rights");
+                }
+                return Ok(await _userManager.GetUserToBan(Guid.Parse(userId)));
+            });
+        }
+
+        [HttpPut]
+        [Route("ban")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
+        public async Task<ActionResult> Ban([FromBody]BanDTO banDTO)
+        {
+            return await HandleExceptions(async () =>
+            {
+                var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+                var userRole = (await _userManager.GetUserRole(Guid.Parse(banDTO.Id))).ToString();
+                if (userRole == "Account manager" || userRole == currentRole)
+                {
+                    return Forbid("Lack of rights");
                 }
                 if (ModelState.IsValid)
                 {
@@ -138,7 +155,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPut("{userId}/unban")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult> Unban(string userId)
         {
             return await HandleExceptions(async () =>
@@ -149,9 +166,9 @@ namespace TrainingProject.Web.Controllers
                 }
                 var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userRole = (await _userManager.GetUserRole(userGuid)).ToString();
-                if (userRole == "AccountManager" || userRole == currentRole)
+                if (userRole == "Account manager" || userRole == currentRole)
                 {
-                    return Forbid("Access denied");
+                    return Forbid("Lack of rights");
                 }
                 await _userManager.UnbanUser(userGuid);
                 return Ok();
@@ -159,7 +176,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         [Route("roles")]
         public async Task<ActionResult<IEnumerable<Role>>> Roles()
         {
@@ -170,7 +187,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet("{userId}/role")]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
             return await HandleExceptions(async () =>
@@ -180,7 +197,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPut("role")]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "AccountManager")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult> ChangeRole([FromBody] ChangeRoleDTO changeRoleDTO)
         {
             return await HandleExceptions(async () =>

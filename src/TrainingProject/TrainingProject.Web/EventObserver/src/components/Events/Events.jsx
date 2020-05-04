@@ -124,9 +124,7 @@ export default class Events extends Component {
 
         fetch(`api/Events${queryTrailer}`)
             .then((response) => {
-                if (!response.ok) {
-                    this.setState({error: true});
-                }
+                this.setState({error: !response.ok});
                 return response.json();
             }).then((data) => {
                 if (this.state.error){

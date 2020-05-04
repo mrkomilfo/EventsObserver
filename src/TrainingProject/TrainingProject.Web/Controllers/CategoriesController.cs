@@ -67,7 +67,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpDelete("{categoryId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult> Delete(int categoryId)
         {
             return await HandleExceptions(async () =>

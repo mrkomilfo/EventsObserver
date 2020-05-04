@@ -74,7 +74,7 @@ export default class Profile extends Component {
     {
         const mainStyle = {display: 'flex'};
         const photoStyle = {maxWidth: '300px', marginRight: '16px'};
-        const statusStyle = {fontSize: '14px', color: 'red'};
+        const statusStyle = {fontSize: '14px', color: 'red', marginLeft: '8px'};
         const bageStyle = {marginLeft: '8px'};
 
         let badge;
@@ -137,11 +137,7 @@ export default class Profile extends Component {
     async loadData(userId) {
         fetch('api/Users/' + userId)
         .then((response) => {
-            if (!response.ok) {
-                this.setState({
-                    error: true
-                });
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

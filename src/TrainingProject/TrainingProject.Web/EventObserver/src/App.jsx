@@ -10,6 +10,7 @@ import Profile from './components/Users/Profile';
 import SignUp from './components/Users/SignUp';
 import SignIn from './components/Users/SignIn';
 import EditProfile from './components/Users/EditProfile';
+import Blocking from './components/Users/Blocking';
 import ChangePassword from './components/Users/ChangePassword';
 import Categories from './components/Categories/Categories';
 import CategoryDetail from './components/Categories/CategoryDetail';
@@ -35,8 +36,8 @@ export default class App extends Component {
               <Route path='/signIn' component={SignIn} />
               {AuthHelper.getRole() !== 'Guest' && <Route path='/editProfile' component={EditProfile} />}
               {AuthHelper.getRole() !== 'Guest' && <Route path='/changePassword' component={ChangePassword} />}
-              {/*{AuthHelper.getRole() === 'Account manager' && <Route path='/roles' component={Roles} />}
-              {AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager' && <Route path='/blocking' component={Blocking} />}*/}
+              {/*{AuthHelper.getRole() === 'Account manager' && <Route path='/roles' component={Roles} />}*/}
+              {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') && <Route path='/blocking' component={Blocking} />}
 
               {AuthHelper.getRole() === 'Admin' && <Route path='/categories' component={Categories} />}
               {AuthHelper.getRole() === 'Admin' && <Route path='/category' component={CategoryDetail} />}

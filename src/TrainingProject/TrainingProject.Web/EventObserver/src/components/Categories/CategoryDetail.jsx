@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
-import { Alert, Button } from 'reactstrap';
+import { Alert, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import AuthHelper from '../../Utils/authHelper.js';
 
@@ -14,9 +14,11 @@ export default class CategoryDetail extends Component {
             errorMessage: '',
             id: null,
             name: '',
-            description: ''
+            description: '',
+            deleteModal: false,
         }
         this.deleteCategory = this.deleteCategory.bind(this);
+        this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
     }
 
     componentDidMount() {
@@ -26,7 +28,25 @@ export default class CategoryDetail extends Component {
         }
     }
 
+    toggleDeleteModal(){
+        this.setState({
+            deleteModal: !this.state.deleteModal
+        });
+    }
+
     renderCategory(){
+        const deleteModal = 
+            <Modal isOpen={this.state.deleteModal} toggle={this.toggleDeleteModal}>
+                <ModalHeader toggle={this.toggleDeleteModal}>Подтвердите действие</ModalHeader>
+                <ModalBody>
+                    Вы действительно хотите удалить данную категорию?
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.deleteCategory}>Да</Button>{' '}
+                    <Button color="secondary" onClick={this.toggleDeleteModal}>Отмена</Button>
+                </ModalFooter>
+            </Modal>
+
         return(
             <>
                 <h4>Название:</h4>
@@ -35,8 +55,9 @@ export default class CategoryDetail extends Component {
                 <p>{this.state.description || 'Отсутствует'}</p>
                 <div>
                     <Button outline color="primary" tag={Link} to={`/editCategory?id=${this.state.id}`}>Редактировать</Button>{' '}
-                    <Button color="danger" onClick={this.deleteCategory}>Удалить</Button>
+                    <Button color="danger" onClick={this.toggleDeleteModal}>Удалить</Button>
                 </div>
+                {deleteModal}
             </>
         )
     }
@@ -70,11 +91,7 @@ export default class CategoryDetail extends Component {
             }
         })
         .then((response) => {
-            if (!response.ok) {
-                this.setState({
-                    error: true
-                });
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

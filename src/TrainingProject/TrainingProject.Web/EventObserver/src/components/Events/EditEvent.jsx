@@ -304,9 +304,7 @@ export default class EditEvent extends Component{
     loadCategories() {
         fetch('api/Categories')
             .then((response) => {
-                if (!response.ok) {
-                    this.setState({error: true});
-                }
+                this.setState({error: !response.ok});
                 return response.json();
             }).then((data) => {
                 if (this.state.error){
@@ -338,11 +336,7 @@ export default class EditEvent extends Component{
                 'Authorization': 'Bearer ' + token
             }
         }).then((response) => {
-            if (!response.ok) {
-                this.setState({
-                    error: true
-                });
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

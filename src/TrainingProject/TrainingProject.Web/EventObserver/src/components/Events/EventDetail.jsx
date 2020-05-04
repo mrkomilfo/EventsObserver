@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import queryString from 'query-string';
-import { Alert, Table, Button } from 'reactstrap';
+import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import AuthHelper from '../../Utils/authHelper.js';
 
@@ -27,12 +27,14 @@ export default class EventMedia extends Component {
             tags: [],
             publicationTime: '',
             image: '',
+            deleteModal: false,
             userRole: AuthHelper.getRole(),
             userId: AuthHelper.getId()
         }
         this.deleteEvent = this.deleteEvent.bind(this);
         this.subscribe = this.subscribe.bind(this);
         this.unsubscribe = this.unsubscribe.bind(this);
+        this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
     }
 
     componentDidMount() {
@@ -42,22 +44,42 @@ export default class EventMedia extends Component {
         }
     }
 
+    toggleDeleteModal(){
+        this.setState({
+            deleteModal: !this.state.deleteModal
+        });
+    }
+
     renderBottomButtonPanel()
     {
-        if (this.state.userId == this.state.organizerId)
+        const deleteModal = 
+            <Modal isOpen={this.state.deleteModal} toggle={this.toggleDeleteModal}>
+                <ModalHeader toggle={this.toggleDeleteModal}>Подтвердите действие</ModalHeader>
+                <ModalBody>
+                    Вы действительно хотите удалить данное событие?
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.deleteEvent}>Да</Button>{' '}
+                    <Button color="secondary" onClick={this.toggleDeleteModal}>Отмена</Button>
+                </ModalFooter>
+            </Modal>
+
+        if (this.state.userId === this.state.organizerId)
         {
             return(
                 <div>
                     <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>Редактировать</Button>{' '}
-                    <Button color="danger" onClick={this.deleteEvent}>Удалить</Button>
+                    <Button color="danger" onClick={this.toggleDeleteModal}>Удалить</Button>
+                    {deleteModal}
                 </div>
             )
         }
-        else if (this.state.userRole == 'Admin')
+        else if (this.state.userRole === 'Admin')
         {
             return(
                 <div>
-                    <Button color="danger" onClick={this.deleteEvent}>Удалить</Button>
+                    <Button color="danger" onClick={this.toggleDeleteModal}>Удалить</Button>
+                    {deleteModal}
                 </div>
             )
         }
@@ -68,7 +90,7 @@ export default class EventMedia extends Component {
 
     renderSubscribeButton()
     {
-        if (this.state.userRole=='Guest' || this.state.userId == this.state.organizerId)
+        if (this.state.userRole === 'Guest' || this.state.userId === this.state.organizerId)
         {
             return null
         } 
@@ -170,11 +192,7 @@ export default class EventMedia extends Component {
     async loadData(eventId) {
         fetch('api/Events/' + eventId)
         .then((response) => {
-            if (!response.ok) {
-                this.setState({
-                    error: true
-                });
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

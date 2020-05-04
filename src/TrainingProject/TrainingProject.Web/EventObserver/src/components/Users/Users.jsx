@@ -74,7 +74,7 @@ export default class Users extends Component {
                         <th scope="row">{this.state.currentPage*this.state.pageSize+index+1}</th>
                         <td><Link to={`user?id=${u.id}`}>{u.userName}</Link></td>
                         <td>{u.role}</td>
-                        <td>{u.status}</td>
+                        <td>{u.status || 'без ограничений'}</td>
                     </tr>)}
                 </tbody>
             </Table>  
@@ -136,9 +136,7 @@ export default class Users extends Component {
             },
         })
         .then((response) => {
-            if (!response.ok) {
-                this.setState({error: true});
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

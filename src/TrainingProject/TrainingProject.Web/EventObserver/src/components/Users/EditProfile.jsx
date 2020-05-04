@@ -196,11 +196,7 @@ export default class EditProfile extends Component {
             },
         })
         .then((response) => {
-            if (!response.ok) {
-                this.setState({
-                    error: true
-                });
-            }
+            this.setState({error: !response.ok});
             return response.json();
         }).then((data) => {
             if (this.state.error){

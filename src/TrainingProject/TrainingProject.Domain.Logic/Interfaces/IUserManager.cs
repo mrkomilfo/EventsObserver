@@ -15,6 +15,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task UpdateUser(UserUpdateDTO user, string hostRoot);
         Task<UserToUpdateDTO> GetUserToUpdate(Guid userId);
         Task DeleteUser(Guid userId, bool force, string hostRoot);
+        Task<UserToBanDTO> GetUserToBan(Guid userId);
         Task BanUser(BanDTO banDTO);
         Task UnbanUser(Guid userId);
         Task<DateTime?> GetUnlockTime(Guid userId);
