@@ -176,24 +176,18 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         [Route("roles")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult<IEnumerable<Role>>> Roles()
         {
-            return await HandleExceptions(async () =>
-            {
-                return Ok(await _userManager.GetRoles());
-            });
+            return await HandleExceptions(async () => Ok(await _userManager.GetRoles()));
         }
 
         [HttpGet("{userId}/role")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
-            return await HandleExceptions(async () =>
-            {
-                return Ok(await _userManager.GetUserWithRole(Guid.Parse(userId)));
-            });
+            return await HandleExceptions(async () => Ok(await _userManager.GetUserWithRole(Guid.Parse(userId))));
         }
 
         [HttpPut]

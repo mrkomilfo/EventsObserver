@@ -12,7 +12,7 @@ namespace TrainingProject.Web.Controllers
     [Route("api/[controller]")]
     public class CategoriesController : ExceptionController
     {
-        private ICategoryManager _categoryManager;
+        private readonly ICategoryManager _categoryManager;
         public CategoriesController(ICategoryManager categoryManager)
         {
             _categoryManager = categoryManager;
@@ -21,19 +21,13 @@ namespace TrainingProject.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> Index()
         {
-            return await HandleExceptions(async () =>
-            {
-                return Ok(await _categoryManager.GetCategories());
-            });
+            return await HandleExceptions(async () => Ok(await _categoryManager.GetCategories()));
         }
 
         [HttpGet("{categoryId}")]
         public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
         {
-            return await HandleExceptions(async () =>
-            {
-                return Ok(await _categoryManager.GetCategory(categoryId));
-            });
+            return await HandleExceptions(async () => Ok(await _categoryManager.GetCategory(categoryId)));
         }
 
         [HttpPost]

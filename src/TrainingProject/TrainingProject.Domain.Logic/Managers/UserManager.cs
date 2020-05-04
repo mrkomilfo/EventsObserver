@@ -73,7 +73,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
         {
-            User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(user.Id)));
+            User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(user.Id)));
             if (updatedUser == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
@@ -126,7 +126,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<UserToBanDTO> GetUserToBan(Guid userId)
         {
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, userId));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
@@ -137,7 +137,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task BanUser(BanDTO banDTO)
         {
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(banDTO.Id)));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDTO.Id)));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
@@ -149,7 +149,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UnbanUser(Guid userId)
         {
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
@@ -174,11 +174,11 @@ namespace TrainingProject.DomainLogic.Managers
         }
         public async Task<DateTime?> GetUnlockTime(Guid userId)
         {
-            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new NullReferenceException($"User with id={userId} not found");
             }
-            return (await _appContext.Users.FirstAsync(u => Guid.Equals(u.Id, userId))).UnlockTime;
+            return (await _appContext.Users.FirstAsync(u => Equals(u.Id, userId))).UnlockTime;
         }
         public async Task<LoginResponseDTO> Login(LoginDTO model)
         {
@@ -239,7 +239,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<UserRoleDTO> GetUserWithRole(Guid userId)
         {
-            User user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, userId));
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");
@@ -250,16 +250,16 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Role> GetUserRole(Guid userId)
         {
-            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new NullReferenceException($"Event with id={userId} not found");
             }
-            return await _appContext.Users.Include(u => u.Role).Where(u => u.Id == userId).Select(u => u.Role).FirstOrDefaultAsync();
+            return await _appContext.Users.Include(u => u.Role).Where(u => Equals(u.Id, userId)).Select(u => u.Role).FirstOrDefaultAsync();
         }
 
         public async Task ChangePassword(ChangePasswordDTO changePasswordDTO)
         {
-            User user = await _appContext.Users.FirstOrDefaultAsync(u => Guid.Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));
             if (user == null)
             {
                 throw new NullReferenceException($"User with id={user.Id} not found");

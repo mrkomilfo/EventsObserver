@@ -11,7 +11,6 @@ using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
 using System.Text.Json;
 using System.Collections.Generic;
-using TrainingProject.DomainLogic.Models.Users;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -167,7 +166,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree,
-            bool vacancies, Guid? organizer, Guid? participant)
+            bool vacancies, Guid organizer = new Guid(), Guid participant = new Guid())
         {
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
@@ -193,15 +192,15 @@ namespace TrainingProject.DomainLogic.Managers
             }
             if (vacancies)
             {
-                query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Where(eu => eu.EventId == e.Id).Count() < e.ParticipantsLimit);
+                query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Count(eu => eu.EventId == e.Id) < e.ParticipantsLimit);
             }
-            if (organizer != null)
+            if (organizer != Guid.Empty)
             {
-                query = query.Where(e => Guid.Equals(e.OrganizerId, organizer));
+                query = query.Where(e => Equals(e.OrganizerId, organizer));
             }
-            if (participant != null)
+            if (participant != Guid.Empty)
             {
-                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Guid.Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participant)));
+                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participant)));
             }
             result.TotalRecords = await query.CountAsync();
             if (upComing != null && (bool)upComing)
@@ -227,7 +226,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task Subscribe(Guid userId, int eventId)
         {
-            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new NullReferenceException($"User with id={userId} not found");
             }
@@ -240,7 +239,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new ArgumentException($"User(id={userId}) is already signed up on event(id={eventId})");
             }
             int participantsLimit = (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit;
-            if (await _appContext.EventsUsers.Where(eu => eu.EventId == eventId).CountAsync() >= participantsLimit && participantsLimit != 0)
+            if (await _appContext.EventsUsers.CountAsync(eu => eu.EventId == eventId) >= participantsLimit && participantsLimit != 0)
             {
                 throw new ArgumentException($"No vacancies on event(id={eventId})");
             }
@@ -255,7 +254,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task Unsubscribe(Guid userId, int eventId)
         {
-            if (!await _appContext.Users.AnyAsync(u => Guid.Equals(u.Id, userId)))
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new NullReferenceException($"User with id={userId} not found");
             }
@@ -263,7 +262,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new NullReferenceException($"Event with id={eventId} not found");
             }
-            if (!await _appContext.EventsUsers.AnyAsync(eu => eu.ParticipantId == userId && eu.EventId == eventId))
+            if (!await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
                 throw new NullReferenceException($"User(id={userId}) is not signed up on event(id={eventId})");
             }
@@ -272,7 +271,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
             }
 
-            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu => eu.EventId == eventId && eu.ParticipantId == userId);
+            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu => eu.EventId == eventId && Equals(eu.ParticipantId, userId));
             if (eu != null)
             {
                 _appContext.EventsUsers.Remove(eu);

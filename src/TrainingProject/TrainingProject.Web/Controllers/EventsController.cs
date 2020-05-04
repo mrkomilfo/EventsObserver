@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
-using TrainingProject.DomainLogic.Models.Users;
 using TrainingProject.Web.Interfaces;
 
 namespace TrainingProject.Web.Controllers
@@ -31,24 +30,8 @@ namespace TrainingProject.Web.Controllers
         {
             return await HandleExceptions(async () =>
             {
-                Guid? organizerGuid;
-                if (Guid.TryParse(organizer, out _))
-                {
-                    organizerGuid = Guid.Parse(organizer);
-                }
-                else
-                {
-                    organizerGuid = null;
-                }
-                Guid? participantGuid;
-                if (Guid.TryParse(participant, out _))
-                {
-                    participantGuid = Guid.Parse(participant);
-                }
-                else
-                {
-                    participantGuid = null;
-                }
+                Guid.TryParse(organizer, out var organizerGuid);
+                Guid.TryParse(participant, out var participantGuid);         
                 return Ok(await _eventManager.GetEvents(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
             });
         }
@@ -56,10 +39,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventFullDTO>> Details(int eventId)
         {
-            return await HandleExceptions(async () =>
-            {
-                return Ok(await _eventManager.GetEvent(eventId));
-            });
+            return await HandleExceptions(async () => Ok(await _eventManager.GetEvent(eventId)));
         }
 
         [HttpPost]
@@ -87,11 +67,10 @@ namespace TrainingProject.Web.Controllers
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
                 var organizerId = await _eventManager.GetEventOrganizerId(eventId);
-                if (role != "Admin" && Guid.Parse(userId) != organizerId)
+                if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
                 {
                     return Forbid("Access denied");
                 }
-                var hostRoot = _hostServices.GetHostPath();
                 return Ok(await _eventManager.GetEventToUpdate(eventId));
             });
         }
@@ -128,7 +107,7 @@ namespace TrainingProject.Web.Controllers
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
                 var organizerId = await _eventManager.GetEventOrganizerId(eventId);
-                if (role != "Admin" && Guid.Parse(userId) != organizerId)
+                if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
                 {
                     return Forbid("Access denied");
                 }
