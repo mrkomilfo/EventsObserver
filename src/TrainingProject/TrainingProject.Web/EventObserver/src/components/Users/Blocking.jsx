@@ -77,7 +77,7 @@ export default class Blocking extends Component {
 
     cancel()
     {
-        this.props.history.push(`/events`);
+        this.props.history.push(`/user?id=${this.state.id}`);
     }
 
     renderContent(){

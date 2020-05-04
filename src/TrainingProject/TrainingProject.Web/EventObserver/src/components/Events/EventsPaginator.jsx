@@ -38,7 +38,7 @@ export default class EventsPaginator extends Component {
             queryTrailer += `&participant=${params.participant}`
         }
 
-        let leftArrows = this.props.currentPage == 0 ? 
+        let leftArrows = this.props.currentPage === 0 ? 
         <>
             <PaginationItem disabled>
                 <PaginationLink>«</PaginationLink>

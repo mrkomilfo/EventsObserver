@@ -46,7 +46,7 @@ export default class ChangePassword extends Component {
                 fieldValidationErrors.newPassword = newPasswordValid ? '' : 'Минимальная длина - 6';
                 break;
             case 'newPasswordConfirm':
-                newPasswordConfirmValid = value == this.state.newPassword;
+                newPasswordConfirmValid = value === this.state.newPassword;
                 fieldValidationErrors.newPasswordConfirm = newPasswordConfirmValid ? '' : 'Пароли не совпадают';
                 break;
             default:

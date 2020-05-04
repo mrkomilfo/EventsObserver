@@ -68,7 +68,7 @@ export default class EditEvent extends Component{
         const name = target.name;
         const value = target.value;
 
-        if (name == 'imageFile')
+        if (name === 'imageFile')
         {
             this.setState({
                 fileName: value,
@@ -104,7 +104,7 @@ export default class EditEvent extends Component{
                 fieldValidationErrors.name = nameValid ? '' : 'У мероприятия должно быть название';
                 break;
             case 'category':
-                categoryValid = !!value && value != '0';
+                categoryValid = !!value && value !== '0';
                 fieldValidationErrors.category = categoryValid ? '' : 'Категория не выбрана';
                 break;
             case 'description':
@@ -132,7 +132,7 @@ export default class EditEvent extends Component{
                 fieldValidationErrors.participantsLimit = participantsLimitValid ? '' : 'Количество участников указано неверно';
                 break;
             case 'tags':
-                tagsValid = value.match(/^[\d\s\w\,а-я]*$/i)
+                tagsValid = value.match(/^[\d\s\w,а-я]*$/i)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
                 break;
             default:
@@ -393,7 +393,7 @@ export default class EditEvent extends Component{
         if (this.state.tags)
         {
             const allTags = this.state.tags ? this.state.tags.split(',').map((tag) => tag.trim().toLowerCase()) : null;
-            const uniqueTags = allTags ? allTags.filter((item, pos) => { return allTags.indexOf(item) == pos; }) : null;  
+            const uniqueTags = allTags ? allTags.filter((item, pos) => { return allTags.indexOf(item) === pos; }) : null;  
             formdata.append('tags', JSON.stringify(uniqueTags));
         }
         if (this.state.imageFile)
@@ -412,12 +412,16 @@ export default class EditEvent extends Component{
                 this.props.history.push(`/event?id=${this.state.id}`);
             }
             else {
+                this.setState({error: true});
                 return response.json();
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data.message
-            });
+            if (this.state.error)
+            {
+                this.setState({
+                    errorMessage: data.message
+                });
+            }
         }).catch((ex) => {
             this.setState({
                 errorMessage: ex.toString()

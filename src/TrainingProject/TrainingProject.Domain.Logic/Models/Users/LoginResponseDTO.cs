@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace TrainingProject.DomainLogic.Models.Users
+﻿namespace TrainingProject.DomainLogic.Models.Users
 {
     public class LoginResponseDTO
     {

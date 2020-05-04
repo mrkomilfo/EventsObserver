@@ -46,10 +46,6 @@ export default class Categories extends Component {
             ? <p><em>Loading...</em></p>
             : this.renderCategoriesList(this.state.categories);
 
-        const contentStyle = {
-            width: '100%'
-        }
-
         return (
             <>
             {errorBaner}

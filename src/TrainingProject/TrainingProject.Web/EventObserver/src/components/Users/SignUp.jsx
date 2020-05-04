@@ -42,11 +42,11 @@ export default class SignUp extends Component {
                 fieldValidationErrors.name = nameValid ? '' : 'Минимальная длина - 4';
                 break;
             case 'email':
-                emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) || value.length == 0;
+                emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) || value.length === 0;
                 fieldValidationErrors.email = emailValid ? '' : 'Неверный формат';
                 break;
             case 'phone':
-                phoneValid = value.match(/^[\+]?[0-9]{6,12}$/i) || value.length == 0;
+                phoneValid = value.match(/^\+?[0-9]{6,12}$/i) || value.length === 0;
                 fieldValidationErrors.phone = phoneValid ? '' : 'Неверный формат';
                 break;
             case 'login':
@@ -58,7 +58,7 @@ export default class SignUp extends Component {
                 fieldValidationErrors.password = passwordValid ? '' : 'Минимальная длина - 6';
                 break;
             case 'passwordConfirm':
-                passwordConfirmValid = value == this.state.password;
+                passwordConfirmValid = value === this.state.password;
                 fieldValidationErrors.passwordConfirm = passwordConfirmValid ? '' : 'Пароли не совпадают';
                 break;
             default:

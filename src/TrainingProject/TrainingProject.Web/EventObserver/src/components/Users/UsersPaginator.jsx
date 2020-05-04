@@ -17,7 +17,7 @@ export default class UsersPaginator extends Component {
             queryTrailer += `&search=${params.search}`
         }
 
-        let leftArrows = this.props.currentPage == 0 ? 
+        let leftArrows = this.props.currentPage === 0 ? 
         <>
             <PaginationItem disabled>
                 <PaginationLink>«</PaginationLink>

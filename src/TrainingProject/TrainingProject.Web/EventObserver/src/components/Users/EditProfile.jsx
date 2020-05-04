@@ -31,7 +31,7 @@ export default class EditProfile extends Component {
         const name = target.name;
         let value = target.value;
 
-        if (name == 'imageFile')
+        if (name === 'imageFile')
         {
             this.setState({
                 fileName: value,
@@ -61,11 +61,11 @@ export default class EditProfile extends Component {
                 fieldValidationErrors.userName = userNameValid ? '' : 'Минимальная длина - 4';
                 break;
             case 'contactEmail':
-                contactEmailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) || value.length == 0;
+                contactEmailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) || value.length === 0;
                 fieldValidationErrors.contactEmail = contactEmailValid ? '' : 'Неверный формат';
                 break;
             case 'contactPhone':
-                contactPhoneValid = value.match(/^[\+]?[0-9]{6,12}$/i) || value.length == 0;
+                contactPhoneValid = value.match(/^\+?[0-9]{6,12}$/i) || value.length === 0;
                 fieldValidationErrors.contactPhone = contactPhoneValid ? '' : 'Неверный формат';
                 break;
             default:

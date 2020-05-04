@@ -39,7 +39,7 @@ export default class Profile extends Component {
             margin: '16px 0px 0px 35%',
         }
 
-        if (this.state.myId == this.state.id)
+        if (this.state.myId === this.state.id)
         {
             return(
                 <div style={buttonPanelStyle}>
@@ -48,7 +48,7 @@ export default class Profile extends Component {
                 </div>
             )
         }
-        else if (this.state.myRole == 'Admin' && this.state.role == 'User')
+        else if (this.state.myRole === 'Admin' && this.state.role === 'User')
         {
             return(
                 <div style={buttonPanelStyle}>
@@ -56,7 +56,7 @@ export default class Profile extends Component {
                 </div>
             )
         }
-        else if (this.state.myRole == 'Account manager')
+        else if (this.state.myRole === 'Account manager')
         {
             return(
                 <div style={buttonPanelStyle}>
@@ -89,7 +89,7 @@ export default class Profile extends Component {
             default:
                 badge = null;
         }
-        const status = (this.state.myRole == 'Admin' || this.state.myRole == 'Account manager') && this.state.status
+        const status = (this.state.myRole === 'Admin' || this.state.myRole === 'Account manager') && this.state.status
             ? <span style={statusStyle}>{this.state.status}</span> : null
 
         const buttonPanel = this.renderButtonPanel();

@@ -196,7 +196,8 @@ namespace TrainingProject.Web.Controllers
             });
         }
 
-        [HttpPut("role")]
+        [HttpPut]
+        [Route("role")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult> ChangeRole([FromBody] ChangeRoleDTO changeRoleDTO)
         {

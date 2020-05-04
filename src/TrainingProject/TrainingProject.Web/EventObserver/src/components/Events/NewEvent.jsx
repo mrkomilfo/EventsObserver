@@ -53,7 +53,7 @@ export default class NewEvent extends Component {
         const name = target.name;
         const value = target.value;
 
-        if (name == 'imageFile')
+        if (name === 'imageFile')
         {
             this.setState({
                 fileName: value,
@@ -89,7 +89,7 @@ export default class NewEvent extends Component {
                 fieldValidationErrors.name = nameValid ? '' : 'У мероприятия должно быть название';
                 break;
             case 'category':
-                categoryValid = !!value && value != '0';
+                categoryValid = !!value && value !== '0';
                 fieldValidationErrors.category = categoryValid ? '' : 'Категория не выбрана';
                 break;
             case 'description':
@@ -117,7 +117,7 @@ export default class NewEvent extends Component {
                 fieldValidationErrors.participantsLimit = participantsLimitValid ? '' : 'Количество участников указано неверно';
                 break;
             case 'tags':
-                tagsValid = value.match(/^[\d\s\w\,]*$/u)
+                tagsValid = value.match(/^[\d\s\w,]*$/u)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
                 break;
             default:
@@ -319,7 +319,7 @@ export default class NewEvent extends Component {
         if (this.state.tags)
         {
             const allTags = this.state.tags.split(',').map((tag) => tag.trim().toLowerCase());
-            const uniqueTags = allTags.filter((item, pos) => { return allTags.indexOf(item) == pos; });  
+            const uniqueTags = allTags.filter((item, pos) => { return allTags.indexOf(item) === pos; });  
             formdata.append('tags', JSON.stringify(uniqueTags));
         }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TrainingProject.DomainLogic.Models.Users
+﻿namespace TrainingProject.DomainLogic.Models.Users
 {
     public class UserRoleDTO
     {
