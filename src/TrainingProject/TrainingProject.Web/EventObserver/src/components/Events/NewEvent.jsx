@@ -24,8 +24,9 @@ export default class NewEvent extends Component {
                 place: '', 
                 date: '', 
                 time: '', 
-                fee: 0,
-                participantsLimit: 0
+                fee: '',
+                participantsLimit: '',
+                imageFile: ''
             },
             formValid: false,
             nameValid: false, 
@@ -37,6 +38,7 @@ export default class NewEvent extends Component {
             feeValid: true,
             participantsLimitValid: true,
             tagsValid: true,
+            imageFileValid: true,
 
             error: false,
             errorMessage: '',
@@ -58,6 +60,8 @@ export default class NewEvent extends Component {
             this.setState({
                 fileName: value,
                 imageFile: target.files[0],
+            }, 
+                () => { this.validateField(name, target.files[0]) 
             }); 
         }
 
@@ -82,6 +86,7 @@ export default class NewEvent extends Component {
         let feeValid = this.state.feeValid;
         let participantsLimitValid = this.state.participantsLimitValid;
         let tagsValid = this.state.tagsValid;
+        let imageFileValid = this.state.imageFileValid;
 
         switch(fieldName){
             case 'name':
@@ -117,8 +122,12 @@ export default class NewEvent extends Component {
                 fieldValidationErrors.participantsLimit = participantsLimitValid ? '' : 'Количество участников указано неверно';
                 break;
             case 'tags':
-                tagsValid = value.match(/^[\d\s\w,]*$/u)
+                tagsValid = value.match(/^[\d\s\w\,а-я]*$/ui)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
+                break;
+            case 'imageFile':
+                imageFileValid = value.size <= 8388608 //8 Mb
+                fieldValidationErrors.imageFile = imageFileValid ? '' : 'Размер изображения не должен превышать 8 Mb';
                 break;
             default:
                 break;
@@ -134,6 +143,7 @@ export default class NewEvent extends Component {
             feeValid: feeValid,
             participantsLimitValid: participantsLimitValid,
             tagsValid: tagsValid,
+            imageFileValid: imageFileValid,
           }, this.validateForm);
     }
 
@@ -147,16 +157,18 @@ export default class NewEvent extends Component {
                 this.state.timeValid &&
                 this.state.feeValid &&
                 this.state.participantsLimitValid &&
-                this.state.tagsValid
+                this.state.tagsValid &&
+                this.state.imageFileValid
         });
     }
 
     removeImage()
     {
         this.setState({
-            fileName: '', 
-            imageFile: null
-        })
+            imageFile: null,
+            fileName: '',
+            imageFileValid: true,
+        }, this.validateForm)
     }
 
     cancel()
@@ -254,7 +266,8 @@ export default class NewEvent extends Component {
                     <UncontrolledTooltip placement="right" target="imageTip">
                         Чтобы удалить картинку - просто кликните по ней
                     </UncontrolledTooltip>
-                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <Input invalid={!this.state.imageFileValid} type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <FormFeedback>{this.state.formErrors.imageFile}</FormFeedback>
                     {imageBlock}
                 </FormGroup>
                 <div>

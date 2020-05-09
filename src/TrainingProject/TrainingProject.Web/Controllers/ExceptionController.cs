@@ -15,7 +15,7 @@ namespace TrainingProject.Web.Controllers
             }
             catch (NullReferenceException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { ex.Message });
             }
             catch (ArgumentOutOfRangeException ex)
             {

@@ -18,6 +18,7 @@ namespace TrainingProject.DomainLogic.Managers
     {
         private readonly IAppContext _appContext;
         private readonly IMapper _mapper;
+
         public EventManager(IAppContext appContext, IMapper mapper)
         {
             _appContext = appContext;

@@ -33,8 +33,9 @@ export default class EditEvent extends Component{
                 place: '', 
                 date: '', 
                 time: '', 
-                fee: 0,
-                participantsLimit: 0
+                fee: '',
+                participantsLimit: '',
+                imageFile: '',
             },
             formValid: true,
             nameValid: true, 
@@ -46,6 +47,7 @@ export default class EditEvent extends Component{
             feeValid: true,
             participantsLimitValid: true,
             tagsValid: true,
+            imageFileValid: true,
 
             categories: [],
         };
@@ -74,7 +76,9 @@ export default class EditEvent extends Component{
                 fileName: value,
                 imageFile: target.files[0],
                 hasImage: true
-            }); 
+            }, 
+                () => { this.validateField(name, target.files[0]) }
+            )
         }
         else{
             this.setState({
@@ -97,6 +101,7 @@ export default class EditEvent extends Component{
         let feeValid = this.state.feeValid;
         let participantsLimitValid = this.state.participantsLimitValid;
         let tagsValid = this.state.tagsValid;
+        let imageFileValid = this.state.imageFileValid;
 
         switch(fieldName){
             case 'name':
@@ -135,6 +140,10 @@ export default class EditEvent extends Component{
                 tagsValid = value.match(/^[\d\s\w,а-я]*$/i)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
                 break;
+            case 'imageFile':
+                imageFileValid = value.size <= 8388608 //8 Mb
+                fieldValidationErrors.imageFile = imageFileValid ? '' : 'Размер изображения не должен превышать 8 Mb';
+                break;
             default:
                 break;
         }
@@ -149,6 +158,7 @@ export default class EditEvent extends Component{
             feeValid: feeValid,
             participantsLimitValid: participantsLimitValid,
             tagsValid: tagsValid,
+            imageFileValid: imageFileValid,
           }, this.validateForm);
     }
 
@@ -162,7 +172,8 @@ export default class EditEvent extends Component{
                 this.state.timeValid &&
                 this.state.feeValid &&
                 this.state.participantsLimitValid &&
-                this.state.tagsValid
+                this.state.tagsValid &&
+                this.state.imageFileValid
         });
     }
 
@@ -172,8 +183,9 @@ export default class EditEvent extends Component{
             imageFile: null,
             hasImage: false,
             fileName: '',
-            imagePath: ''
-        })
+            imagePath: '',
+            imageFileValid: true,
+        }, this.validateForm)
     }
 
     cancel()
@@ -271,7 +283,8 @@ export default class EditEvent extends Component{
                     <UncontrolledTooltip placement="right" target="imageTip">
                         Чтобы удалить картинку - просто кликните по ней
                     </UncontrolledTooltip>
-                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <Input invalid={!this.state.imageFileValid} type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <FormFeedback>{this.state.formErrors.imageFile}</FormFeedback>
                     {imageBlock}
                 </FormGroup>
                 <div>
@@ -345,7 +358,6 @@ export default class EditEvent extends Component{
                 });
             }
             else {
-                debugger;
                 this.setState({ 
                     id: data.id,
                     name: data.name,

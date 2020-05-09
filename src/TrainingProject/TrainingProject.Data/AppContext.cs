@@ -1,6 +1,4 @@
-﻿using System.Data.Entity;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TrainingProject.Domain;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 

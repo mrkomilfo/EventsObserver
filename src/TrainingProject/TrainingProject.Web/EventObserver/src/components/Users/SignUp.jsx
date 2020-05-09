@@ -5,10 +5,30 @@ export default class SignUp extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            name: '', email: '', phone: '', login: '', password: '', passwordConfirm: '',
-            formErrors: { name: '', email: '', phone: '', login: '', password: '', passwordConfirm: '' },
-            formValid: false, nameValid: false, emailValid: true, phoneValid: true, loginValid: false, passwordValid: false, passwordConfirmValid: false,
-            errorMessage: ''
+            error: false,
+            errorMessage: '',
+
+            name: '', 
+            email: '', 
+            phone: '', 
+            login: '', 
+            password: '', 
+            passwordConfirm: '',
+            formErrors: { 
+                name: '', 
+                email: '', 
+                phone: '', 
+                login: '', 
+                password: '',
+                passwordConfirm: '' 
+            },
+            formValid: false, 
+            nameValid: false, 
+            emailValid: true, 
+            phoneValid: true, 
+            loginValid: false, 
+            passwordValid: false, 
+            passwordConfirmValid: false,
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);

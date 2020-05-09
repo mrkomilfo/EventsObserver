@@ -25,7 +25,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 8, string search = null, int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
+        public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 2, string search = null, int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizer = null, string participant = null)
         {
             return await HandleExceptions(async () =>

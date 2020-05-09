@@ -8,10 +8,29 @@ export default class EditProfile extends Component {
         super(props);
         this.state = { 
             loading: true,
-            id: '', userName: '', contactEmail: '', contactPhone: '', hasImage: false, imagePath: '', imageFile: null, fileName: '',
-            formErrors: { userName: '', contactEmail: '', contactPhone: ''},
-            formValid: true, userNameValid: true, contactEmailValid: true, contactPhoneValid: true,
-            error: false, errorMessage: ''
+
+            error: false, 
+            errorMessage: '',
+
+            id: '', 
+            userName: '', 
+            contactEmail: '', 
+            contactPhone: '', 
+            hasImage: false, 
+            imagePath: '', 
+            imageFile: null, 
+            fileName: '',
+            formErrors: { 
+                userName: '', 
+                contactEmail: '', 
+                contactPhone: '',
+                imageFile: ''
+            },
+            formValid: true,
+            userNameValid: true, 
+            contactEmailValid: true, 
+            contactPhoneValid: true,
+            imageFileValid: true,
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
@@ -37,7 +56,9 @@ export default class EditProfile extends Component {
                 fileName: value,
                 imageFile: target.files[0],
                 hasImage: true
-            }); 
+            }, 
+                () => { this.validateField(name, target.files[0]) }
+            )
         }
         else{
             this.setState({
@@ -54,6 +75,7 @@ export default class EditProfile extends Component {
         let userNameValid = this.state.userNameValid;
         let contactEmailValid = this.state.contactEmailValid;
         let contactPhoneValid = this.state.contactPhoneValid;
+        let imageFileValid = this.state.imageFileValid;
 
         switch(fieldName){
             case 'userName':
@@ -68,6 +90,10 @@ export default class EditProfile extends Component {
                 contactPhoneValid = value.match(/^\+?[0-9]{6,12}$/i) || value.length === 0;
                 fieldValidationErrors.contactPhone = contactPhoneValid ? '' : 'Неверный формат';
                 break;
+            case 'imageFile':
+                imageFileValid = value.size <= 8388608 //8 Mb
+                fieldValidationErrors.imageFile = imageFileValid ? '' : 'Размер изображения не должен превышать 8 Mb';
+                break;
             default:
                 break;
         }
@@ -76,6 +102,7 @@ export default class EditProfile extends Component {
             userNameValid: userNameValid,
             contactEmailValid: contactEmailValid,
             contactPhoneValid: contactPhoneValid,
+            imageFileValid: imageFileValid,
           }, this.validateForm);
     }
 
@@ -93,9 +120,10 @@ export default class EditProfile extends Component {
         this.setState({
             imageFile: null,
             hasImage: false,
+            fileName: '',
             imagePath: '',
-            fileName: ''
-        })
+            imageFileValid: true,
+        }, this.validateForm)
     }
 
     cancel()
@@ -105,7 +133,7 @@ export default class EditProfile extends Component {
 
     renderProfile(){
         const formStyle = {
-            maxWidth: '256px'
+            maxWidth: '420px'
         }
 
         const imageStyle = {
@@ -157,7 +185,8 @@ export default class EditProfile extends Component {
                     <UncontrolledTooltip placement="right" target="imageTip">
                         Чтобы удалить фото - просто кликните по нему
                     </UncontrolledTooltip>
-                    <Input type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <Input invalid={!this.state.imageFileValid} type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                    <FormFeedback>{this.state.formErrors.imageFile}</FormFeedback>
                     {imageBlock}
                 </FormGroup>
                 <div>
@@ -208,8 +237,8 @@ export default class EditProfile extends Component {
                 this.setState({ 
                     id: data.id,
                     userName: data.userName,
-                    contactEmail: data.contactEmail || 'Не указан',
-                    contactPhone: data.contactPhone || 'Не указан',
+                    contactEmail: data.contactEmail,
+                    contactPhone: data.contactPhone,
                     hasImage: data.hasPhoto,
                     imagePath: data.photo,
                     loading: false
