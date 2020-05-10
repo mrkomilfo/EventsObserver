@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
@@ -23,6 +22,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         [Required]
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public string Tags { get; set; }
+        [MaxFileSize(8 * 1024 * 1024)]
         public IFormFile Image { get; set; }
         [Required]
         public bool HasImage { get; set; }

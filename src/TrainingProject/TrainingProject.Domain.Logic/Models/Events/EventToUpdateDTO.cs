@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TrainingProject.DomainLogic.Models.Events
+﻿namespace TrainingProject.DomainLogic.Models.Events
 {
     public class EventToUpdateDTO
     {
