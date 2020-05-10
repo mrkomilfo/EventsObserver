@@ -328,14 +328,9 @@ export default class NewEvent extends Component {
         formdata.append('fee', parseFloat(this.state.fee));
         formdata.append('participantsLimit', this.state.participantsLimit);
         formdata.append('organizerId', AuthHelper.getId());
-
-        if (this.state.tags)
-        {
-            const allTags = this.state.tags.split(',').map((tag) => tag.trim().toLowerCase());
-            const uniqueTags = allTags.filter((item, pos) => { return allTags.indexOf(item) === pos; });  
-            formdata.append('tags', JSON.stringify(uniqueTags));
+        if (this.state.tags) {
+            formdata.append('tags', this.state.tags);
         }
-
         if (this.state.imageFile)
         {
             formdata.append('image', this.state.imageFile);

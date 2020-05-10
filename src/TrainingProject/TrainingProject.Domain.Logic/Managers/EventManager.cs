@@ -11,6 +11,7 @@ using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
 using System.Text.Json;
 using System.Collections.Generic;
+using TrainingProject.DomainLogic.Helpers;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -40,7 +41,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             if (@event.Tags != null)
             {
-                var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+                var tags = @event.Tags.ParseSubstrings(",");
                 foreach (var tagName in tags)
                 {
                     var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
@@ -53,7 +54,7 @@ namespace TrainingProject.DomainLogic.Managers
                     await _appContext.EventsTags.AddAsync(new EventsTags { EventId = newEvent.Id, TagId = tag.Id });
                 }
             }
-            
+
             await _appContext.SaveChangesAsync(default);
         }
 
@@ -75,10 +76,10 @@ namespace TrainingProject.DomainLogic.Managers
             _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
             if (@event.Tags != null)
             {
-                var tags = JsonSerializer.Deserialize<ICollection<string>>(@event.Tags);
+                var tags = @event.Tags.ParseSubstrings(",");
                 foreach (var tagName in tags)
                 {
-                    var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
+                    var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName));
                     if (tag == null)
                     {
                         tag = _mapper.Map<string, Tag>(tagName);

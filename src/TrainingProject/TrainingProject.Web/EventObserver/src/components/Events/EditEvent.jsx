@@ -402,14 +402,10 @@ export default class EditEvent extends Component{
         formdata.append('fee', parseFloat(this.state.fee));
         formdata.append('participantsLimit', this.state.participantsLimit);
         formdata.append('hasImage', this.state.hasImage);
-        if (this.state.tags)
-        {
-            const allTags = this.state.tags ? this.state.tags.split(',').map((tag) => tag.trim().toLowerCase()) : null;
-            const uniqueTags = allTags ? allTags.filter((item, pos) => { return allTags.indexOf(item) === pos; }) : null;  
-            formdata.append('tags', JSON.stringify(uniqueTags));
+        if (this.state.tags) {
+            formdata.append('tags', this.state.tags);
         }
-        if (this.state.imageFile)
-        {
+        if (this.state.imageFile) {
             formdata.append('image', this.state.imageFile);
         }
         const token = AuthHelper.getToken();
