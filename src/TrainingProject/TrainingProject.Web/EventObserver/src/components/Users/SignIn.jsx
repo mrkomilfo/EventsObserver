@@ -70,7 +70,7 @@ export default class SignUp extends Component {
                 });
             }
             else {
-                AuthHelper.saveAuth(data.name, data.accessToken, data.role);
+                AuthHelper.saveAuth(data.name, data.accessToken, data.role, data.login, data.password);
                 this.props.history.push("/events");
             }
         }).catch((ex) => {

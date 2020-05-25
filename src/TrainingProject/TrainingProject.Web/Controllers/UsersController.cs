@@ -218,7 +218,6 @@ namespace TrainingProject.Web.Controllers
                 }
                 return BadRequest("Model state is not valid");
             });
-
         }
 
         [HttpPut]

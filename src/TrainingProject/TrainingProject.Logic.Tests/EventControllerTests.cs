@@ -15,9 +15,10 @@ namespace TrainingProject.Logic.Tests
                 "Tag1, taG1, ",
                 "," , 
                 ", ,"
-                
             };
+
             IEnumerable<string>[] parsedTagLists = tagLists.Select(tl => tl.ParseSubstrings(",")).ToArray();
+
             Assert.Equal(parsedTagLists[0], new List<string> { "tag1", "tag2" });
             Assert.Equal(parsedTagLists[1], new List<string> { "tag1" });
             Assert.Empty(parsedTagLists[2]);
