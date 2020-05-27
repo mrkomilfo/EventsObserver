@@ -8,8 +8,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using AppContext = TrainingProject.Data.AppContext;
 using TrainingProject.Data;
-using FluentScheduler;
-using TrainingProject.Web.Services;
 
 namespace TrainingProject.Web
 {
