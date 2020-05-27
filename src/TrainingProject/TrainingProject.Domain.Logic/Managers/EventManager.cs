@@ -9,9 +9,8 @@ using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
-using System.Text.Json;
-using System.Collections.Generic;
 using TrainingProject.DomainLogic.Helpers;
+using TrainingProject.DomainLogic.Services;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -19,11 +18,13 @@ namespace TrainingProject.DomainLogic.Managers
     {
         private readonly IAppContext _appContext;
         private readonly IMapper _mapper;
+        private readonly INotificator _notificator;
 
-        public EventManager(IAppContext appContext, IMapper mapper)
+        public EventManager(IAppContext appContext, IMapper mapper, INotificator notificator)
         {
             _appContext = appContext;
             _mapper = mapper;
+            _notificator = notificator;
         }
 
         public async Task AddEvent(EventCreateDTO @event, string hostRoot)
@@ -288,6 +289,21 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new NullReferenceException($"Event with id={eventId} not found");
             }
             return (await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId))?.OrganizerId;
+        }
+
+        public void Notificate()
+        {
+            DateTime now = DateTime.Now;
+            var eventUsers = _appContext.EventsUsers.Include(eu => eu.Event).Include(eu => eu.Participant).ToList();
+            var eventUsersList = eventUsers
+                .Where(eu => !String.IsNullOrEmpty(eu.Participant.ContactEmail)
+                    && eu.Event.Start > now.AddHours(23)
+                    && eu.Event.Start <= now.AddHours(24));
+
+            foreach (var eu in eventUsersList)
+            {
+                _notificator.Notificate(eu);
+            }
         }
     }
 }

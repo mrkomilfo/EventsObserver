@@ -16,5 +16,6 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task Subscribe(Guid userId, int eventId);
         Task Unsubscribe(Guid userId, int eventId);
         Task<Guid?> GetEventOrganizerId(int eventId);
+        void Notificate();
     }
 }

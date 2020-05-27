@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using TrainingProject.Web.Helpers;
+using TrainingProject.DomainLogic.Services;
+using FluentScheduler;
+using TrainingProject.Web.Jobs;
 
 namespace TrainingProject.Web
 {
@@ -72,7 +75,9 @@ namespace TrainingProject.Web
             services.AddScoped<ICategoryManager, CategoryManager>();
             services.AddScoped<IEventManager, EventManager>();
             services.AddScoped<IHostServices, HostServices>();
+            services.AddScoped<INotificator, Notificator>();
             services.AddSingleton<IWebHostEnvironment>(Environment);
+            services.AddTransient<SendMessageJob>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -106,6 +111,8 @@ namespace TrainingProject.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            JobManager.Initialize(new Sheduler(app.ApplicationServices));
         }
     }
 }

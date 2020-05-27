@@ -19,6 +19,7 @@ export default class EventMedia extends Component {
             category: '',
             description: '',
             start: '',
+            startParsable: 0,
             place: '',
             fee: 0,
             participantsLimit: 0,
@@ -91,7 +92,9 @@ export default class EventMedia extends Component {
 
     renderSubscribeButton()
     {
-        if (this.state.userRole === 'Guest' || this.state.userId === this.state.organizerId)
+        const start = new Date(this.state.startParsable);
+        const currentDate = new Date();
+        if (this.state.userRole === 'Guest' || this.state.userId === this.state.organizerId || start <= currentDate)
         {
             return null
         } 
@@ -209,6 +212,7 @@ export default class EventMedia extends Component {
                     category: data.category,
                     description: data.description,
                     start: data.start,
+                    startParsable: data.startParsable,
                     place: data.place,
                     fee: data.fee,
                     participantsLimit: data.participantsLimit,
