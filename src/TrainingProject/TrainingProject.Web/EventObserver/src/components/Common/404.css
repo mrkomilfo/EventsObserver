@@ -1,0 +1,41 @@
+.top{
+    text-align: center;
+    font-size: 8em;
+    margin: auto;
+}
+
+.body{
+    text-align: center;
+    font-size: 4em;
+    width: fit-content;
+    margin: auto;
+}
+
+.overlay404::before{
+    content: "";
+    background: url('/kek/varlamov.jpg') no-repeat;
+    background-size: cover;
+    background-position: left bottom;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.overlay404{
+    background: #FFF;
+    z-index: -1;
+}
+
+.body404{
+    margin: 0;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    width: fit-content;
+    font-weight: 500;
+}
