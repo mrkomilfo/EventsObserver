@@ -3,9 +3,8 @@ import queryString from 'query-string';
 import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import AuthHelper from '../../Utils/authHelper.js';
-import Error404 from '../Common/404';
 
-export default class EventMedia extends Component {
+export default class EventDetail extends Component {
     constructor(props)
     {
         super(props);

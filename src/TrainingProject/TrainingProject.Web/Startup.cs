@@ -39,7 +39,7 @@ namespace TrainingProject.Web
 
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "EventsObserver/build";
+                configuration.RootPath = "EventObserver/build";
             });
 
             services.AddAuthentication(x =>
@@ -86,7 +86,7 @@ namespace TrainingProject.Web
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseDeveloperExceptionPage();
             app.UseAuthentication();
       
             app.UseHttpsRedirection();
@@ -95,6 +95,7 @@ namespace TrainingProject.Web
 
             app.UseRouting();
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
