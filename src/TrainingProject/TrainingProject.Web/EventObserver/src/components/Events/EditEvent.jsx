@@ -303,7 +303,7 @@ export default class EditEvent extends Component{
         </Alert> : null;
 
         const content = this.state.loading
-            ? <p><em>Loading...</em></p>
+            ? <p><em cn>Loading...</em></p>
             : this.renderEvent();
 
         return(

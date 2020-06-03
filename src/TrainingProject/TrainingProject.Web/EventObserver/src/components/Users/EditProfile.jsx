@@ -237,8 +237,8 @@ export default class EditProfile extends Component {
                 this.setState({ 
                     id: data.id,
                     userName: data.userName,
-                    contactEmail: data.contactEmail,
-                    contactPhone: data.contactPhone,
+                    contactEmail: data.contactEmail || "",
+                    contactPhone: data.contactPhone || "",
                     hasImage: data.hasPhoto,
                     imagePath: data.photo,
                     loading: false
