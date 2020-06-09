@@ -2,7 +2,7 @@
 import queryString from 'query-string';
 import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class EventDetail extends Component {
     constructor(props)
@@ -233,6 +233,9 @@ export default class EventDetail extends Component {
 
     deleteEvent() {
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Events/' + this.state.id, {
             method: 'DELETE',
             headers: {
@@ -263,6 +266,9 @@ export default class EventDetail extends Component {
 
     subscribe() {
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch(`api/Events/${this.state.id}/subscribe`, {
             method: 'PUT',
             headers: {
@@ -293,6 +299,9 @@ export default class EventDetail extends Component {
 
     unsubscribe() {
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch(`api/Events/${this.state.id}/unsubscribe`, {
             method: 'PUT',
             headers: {

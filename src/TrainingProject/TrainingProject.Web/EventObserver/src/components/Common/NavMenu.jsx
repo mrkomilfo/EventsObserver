@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, 
     Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
+
+import './NavMenu.css';
 
 export default class NavMenu extends Component {
     static displayName = NavMenu.name;
@@ -27,6 +29,7 @@ export default class NavMenu extends Component {
             role: AuthHelper.getRole(),
             id: AuthHelper.getId()
         });
+        AuthHelper.getToken();
     }
 
     toggleNavbar () {
@@ -101,7 +104,7 @@ export default class NavMenu extends Component {
             </Modal>
 
         return (
-            <header>
+            <header id="header">
                 <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
                 <Container>
                     <NavbarBrand tag={Link} to="/">EventObserver</NavbarBrand>

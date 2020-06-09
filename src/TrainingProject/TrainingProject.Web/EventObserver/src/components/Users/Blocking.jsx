@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class Blocking extends Component {
     constructor(props) {
@@ -173,6 +173,9 @@ export default class Blocking extends Component {
             hours: parseInt(this.state.hours, 10),
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Users/ban', {
             method: 'PUT',
             headers: {
@@ -205,6 +208,9 @@ export default class Blocking extends Component {
 
     unban(){
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch(`api/Users/${this.state.id}/unban`, {
             method: 'PUT',
             headers: {

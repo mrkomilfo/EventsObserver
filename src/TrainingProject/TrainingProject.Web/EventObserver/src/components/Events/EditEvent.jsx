@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper'
+import AuthHelper from '../../Utils/AuthHelper'
 
 export default class EditEvent extends Component{
     constructor(props) {
@@ -409,6 +409,9 @@ export default class EditEvent extends Component{
             formdata.append('image', this.state.imageFile);
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Events', {
             method: 'PUT',
             headers: {

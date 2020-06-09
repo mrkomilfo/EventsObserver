@@ -3,7 +3,7 @@ import { Alert, Table, Button, Input, InputGroup, InputGroupAddon } from 'reacts
 import { Link } from 'react-router-dom';
 import UsersPaginator from './UsersPaginator';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class Users extends Component {
     constructor(props) {

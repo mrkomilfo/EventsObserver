@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/authHelper';
+import AuthHelper from '../../Utils/AuthHelper';
 
 export default class SignUp extends Component {
     constructor(props) {
@@ -50,7 +50,7 @@ export default class SignUp extends Component {
     }
 
     logIn() {
-        let data = {
+        let auth_data = {
             login: this.state.login,
             password: this.state.password
         };
@@ -59,7 +59,7 @@ export default class SignUp extends Component {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(auth_data)
         }).then((response) => {
             this.setState({error: !response.ok});
             return response.json();
@@ -70,7 +70,7 @@ export default class SignUp extends Component {
                 });
             }
             else {
-                AuthHelper.saveAuth(data.name, data.accessToken, data.role, data.login, data.password);
+                AuthHelper.saveAuth(data.name, data.accessToken, data.role, auth_data.login, auth_data.password);
                 this.props.history.push("/events");
             }
         }).catch((ex) => {

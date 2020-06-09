@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import queryString from 'query-string';
 import { Alert, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class CategoryDetail extends Component {
     constructor(props)
@@ -116,6 +116,9 @@ export default class CategoryDetail extends Component {
 
     deleteCategory() {
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Categories/' + this.state.id, {
             method: 'DELETE',
             headers: {

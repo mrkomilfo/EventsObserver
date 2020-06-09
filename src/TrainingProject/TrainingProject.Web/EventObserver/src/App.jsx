@@ -17,7 +17,7 @@ import Categories from './components/Categories/Categories';
 import CategoryDetail from './components/Categories/CategoryDetail';
 import NewCategory from './components/Categories/NewCategory';
 import EditCategory from './components/Categories/EditCategory';
-import AuthHelper from './Utils/authHelper';
+import AuthHelper from './Utils/AuthHelper';
 import Error404 from './components/Common/404';
 
 export default class App extends Component {
@@ -28,22 +28,22 @@ export default class App extends Component {
                 <Route path='/events' component={Events} />
                 <Route exact path='/' render={() => (<Redirect to='/events' />)} />
                 <Route path='/event' component={EventDetail} />
-                {AuthHelper.getRole() !== 'Guest' && <Route path='/newEvent' component={NewEvent} />}
-                {AuthHelper.getRole() !== 'Guest' && <Route path='/editEvent' component={EditEvent} />}
+                {AuthHelper.getRole() !== 'Guest' ? <Route path='/newEvent' component={NewEvent} /> : <Route path='/newEvent' render={() => (<Redirect to='/signIn' />)} />}
+                {AuthHelper.getRole() !== 'Guest' ? <Route path='/editEvent' component={EditEvent} /> : <Route path='/editEvent' render={() => (<Redirect to='/signIn' />)} />}
 
-                {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') && <Route path='/users' component={Users} />}
+                {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') ? <Route path='/users' component={Users} /> : <Route path='/users' render={() => (<Redirect to='/signIn' />)} />}
                 <Route path='/user' component={Profile} />
                 <Route path='/signUp' component={SignUp} />
                 <Route path='/signIn' component={SignIn} />
-                {AuthHelper.getRole() !== 'Guest' && <Route path='/editProfile' component={EditProfile} />}
-                {AuthHelper.getRole() !== 'Guest' && <Route path='/changePassword' component={ChangePassword} />}
-                {AuthHelper.getRole() === 'Account manager' && <Route path='/roles' component={Roles} />}
-                {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') && <Route path='/blocking' component={Blocking} />}
+                {AuthHelper.getRole() !== 'Guest' ? <Route path='/editProfile' component={EditProfile} /> : <Route path='/editProfile' render={() => (<Redirect to='/signIn' />)} />}
+                {AuthHelper.getRole() !== 'Guest' ? <Route path='/changePassword' component={ChangePassword} /> : <Route path='/changePassword' render={() => (<Redirect to='/signIn' />)} /> }
+                {AuthHelper.getRole() === 'Account manager' ? <Route path='/roles' component={Roles} /> : <Route path='/roles' render={() => (<Redirect to='/signIn' />)} />}
+                {(AuthHelper.getRole() === 'Admin' || AuthHelper.getRole() === 'Account manager') ? <Route path='/blocking' component={Blocking} /> : <Route path='/blocking' render={() => (<Redirect to='/signIn' />)} />}
 
-                {AuthHelper.getRole() === 'Admin' && <Route path='/categories' component={Categories} />}
-                {AuthHelper.getRole() === 'Admin' && <Route path='/category' component={CategoryDetail} />}
-                {AuthHelper.getRole() === 'Admin' && <Route path='/newCategory' component={NewCategory} />}
-                {AuthHelper.getRole() === 'Admin' && <Route path='/editCategory' component={EditCategory} />}
+                {AuthHelper.getRole() === 'Admin' ? <Route path='/categories' component={Categories} /> : <Route path='/categories' render={() => (<Redirect to='/signIn' />)} />}
+                {AuthHelper.getRole() === 'Admin' ? <Route path='/category' component={CategoryDetail} /> : <Route path='/category' render={() => (<Redirect to='/signIn' />)} />}
+                {AuthHelper.getRole() === 'Admin' ? <Route path='/newCategory' component={NewCategory} /> : <Route path='/newCateory' render={() => (<Redirect to='/signIn' />)} />}
+                {AuthHelper.getRole() === 'Admin' ? <Route path='/editCategory' component={EditCategory} /> : <Route path='/editCategory' render={() => (<Redirect to='/signIn' />)} />}
                 <Route path="*" component={Error404}/>
             </Switch>
         </Layout>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/authHelper'
+import AuthHelper from '../../Utils/AuthHelper'
 
 export default class NewCategory extends Component {
     constructor(props) {
@@ -24,7 +24,7 @@ export default class NewCategory extends Component {
         this.createCategory = this.createCategory.bind(this);
         this.cancel = this.cancel.bind(this);
     }
-    
+
     handleInputChange(event) {
         const target = event.target;
         const name = target.name;
@@ -119,6 +119,9 @@ export default class NewCategory extends Component {
             description: this.state.description
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Categories', {
             method: 'POST',
             headers: {

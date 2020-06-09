@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper'
+import AuthHelper from '../../Utils/AuthHelper'
 
 export default class EditEvent extends Component{
     constructor(props) {
@@ -149,6 +149,9 @@ export default class EditEvent extends Component{
             roleId: parseInt(this.state.roleId, 10),
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Users/role', {
             method: 'PUT',
             headers: {

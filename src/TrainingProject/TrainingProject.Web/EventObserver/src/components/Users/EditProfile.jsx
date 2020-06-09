@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class EditProfile extends Component {
     constructor(props) {
@@ -270,6 +270,9 @@ export default class EditProfile extends Component {
             formdata.append('photo', this.state.imageFile);
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Users', {
             method: 'PUT',
             headers: {

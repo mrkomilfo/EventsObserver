@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/authHelper.js';
+import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class ChangePassword extends Component {
     constructor(props) {
@@ -128,6 +128,9 @@ export default class ChangePassword extends Component {
         };
 
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Users/changePassword', {
             method: 'PUT',
             headers: {

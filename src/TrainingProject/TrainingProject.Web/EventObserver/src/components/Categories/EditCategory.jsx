@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/authHelper'
+import AuthHelper from '../../Utils/AuthHelper'
 
-export default class NewCategory extends Component {
+export default class EditCategory extends Component {
     constructor(props) {
         super(props);
         this.state = {     
@@ -174,6 +174,9 @@ export default class NewCategory extends Component {
             description: this.state.description
         }
         const token = AuthHelper.getToken();
+        if (!token) {
+            this.props.history.push("/signIn");
+        }
         fetch('api/Categories', {
             method: 'PUT',
             headers: {
