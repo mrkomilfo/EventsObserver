@@ -83,7 +83,7 @@ export default class CategoryDetail extends Component {
     }
 
     async loadData(categoryId) {
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         fetch('api/Categories/' + categoryId, {
             method: 'GET',
             headers: {

@@ -217,7 +217,7 @@ export default class EditProfile extends Component {
     }
 
     async loadUser(userId) {
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         fetch(`api/Users/${userId}/update`, {
             method: 'GET',
             headers: {

@@ -124,7 +124,7 @@ export default class Blocking extends Component {
     }
 
     async loadUser(userId) {
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         fetch(`api/Users/${userId}/ban`, {
             method: 'GET',
             headers: {

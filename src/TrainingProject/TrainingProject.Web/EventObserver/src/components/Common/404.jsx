@@ -8,8 +8,8 @@ export default class Page404 extends Component
         return(
             <div className="overlay404">
                 <div className="body404">
-                    <p className="top">404</p>
-                    <p className="body">Page not found</p>
+                    <p className="number404">404</p>
+                    <p className="inscription404">Page not found</p>
                 </div>
             </div>
         )

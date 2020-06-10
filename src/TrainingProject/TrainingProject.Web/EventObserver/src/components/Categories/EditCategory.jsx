@@ -129,7 +129,7 @@ export default class EditCategory extends Component {
     }
 
     async loadCategory(categoryId) {
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         fetch('api/Categories/' + categoryId, {
             method: 'GET',
             headers: {

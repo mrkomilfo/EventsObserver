@@ -128,7 +128,7 @@ export default class Users extends Component {
         if (search) {
             queryTrailer += `&search=${search}`
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         fetch(`api/Users${queryTrailer}`, {
             method: 'GET',
             headers: {
