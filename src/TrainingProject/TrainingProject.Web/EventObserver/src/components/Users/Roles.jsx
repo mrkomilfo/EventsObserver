@@ -82,8 +82,8 @@ export default class EditEvent extends Component{
         )
     }
 
-    loadRoles() {
-        const token = AuthHelper.getToken();
+    async loadRoles() {
+        const token = await AuthHelper.getToken();
         fetch('api/Users/roles', {
             method: 'GET',
             headers: {
@@ -142,13 +142,13 @@ export default class EditEvent extends Component{
         });
     }
 
-    changeRole()
+    async changeRole()
     {
         let data = {
             userId: this.state.userId,
             roleId: parseInt(this.state.roleId, 10),
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

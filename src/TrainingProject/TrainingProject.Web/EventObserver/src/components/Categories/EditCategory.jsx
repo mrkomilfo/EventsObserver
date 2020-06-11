@@ -160,7 +160,7 @@ export default class EditCategory extends Component {
         });
     }
 
-    editCategory(){
+    async editCategory(){
         if (!this.state.formValid)
         {
             this.setState({
@@ -173,7 +173,7 @@ export default class EditCategory extends Component {
             name: this.state.name,
             description: this.state.description
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

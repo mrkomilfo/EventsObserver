@@ -23,6 +23,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public int ParticipantsLimit { get; set; } //0 - unlimited
         public string Tags { get; set; }
         [MaxFileSize(8 * 1024 * 1024)]
+        [FileType("jpg, jpeg, png")]
         public IFormFile Image { get; set; }
         [Required]
         public bool HasImage { get; set; }

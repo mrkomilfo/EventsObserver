@@ -231,8 +231,8 @@ export default class EventDetail extends Component {
         });
     }
 
-    deleteEvent() {
-        const token = AuthHelper.getToken();
+    async deleteEvent() {
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }
@@ -264,8 +264,8 @@ export default class EventDetail extends Component {
         });
     }
 
-    subscribe() {
-        const token = AuthHelper.getToken();
+    async subscribe() {
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }
@@ -297,8 +297,8 @@ export default class EventDetail extends Component {
         });
     }
 
-    unsubscribe() {
-        const token = AuthHelper.getToken();
+    async unsubscribe() {
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

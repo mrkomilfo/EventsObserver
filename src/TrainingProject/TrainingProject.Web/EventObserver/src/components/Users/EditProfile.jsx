@@ -251,7 +251,7 @@ export default class EditProfile extends Component {
         });
     }
 
-    editProfile(){
+    async editProfile(){
         if (!this.state.formValid)
         {
             this.setState({
@@ -269,7 +269,7 @@ export default class EditProfile extends Component {
         {
             formdata.append('photo', this.state.imageFile);
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

@@ -159,7 +159,7 @@ export default class Blocking extends Component {
         });
     }
 
-    ban(){
+    async ban(){
         if (!this.state.formValid)
         {
             this.setState({
@@ -172,7 +172,7 @@ export default class Blocking extends Component {
             days: parseInt(this.state.days, 10),
             hours: parseInt(this.state.hours, 10),
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }
@@ -206,8 +206,8 @@ export default class Blocking extends Component {
         });
     }
 
-    unban(){
-        const token = AuthHelper.getToken();
+    async unban(){
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

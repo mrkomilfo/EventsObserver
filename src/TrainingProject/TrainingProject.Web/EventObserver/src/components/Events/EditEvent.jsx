@@ -303,7 +303,7 @@ export default class EditEvent extends Component{
         </Alert> : null;
 
         const content = this.state.loading
-            ? <p><em cn>Loading...</em></p>
+            ? <p><em>Loading...</em></p>
             : this.renderEvent();
 
         return(
@@ -381,7 +381,7 @@ export default class EditEvent extends Component{
         });
     }
 
-    editEvent()
+    async editEvent()
     {
         if (!this.state.formValid)
         {
@@ -408,7 +408,7 @@ export default class EditEvent extends Component{
         if (this.state.imageFile) {
             formdata.append('image', this.state.imageFile);
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

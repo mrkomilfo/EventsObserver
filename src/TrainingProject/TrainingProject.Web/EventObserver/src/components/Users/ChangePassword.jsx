@@ -112,7 +112,7 @@ export default class ChangePassword extends Component {
         )
     }
 
-    changePassword(){
+    async changePassword(){
         if (!this.state.formValid)
         {
             this.setState({
@@ -127,7 +127,7 @@ export default class ChangePassword extends Component {
             newPasswordConfirm: this.state.newPasswordConfirm
         };
 
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

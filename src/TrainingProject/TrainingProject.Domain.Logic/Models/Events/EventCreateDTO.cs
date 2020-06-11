@@ -24,6 +24,7 @@ namespace TrainingProject.DomainLogic.Models.Events
         public string OrganizerId { get; set; }
         public string Tags { get; set; }
         [MaxFileSize(8 * 1024 * 1024)]
+        [FileType("jpg, jpeg, png")]
         public IFormFile Image { get; set; }
     }
 }

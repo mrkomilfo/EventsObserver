@@ -106,7 +106,7 @@ export default class NewCategory extends Component {
         )
     }
 
-    createCategory(){
+    async createCategory(){
         if (!this.state.formValid)
         {
             this.setState({
@@ -118,7 +118,7 @@ export default class NewCategory extends Component {
             name: this.state.name,
             description: this.state.description
         }
-        const token = AuthHelper.getToken();
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }

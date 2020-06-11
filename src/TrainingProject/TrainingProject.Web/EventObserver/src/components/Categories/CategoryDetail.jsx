@@ -114,8 +114,8 @@ export default class CategoryDetail extends Component {
         });
     }
 
-    deleteCategory() {
-        const token = AuthHelper.getToken();
+    async deleteCategory() {
+        const token = await AuthHelper.getToken();
         if (!token) {
             this.props.history.push("/signIn");
         }
