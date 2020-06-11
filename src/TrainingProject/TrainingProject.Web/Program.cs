@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using AppContext = TrainingProject.Data.AppContext;
 using TrainingProject.Data;
+using Serilog.Events;
 
 namespace TrainingProject.Web
 {
@@ -15,9 +16,29 @@ namespace TrainingProject.Web
     {
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            await CreateDbIfNotExists(host);
-            host.Run();
+            Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+            .CreateLogger();
+
+            try
+            {
+                var host = CreateHostBuilder(args).Build();
+                await CreateDbIfNotExists(host);
+                Log.Information("Starting web host");
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         private static async Task CreateDbIfNotExists(IHost host)
@@ -28,22 +49,21 @@ namespace TrainingProject.Web
                 try
                 {
                     var context = (AppContext)services.GetRequiredService<IAppContext>();
+                    Log.Information("Migrate database");
                     context.Database.Migrate();
                     await DBInitializer.InitializeUsers(context);
                     await DBInitializer.InitializeEvents(context);
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred creating the DB.");
+                    Log.Fatal(ex, "An error occurred creating the DB.");
                 }
             }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(builder => builder.ClearProviders()
-                    .AddSerilog().AddDebug().AddConsole())
+                .UseSerilog()    
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }

@@ -20,6 +20,7 @@ using TrainingProject.Web.Helpers;
 using TrainingProject.DomainLogic.Services;
 using FluentScheduler;
 using TrainingProject.Web.Jobs;
+using Serilog;
 
 namespace TrainingProject.Web
 {
@@ -87,12 +88,12 @@ namespace TrainingProject.Web
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
+            
+            app.UseSerilogRequestLogging();            
             app.UseAuthentication();
-      
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles(); 
-
             app.UseRouting();
             app.UseAuthorization();
 
