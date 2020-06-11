@@ -11,6 +11,7 @@ using TrainingProject.DomainLogic.Models.Events;
 using System.Linq;
 using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Services;
+using System.Collections.Generic;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -64,7 +65,7 @@ namespace TrainingProject.DomainLogic.Managers
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
             if (update == null)
             {
-                throw new NullReferenceException($"Event with id={@event.Id} not found");
+                throw new KeyNotFoundException($"Event with id={@event.Id} not found");
             }
             int subscribesCount = await _appContext.EventsUsers.Where(eu => eu.EventId == @event.Id).CountAsync();
             if (@event.ParticipantsLimit < subscribesCount && @event.ParticipantsLimit != 0)
@@ -106,7 +107,7 @@ namespace TrainingProject.DomainLogic.Managers
             var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
             if (@event == null)
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             EventToUpdateDTO eventToUpdate = _mapper.Map<EventToUpdateDTO>(@event);
 
@@ -125,7 +126,7 @@ namespace TrainingProject.DomainLogic.Managers
                 .FirstOrDefaultAsync(c => c.Id == eventId);
             if (@event == null)
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             if (force)
             {
@@ -145,7 +146,7 @@ namespace TrainingProject.DomainLogic.Managers
             var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
             if (DBEvent == null)
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             var eventFullDTO = _mapper.Map<EventFullDTO>(DBEvent);
 
@@ -231,11 +232,11 @@ namespace TrainingProject.DomainLogic.Managers
         {
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
-                throw new NullReferenceException($"User with id={userId} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             if (await _appContext.EventsUsers.AnyAsync(eu => eu.ParticipantId == userId && eu.EventId == eventId))
             {
@@ -259,15 +260,15 @@ namespace TrainingProject.DomainLogic.Managers
         {
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
-                throw new NullReferenceException($"User with id={userId} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             if (!await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
-                throw new NullReferenceException($"User(id={userId}) is not signed up on event(id={eventId})");
+                throw new KeyNotFoundException($"User(id={userId}) is not signed up on event(id={eventId})");
             }
             if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
             {
@@ -286,7 +287,7 @@ namespace TrainingProject.DomainLogic.Managers
         {
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
-                throw new NullReferenceException($"Event with id={eventId} not found");
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
             return (await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId))?.OrganizerId;
         }

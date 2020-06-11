@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace TrainingProject.Web.Controllers
             {
                 return await action.Invoke();
             }
-            catch (NullReferenceException ex)
+            catch (KeyNotFoundException ex)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { ex.Message });
             }
