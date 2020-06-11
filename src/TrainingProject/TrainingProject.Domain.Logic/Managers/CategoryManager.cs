@@ -37,7 +37,7 @@ namespace TrainingProject.DomainLogic.Managers
             var update = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
             if (update == null)
             {
-                throw new NullReferenceException($"Category with id={category.Id} not found");
+                throw new KeyNotFoundException($"Category with id={category.Id} not found");
             }
             update.Name = category.Name;
             update.Description = category.Description;
@@ -50,7 +50,7 @@ namespace TrainingProject.DomainLogic.Managers
                 .FirstOrDefaultAsync(c => c.Id == categoryId);
             if (category == null)
             {
-                throw new NullReferenceException($"Category with id={categoryId} not found");
+                throw new KeyNotFoundException($"Category with id={categoryId} not found");
             }
             if (force)
             {
@@ -68,7 +68,7 @@ namespace TrainingProject.DomainLogic.Managers
             var category = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
             if (category == null)
             {
-                throw new NullReferenceException($"Category with id={categoryId} not found");
+                throw new KeyNotFoundException($"Category with id={categoryId} not found");
             }
             return _mapper.Map<CategoryFullDTO>(category);
         }
