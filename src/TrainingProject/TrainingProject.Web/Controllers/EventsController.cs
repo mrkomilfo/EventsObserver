@@ -18,13 +18,13 @@ namespace TrainingProject.Web.Controllers
     {
         private IEventManager _eventManager;
         private IHostServices _hostServices;
-        private ILogHelper _log;
+        private ILogHelper _logger;
 
-        public EventsController(IEventManager eventManager, IHostServices hostServices, ILogHelper log)
+        public EventsController(IEventManager eventManager, IHostServices hostServices, ILogHelper logger) : base(logger)
         {
             _eventManager = eventManager;
             _hostServices = hostServices;
-            _log = log;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -32,7 +32,7 @@ namespace TrainingProject.Web.Controllers
             int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizer = null, string participant = null)
         {
-            _log.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizer, participant });
+            _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizer, participant });
             return await HandleExceptions(async () =>
             {
                 Guid.TryParse(organizer, out var organizerGuid);
@@ -44,7 +44,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventFullDTO>> Details(int eventId)
         {
-            _log.LogMethodCalling();
+            _logger.LogMethodCalling();
             return await HandleExceptions(async () => Ok(await _eventManager.GetEvent(eventId)));
         }
 
@@ -52,7 +52,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Create([FromForm] EventCreateDTO eventCreateDTO)
         {
-            _log.LogMethodCallingWithObject(eventCreateDTO);
+            _logger.LogMethodCallingWithObject(eventCreateDTO);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -69,7 +69,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
         {
-            _log.LogMethodCallingWithObject(new { eventId });
+            _logger.LogMethodCallingWithObject(new { eventId });
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -87,7 +87,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Update([FromForm] EventUpdateDTO eventUpdateDTO)
         {
-            _log.LogMethodCallingWithObject(eventUpdateDTO);
+            _logger.LogMethodCallingWithObject(eventUpdateDTO);
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -111,7 +111,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Delete(int eventId)
         {
-            _log.LogMethodCallingWithObject(new { eventId });
+            _logger.LogMethodCallingWithObject(new { eventId });
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -131,7 +131,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Subscribe(int eventId)
         {
-            _log.LogMethodCallingWithObject(new { eventId });
+            _logger.LogMethodCallingWithObject(new { eventId });
             return await HandleExceptions(async () =>
             {
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
@@ -144,7 +144,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Unsubscribe(int eventId)
         {
-            _log.LogMethodCallingWithObject(new { eventId });
+            _logger.LogMethodCallingWithObject(new { eventId });
             return await HandleExceptions(async () =>
             {
                 var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;

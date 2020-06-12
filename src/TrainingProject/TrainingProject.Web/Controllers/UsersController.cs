@@ -20,19 +20,19 @@ namespace TrainingProject.Web.Controllers
     {
         private IUserManager _userManager;
         private IHostServices _hostServices;
-        private ILogHelper _log;
-        public UsersController(IUserManager userManager, IHostServices hostServices, ILogHelper log)
+        private ILogHelper _logger;
+        public UsersController(IUserManager userManager, IHostServices hostServices, ILogHelper logger) : base(logger)
         {
             _userManager = userManager;
             _hostServices = hostServices;
-            _log = log;
+            _logger = logger;
         }
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult<Page<UserLiteDTO>>> Index([FromQuery] int index = 0, int pageSize = 20, string search = null)
         {
-            _log.LogMethodCallingWithObject(new { index, pageSize, search});
+            _logger.LogMethodCallingWithObject(new { index, pageSize, search});
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -47,7 +47,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserFullDTO>> Details(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () =>
             {
                 var hostRoot = _hostServices.GetHostPath();
@@ -58,7 +58,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] RegisterDTO registerDTO)
         {
-            _log.LogMethodCallingWithObject(registerDTO);
+            _logger.LogMethodCallingWithObject(registerDTO);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -74,7 +74,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<UserToUpdateDTO>> Update(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -92,7 +92,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Update([FromForm] UserUpdateDTO userUpdateDTO)
         {
-            _log.LogMethodCallingWithObject(userUpdateDTO);
+            _logger.LogMethodCallingWithObject(userUpdateDTO);
             return await HandleExceptions(async () =>
             {
                 var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -115,7 +115,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult> Delete(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () =>
             {
                 var hostRoot = _hostServices.GetHostPath();
@@ -128,7 +128,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult<UserToBanDTO>> Ban(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () =>
             {
                 var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -146,7 +146,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult> Ban([FromBody]BanDTO banDTO)
         {
-            _log.LogMethodCallingWithObject(banDTO);
+            _logger.LogMethodCallingWithObject(banDTO);
             return await HandleExceptions(async () =>
             {
                 var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -168,7 +168,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult> Unban(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () =>
             {
                 if (!Guid.TryParse(userId, out Guid userGuid))
@@ -191,7 +191,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult<IEnumerable<Role>>> Roles()
         {
-            _log.LogMethodCalling();
+            _logger.LogMethodCalling();
             return await HandleExceptions(async () => Ok(await _userManager.GetRoles()));
         }
 
@@ -199,7 +199,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult<UserRoleDTO>> ChangeRole(string userId)
         {
-            _log.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { userId });
             return await HandleExceptions(async () => Ok(await _userManager.GetUserWithRole(Guid.Parse(userId))));
         }
 
@@ -208,7 +208,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
         public async Task<ActionResult> ChangeRole([FromBody] ChangeRoleDTO changeRoleDTO)
         {
-            _log.LogMethodCallingWithObject(changeRoleDTO);
+            _logger.LogMethodCallingWithObject(changeRoleDTO);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -224,7 +224,7 @@ namespace TrainingProject.Web.Controllers
         [Route("signIn")]
         public async Task<ActionResult> SignIn([FromBody] LoginDTO loginDTO)
         {
-            _log.LogMethodCallingWithObject(loginDTO);
+            _logger.LogMethodCallingWithObject(new { login = loginDTO.Login, password = new string('*', loginDTO.Password.Length) });
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -240,7 +240,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> ChangePassword([FromBody]ChangePasswordDTO changePasswordDTO)
         {
-            _log.LogMethodCallingWithObject(changePasswordDTO);
+            _logger.LogMethodCallingWithObject(changePasswordDTO);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)

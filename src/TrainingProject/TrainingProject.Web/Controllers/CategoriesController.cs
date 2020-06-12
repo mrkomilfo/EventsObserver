@@ -14,24 +14,24 @@ namespace TrainingProject.Web.Controllers
     public class CategoriesController : ExceptionController
     {
         private readonly ICategoryManager _categoryManager;
-        private readonly ILogHelper _log;
-        public CategoriesController(ICategoryManager categoryManager, ILogHelper log)
+        private readonly ILogHelper _logger;
+        public CategoriesController(ICategoryManager categoryManager, ILogHelper logger) : base(logger)
         {
             _categoryManager = categoryManager;
-            _log = log;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> Index()
         {
-            _log.LogMethodCalling();
+            _logger.LogMethodCalling();
             return await HandleExceptions(async () => Ok(await _categoryManager.GetCategories()));
         }
 
         [HttpGet("{categoryId}")]
         public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
         {
-            _log.LogMethodCallingWithObject(new { categoryId });
+            _logger.LogMethodCallingWithObject(new { categoryId });
             return await HandleExceptions(async () => Ok(await _categoryManager.GetCategory(categoryId)));
         }
 
@@ -39,7 +39,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult> Create([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
-            _log.LogMethodCallingWithObject(categoryCreateDTO);
+            _logger.LogMethodCallingWithObject(categoryCreateDTO);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -55,7 +55,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult> Update([FromBody] Category category)
         {
-            _log.LogMethodCallingWithObject(category);
+            _logger.LogMethodCallingWithObject(category);
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -71,7 +71,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult> Delete(int categoryId)
         {
-            _log.LogMethodCallingWithObject(new { categoryId });
+            _logger.LogMethodCallingWithObject(new { categoryId });
             return await HandleExceptions(async () =>
             {
                 await _categoryManager.DeleteCategory(categoryId, false);

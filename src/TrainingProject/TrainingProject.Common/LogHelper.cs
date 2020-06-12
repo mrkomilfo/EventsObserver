@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using Serilog;
+using System;
 
 namespace TrainingProject.Common
 {
@@ -11,6 +12,16 @@ namespace TrainingProject.Common
         private ILogger _logger;
         public LogHelper(ILogger logger) {
             _logger = logger;
+        }
+
+        public void LogInfo(string message)
+        {
+            _logger.Information(message);
+        }
+
+        public void LogError(Exception ex)
+        {
+            _logger.Error(ex, ex.Message);
         }
 
         public void LogMethodCalling()
