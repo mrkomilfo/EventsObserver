@@ -20,6 +20,7 @@ using TrainingProject.Web.Helpers;
 using TrainingProject.DomainLogic.Services;
 using FluentScheduler;
 using TrainingProject.Web.Jobs;
+using TrainingProject.Common;
 using Serilog;
 
 namespace TrainingProject.Web
@@ -69,7 +70,6 @@ namespace TrainingProject.Web
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
-
             services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserManager, UserManager>();
@@ -79,6 +79,8 @@ namespace TrainingProject.Web
             services.AddScoped<INotificator, Notificator>();
             services.AddSingleton<IWebHostEnvironment>(Environment);
             services.AddTransient<SendMessageJob>();
+            services.AddSingleton<ILogger>(Log.Logger);
+            services.AddScoped<ILogHelper, LogHelper>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

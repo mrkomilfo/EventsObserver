@@ -21,7 +21,7 @@ export default class EventMedia extends Component {
             {image}
             <Media body>
                 <Media heading>
-                    <Link to={`/event?id=${this.props.event.id}`}>{this.props.event.name}</Link>                  
+                    <Link style={{ wordBreak: "break-all" }} to={`/event?id=${this.props.event.id}`}>{this.props.event.name}</Link>                  
                 </Media>
                 {`Категория:`} <Link to={`/events?categoryId=${this.props.event.categoryId}`}>{this.props.event.category}</Link>
                 <br/>

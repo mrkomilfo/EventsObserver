@@ -65,7 +65,7 @@ export default class EventDetail extends Component {
                 </ModalFooter>
             </Modal>
 
-        if (this.state.userId === this.state.organizerId)
+        if (this.state.userId === this.state.organizerId || this.state.userRole == 'Admin')
         {
             return(
                 <div>
