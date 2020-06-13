@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Text;
 using Serilog;
 using System;
+using System.Linq;
+using TrainingProject.Common.Helpers;
 
 namespace TrainingProject.Common
 {
@@ -29,14 +31,15 @@ namespace TrainingProject.Common
             _logger.Information($"Call method {new StackTrace().GetFrame(1).GetMethod().DeclaringType.FullName}");
         }
 
-        public void LogMethodCallingWithObject(object obj)
+        public void LogMethodCallingWithObject(object obj, string hide = "")
         {
             StringBuilder log = new StringBuilder($"Call method " +
                 $"{new StackTrace().GetFrame(1).GetMethod().DeclaringType.FullName}");
             IList<PropertyInfo> props = new List<PropertyInfo>(obj.GetType().GetProperties());
+            IList<string> toHide = hide.ParseSubstrings(",").ToList();
             foreach (PropertyInfo prop in props)
             {
-                log.Append($"\n\t{prop.Name}: {prop.GetValue(obj, null) ?? "null"}");
+                log.Append($"\n\t{prop.Name}: {(toHide.Contains(prop.Name) ? new string('*', prop.GetValue(obj, null).ToString().Length) : prop.GetValue(obj, null) ?? "null")}");
             }
             _logger.Information(log.ToString());
         }

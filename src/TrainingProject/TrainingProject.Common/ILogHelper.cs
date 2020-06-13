@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TrainingProject.Common
 {
@@ -9,6 +7,6 @@ namespace TrainingProject.Common
         public void LogInfo(string message);
         public void LogError(Exception ex);
         void LogMethodCalling();
-        void LogMethodCallingWithObject(object obj);
+        void LogMethodCallingWithObject(object obj, string hide = "");
     }
 }

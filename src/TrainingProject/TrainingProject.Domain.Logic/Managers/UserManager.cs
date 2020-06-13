@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Helpers;
@@ -22,15 +23,18 @@ namespace TrainingProject.DomainLogic.Managers
     {
         private readonly IAppContext _appContext;
         private readonly IMapper _mapper;
+        private readonly ILogHelper _logger;
 
-        public UserManager(IAppContext appContext, IMapper mapper)
+        public UserManager(IAppContext appContext, IMapper mapper, ILogHelper logger)
         {
             _appContext = appContext;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<UserFullDTO> GetUser(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
             if (DBUser == null)
             {
@@ -48,6 +52,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize, string search)
         {
+            _logger.LogMethodCallingWithObject(new { index, pageSize, search });
             var result = new Page<UserLiteDTO>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Users.Include(e => e.Role).AsQueryable();
             if (search != null)
@@ -61,6 +66,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task RegisterUser(RegisterDTO user)
         {
+            _logger.LogMethodCallingWithObject(user, "Password, PasswordConfirm");
             if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
             {
                 throw new ArgumentException($"User with login \"{user.Login}\" already exist");
@@ -73,6 +79,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
         {
+            _logger.LogMethodCallingWithObject(user);
             User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(user.Id)));
             if (updatedUser == null)
             {
@@ -82,6 +89,7 @@ namespace TrainingProject.DomainLogic.Managers
             if (user.Photo != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\users\\{updatedUser.Id}.jpg";
+                _logger.LogInfo($"Saving image to {path}");
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await user.Photo.CopyToAsync(fileStream);
             }
@@ -90,6 +98,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<UserToUpdateDTO> GetUserToUpdate(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FindAsync(userId);
             if (user == null)
             {
@@ -105,6 +114,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task DeleteUser(Guid userId, bool force, string hostRoot)
         {
+            _logger.LogMethodCallingWithObject(new { userId, force, hostRoot });
             var user = await _appContext.Users.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
@@ -115,6 +125,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 _appContext.Users.Remove(user);
                 string path = $"{hostRoot}\\wwwroot\\img\\users\\{userId}.jpg";
+                _logger.LogInfo($"Deleting image from {path}");
                 File.Delete(path);
             }
             else
@@ -126,6 +137,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<UserToBanDTO> GetUserToBan(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
@@ -137,6 +149,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task BanUser(BanDTO banDTO)
         {
+            _logger.LogMethodCallingWithObject(banDTO);
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDTO.Id)));
             if (user == null)
             {
@@ -149,6 +162,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UnbanUser(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
@@ -160,6 +174,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task ChangeRole(ChangeRoleDTO changeRoleDTO)
         {
+            _logger.LogMethodCallingWithObject(changeRoleDTO);
             var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDTO.UserId));
             if (user == null)
             {
@@ -174,15 +189,17 @@ namespace TrainingProject.DomainLogic.Managers
         }
         public async Task<DateTime?> GetUnlockTime(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
             return (await _appContext.Users.FirstAsync(u => Equals(u.Id, userId))).UnlockTime;
         }
-        public async Task<LoginResponseDTO> Login(LoginDTO model)
+        public async Task<LoginResponseDTO> Login(LoginDTO loginDto)
         {
-            var identity = await GetIdentity(model.Login, model.Password);
+            _logger.LogMethodCallingWithObject(loginDto, "Password");
+            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
             if (identity == null)
             {
                 throw new UnauthorizedAccessException($"Wrong login or password");
@@ -213,6 +230,7 @@ namespace TrainingProject.DomainLogic.Managers
         }
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
         {
+            _logger.LogMethodCallingWithObject(new { login, password }, "password");
             ClaimsIdentity identity = null;
             var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => string.Equals(u.Login, login));
             if (user == null)
@@ -234,11 +252,13 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<IEnumerable<Role>> GetRoles()
         {
+            _logger.LogMethodCalling();
             return await _appContext.Roles.ToListAsync();
         }
 
         public async Task<UserRoleDTO> GetUserWithRole(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
@@ -250,6 +270,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Role> GetUserRole(Guid userId)
         {
+            _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new KeyNotFoundException($"Event with id={userId} not found");
@@ -259,6 +280,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task ChangePassword(ChangePasswordDTO changePasswordDTO)
         {
+            _logger.LogMethodCallingWithObject(changePasswordDTO, "OldPassword, NewPassword, NewPasswordConfirm");
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));
             if (user == null)
             {

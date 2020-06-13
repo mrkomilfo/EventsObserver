@@ -12,6 +12,7 @@ using System.Linq;
 using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Services;
 using System.Collections.Generic;
+using TrainingProject.Common;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -20,16 +21,19 @@ namespace TrainingProject.DomainLogic.Managers
         private readonly IAppContext _appContext;
         private readonly IMapper _mapper;
         private readonly INotificator _notificator;
+        private readonly ILogHelper _logger;
 
-        public EventManager(IAppContext appContext, IMapper mapper, INotificator notificator)
+        public EventManager(IAppContext appContext, IMapper mapper, INotificator notificator, ILogHelper logger)
         {
             _appContext = appContext;
             _mapper = mapper;
             _notificator = notificator;
+            _logger = logger;
         }
 
         public async Task AddEvent(EventCreateDTO @event, string hostRoot)
         {
+            _logger.LogMethodCallingWithObject(@event);
             var newEvent = _mapper.Map<EventCreateDTO, Event>(@event);
             await _appContext.Events.AddAsync(newEvent);
             await _appContext.SaveChangesAsync(default);
@@ -37,6 +41,7 @@ namespace TrainingProject.DomainLogic.Managers
             if (@event.Image != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{newEvent.Id}.jpg";
+                _logger.LogInfo($"Saving image to {path}");
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
@@ -62,6 +67,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task UpdateEvent(EventUpdateDTO @event, string hostRoot)
         {
+            _logger.LogMethodCallingWithObject(@event);
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
             if (update == null)
             {
@@ -95,6 +101,7 @@ namespace TrainingProject.DomainLogic.Managers
             if (@event.Image != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{update.Id}.jpg";
+                _logger.LogInfo($"Saving image to {path}");
                 await using var fileStream = new FileStream(path, FileMode.Create);
                 await @event.Image.CopyToAsync(fileStream);
             }
@@ -104,6 +111,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<EventToUpdateDTO> GetEventToUpdate(int eventId)
         {
+            _logger.LogMethodCallingWithObject(new { eventId });
             var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
             if (@event == null)
             {
@@ -122,6 +130,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task DeleteEvent(int eventId, bool force, string hostRoot)
         {
+            _logger.LogMethodCallingWithObject(new { eventId, force, hostRoot });
             var @event = await _appContext.Events.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(c => c.Id == eventId);
             if (@event == null)
@@ -132,6 +141,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 _appContext.Events.Remove(@event);
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{eventId}.jpg";
+                _logger.LogInfo($"Deleting image from {path}");
                 File.Delete(path);
             }
             else
@@ -143,6 +153,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<EventFullDTO> GetEvent(int eventId)
         {
+            _logger.LogMethodCallingWithObject(new { eventId });
             var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
             if (DBEvent == null)
             {
@@ -169,9 +180,10 @@ namespace TrainingProject.DomainLogic.Managers
             return eventFullDTO;
         }
 
-        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree,
-            bool vacancies, Guid organizer = new Guid(), Guid participant = new Guid())
+        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, 
+            bool? upComing, bool onlyFree, bool vacancies, Guid organizerId = new Guid(), Guid participantId = new Guid())
         {
+            _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
             var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
             if (search != null)
@@ -198,13 +210,13 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Count(eu => eu.EventId == e.Id) < e.ParticipantsLimit);
             }
-            if (organizer != Guid.Empty)
+            if (organizerId != Guid.Empty)
             {
-                query = query.Where(e => Equals(e.OrganizerId, organizer));
+                query = query.Where(e => Equals(e.OrganizerId, organizerId));
             }
-            if (participant != Guid.Empty)
+            if (participantId != Guid.Empty)
             {
-                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participant)));
+                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participantId)));
             }
             result.TotalRecords = await query.CountAsync();
             if (upComing != null && (bool)upComing)
@@ -230,6 +242,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task Subscribe(Guid userId, int eventId)
         {
+            _logger.LogMethodCallingWithObject(new { userId, eventId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
@@ -258,6 +271,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task Unsubscribe(Guid userId, int eventId)
         {
+            _logger.LogMethodCallingWithObject(new { userId, eventId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
@@ -285,6 +299,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<Guid?> GetEventOrganizerId(int eventId)
         {
+            _logger.LogMethodCallingWithObject(new { eventId });
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
@@ -294,10 +309,11 @@ namespace TrainingProject.DomainLogic.Managers
 
         public void Notificate()
         {
+            _logger.LogMethodCalling();
             DateTime now = DateTime.Now;
             var eventUsers = _appContext.EventsUsers.Include(eu => eu.Event).Include(eu => eu.Participant).ToList();
             var eventUsersList = eventUsers
-                .Where(eu => !String.IsNullOrEmpty(eu.Participant.ContactEmail)
+                .Where(eu => !string.IsNullOrEmpty(eu.Participant.ContactEmail)
                     && eu.Event.Start > now.AddHours(23)
                     && eu.Event.Start <= now.AddHours(24));
 

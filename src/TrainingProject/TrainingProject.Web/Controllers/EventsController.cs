@@ -30,13 +30,13 @@ namespace TrainingProject.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null, 
             int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
-            bool vacancies = false, string organizer = null, string participant = null)
+            bool vacancies = false, string organizerId = null, string participantId = null)
         {
-            _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizer, participant });
+            _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
             return await HandleExceptions(async () =>
             {
-                Guid.TryParse(organizer, out var organizerGuid);
-                Guid.TryParse(participant, out var participantGuid);         
+                Guid.TryParse(organizerId, out var organizerGuid);
+                Guid.TryParse(participantId, out var participantGuid);         
                 return Ok(await _eventManager.GetEvents(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
             });
         }

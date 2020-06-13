@@ -19,7 +19,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task BanUser(BanDTO banDTO);
         Task UnbanUser(Guid userId);
         Task<DateTime?> GetUnlockTime(Guid userId);
-        Task<LoginResponseDTO> Login(LoginDTO model);
+        Task<LoginResponseDTO> Login(LoginDTO loginDto);
         Task ChangeRole(ChangeRoleDTO changeRoleDTO);
         Task<IEnumerable<Role>> GetRoles();
         Task<UserRoleDTO> GetUserWithRole(Guid userId);

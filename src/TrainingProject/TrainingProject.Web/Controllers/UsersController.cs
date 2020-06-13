@@ -58,7 +58,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] RegisterDTO registerDTO)
         {
-            _logger.LogMethodCallingWithObject(registerDTO);
+            _logger.LogMethodCallingWithObject(registerDTO, "Password, PasswordConfirm");
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -224,7 +224,7 @@ namespace TrainingProject.Web.Controllers
         [Route("signIn")]
         public async Task<ActionResult> SignIn([FromBody] LoginDTO loginDTO)
         {
-            _logger.LogMethodCallingWithObject(new { login = loginDTO.Login, password = new string('*', loginDTO.Password.Length) });
+            _logger.LogMethodCallingWithObject(loginDTO, "Password");
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
@@ -240,7 +240,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> ChangePassword([FromBody]ChangePasswordDTO changePasswordDTO)
         {
-            _logger.LogMethodCallingWithObject(changePasswordDTO);
+            _logger.LogMethodCallingWithObject(changePasswordDTO, "OldPassword, NewPassword, NewPasswordConfirm");
             return await HandleExceptions(async () =>
             {
                 if (ModelState.IsValid)
