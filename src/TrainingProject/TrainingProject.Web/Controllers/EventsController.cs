@@ -8,19 +8,21 @@ using TrainingProject.Common;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
+using TrainingProject.Web.Filters;
 using TrainingProject.Web.Interfaces;
 
 namespace TrainingProject.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EventsController : ExceptionController
+    [ServiceFilter(typeof(ExceptionHandlingFilter))]
+    public class EventsController : ControllerBase
     {
         private IEventManager _eventManager;
         private IHostServices _hostServices;
         private ILogHelper _logger;
 
-        public EventsController(IEventManager eventManager, IHostServices hostServices, ILogHelper logger) : base(logger)
+        public EventsController(IEventManager eventManager, IHostServices hostServices, ILogHelper logger)
         {
             _eventManager = eventManager;
             _hostServices = hostServices;
@@ -33,19 +35,17 @@ namespace TrainingProject.Web.Controllers
             bool vacancies = false, string organizerId = null, string participantId = null)
         {
             _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            return await HandleExceptions(async () =>
-            {
-                Guid.TryParse(organizerId, out var organizerGuid);
-                Guid.TryParse(participantId, out var participantGuid);         
-                return Ok(await _eventManager.GetEvents(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerGuid, participantGuid));
-            });
+            Guid.TryParse(organizerId, out var organizerGuid);
+            Guid.TryParse(participantId, out var participantGuid);
+            return Ok(await _eventManager.GetEvents(page, pageSize, search, categoryId, tag, upComing,
+                onlyFree, vacancies, organizerGuid, participantGuid));
         }
 
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventFullDTO>> Details(int eventId)
         {
             _logger.LogMethodCalling();
-            return await HandleExceptions(async () => Ok(await _eventManager.GetEvent(eventId)));
+            return Ok(await _eventManager.GetEvent(eventId));
         }
 
         [HttpPost]
@@ -53,16 +53,13 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> Create([FromForm] EventCreateDTO eventCreateDTO)
         {
             _logger.LogMethodCallingWithObject(eventCreateDTO);
-            return await HandleExceptions(async () =>
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    var hostRoot = _hostServices.GetHostPath();
-                    await _eventManager.AddEvent(eventCreateDTO, hostRoot);
-                    return Ok();
-                }
-                return BadRequest("Model state is not valid");
-            });
+                var hostRoot = _hostServices.GetHostPath();
+                await _eventManager.AddEvent(eventCreateDTO, hostRoot);
+                return Ok();
+            }
+            return BadRequest("Model state is not valid");
         }
 
         [HttpGet("{eventId}/update")]
@@ -70,17 +67,14 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<EventToUpdateDTO>> Update(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
-            return await HandleExceptions(async () =>
+            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            var organizerId = await _eventManager.GetEventOrganizerId(eventId);
+            if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
             {
-                var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-                var organizerId = await _eventManager.GetEventOrganizerId(eventId);
-                if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
-                {
-                    return Forbid("Access denied");
-                }
-                return Ok(await _eventManager.GetEventToUpdate(eventId));
-            });
+                return Forbid("Access denied");
+            }
+            return Ok(await _eventManager.GetEventToUpdate(eventId));
         }
 
         [HttpPut]
@@ -88,23 +82,20 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> Update([FromForm] EventUpdateDTO eventUpdateDTO)
         {
             _logger.LogMethodCallingWithObject(eventUpdateDTO);
-            return await HandleExceptions(async () =>
+            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            var organizerId = await _eventManager.GetEventOrganizerId(eventUpdateDTO.Id);
+            if (role != "Admin" && Guid.Parse(userId) != organizerId)
             {
-                var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-                var organizerId = await _eventManager.GetEventOrganizerId(eventUpdateDTO.Id);
-                if (role != "Admin" && Guid.Parse(userId) != organizerId)
-                {
-                    return Forbid("Access denied");
-                }
-                if (ModelState.IsValid)
-                {
-                    var hostRoot = _hostServices.GetHostPath();
-                    await _eventManager.UpdateEvent(eventUpdateDTO, hostRoot);
-                    return Ok();
-                }
-                return BadRequest("Model state is not valid");
-            });
+                return Forbid("Access denied");
+            }
+            if (ModelState.IsValid)
+            {
+                var hostRoot = _hostServices.GetHostPath();
+                await _eventManager.UpdateEvent(eventUpdateDTO, hostRoot);
+                return Ok();
+            }
+            return BadRequest("Model state is not valid");
         }
 
         [HttpDelete("{eventId}")]
@@ -112,19 +103,16 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> Delete(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
-            return await HandleExceptions(async () =>
+            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            var organizerId = await _eventManager.GetEventOrganizerId(eventId);
+            if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
             {
-                var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-                var organizerId = await _eventManager.GetEventOrganizerId(eventId);
-                if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
-                {
-                    return Forbid("Access denied");
-                }
-                var hostRoot = _hostServices.GetHostPath();
-                await _eventManager.DeleteEvent(eventId, false, hostRoot);
-                return Ok();
-            });
+                return Forbid("Access denied");
+            }
+            var hostRoot = _hostServices.GetHostPath();
+            await _eventManager.DeleteEvent(eventId, false, hostRoot);
+            return Ok();
         }
 
         [HttpPut("{eventId}/subscribe")]
@@ -132,12 +120,9 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> Subscribe(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
-            return await HandleExceptions(async () =>
-            {
-                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-                await _eventManager.Subscribe(Guid.Parse(userId), eventId);
-                return Ok();
-            });
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            await _eventManager.Subscribe(Guid.Parse(userId), eventId);
+            return Ok();
         }
 
         [HttpPut("{eventId}/unsubscribe")]
@@ -145,12 +130,9 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> Unsubscribe(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
-            return await HandleExceptions(async () =>
-            {
-                var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-                await _eventManager.Unsubscribe(Guid.Parse(userId), eventId);
-                return Ok();
-            });
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            await _eventManager.Unsubscribe(Guid.Parse(userId), eventId);
+            return Ok();
         }
     }
 }

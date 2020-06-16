@@ -96,7 +96,7 @@ export default class CategoryDetail extends Component {
         }).then((data) => {
             if (this.state.error){
                 this.setState({ 
-                    errorMessage: data.message 
+                    errorMessage: data 
                 });
             }
             else {
@@ -136,7 +136,7 @@ export default class CategoryDetail extends Component {
             if (this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 })
             }
         }).catch((ex) => {

@@ -140,7 +140,7 @@ export default class Users extends Component {
             return response.json();
         }).then((data) => {
             if (this.state.error){
-                this.setState({errorMessage: data.message});
+                this.setState({errorMessage: data});
             }
             else {
                 this.setState({ 

@@ -142,7 +142,7 @@ export default class Profile extends Component {
         }).then((data) => {
             if (this.state.error){
                 this.setState({ 
-                    errorMessage: data.message 
+                    errorMessage: data 
                 });
             }
             else {

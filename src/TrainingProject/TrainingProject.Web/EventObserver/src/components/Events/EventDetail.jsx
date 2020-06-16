@@ -200,7 +200,7 @@ export default class EventDetail extends Component {
         }).then((data) => {
             if (this.state.error){
                 this.setState({ 
-                    errorMessage: data.message 
+                    errorMessage: data 
                 });
             }
             else {
@@ -254,7 +254,7 @@ export default class EventDetail extends Component {
             if (this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 })
             }
         }).catch((ex) => {
@@ -287,7 +287,7 @@ export default class EventDetail extends Component {
             if (this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 })
             }
         }).catch((ex) => {
@@ -320,7 +320,7 @@ export default class EventDetail extends Component {
             if (this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 })
             }
         }).catch((ex) => {

@@ -141,7 +141,7 @@ export default class NewCategory extends Component {
             if(this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 });
             }
         }).catch((ex) => {

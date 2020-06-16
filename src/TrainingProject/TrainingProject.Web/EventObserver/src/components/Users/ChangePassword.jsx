@@ -151,7 +151,7 @@ export default class ChangePassword extends Component {
             if(this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 });
             }
         }).catch((ex) => {

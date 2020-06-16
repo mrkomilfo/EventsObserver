@@ -22,6 +22,7 @@ using FluentScheduler;
 using TrainingProject.Web.Jobs;
 using TrainingProject.Common;
 using Serilog;
+using TrainingProject.Web.Filters;
 
 namespace TrainingProject.Web
 {
@@ -79,6 +80,7 @@ namespace TrainingProject.Web
             services.AddScoped<INotificator, Notificator>();
             services.AddSingleton<IWebHostEnvironment>(Environment);
             services.AddTransient<SendMessageJob>();
+            services.AddScoped<ExceptionHandlingFilter>();
             services.AddSingleton<ILogger>(Log.Logger);
             services.AddScoped<ILogHelper, LogHelper>();
         }

@@ -141,7 +141,7 @@ export default class Blocking extends Component {
         }).then((data) => {
             if (this.state.error){
                 this.setState({ 
-                    errorMessage: data.message,
+                    errorMessage: data,
                 });
             }
             else {
@@ -192,11 +192,10 @@ export default class Blocking extends Component {
                 return response.json();
             }
         }).then((data) => {
-            debugger;
             if(this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 });
             }
         }).catch((ex) => {
@@ -228,7 +227,7 @@ export default class Blocking extends Component {
             if(this.state.error)
             {
                 this.setState({
-                    errorMessage: data.message
+                    errorMessage: data
                 });
             }
         }).catch((ex) => {
