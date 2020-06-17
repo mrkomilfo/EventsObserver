@@ -25,5 +25,6 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<UserRoleDTO> GetUserWithRole(Guid userId);
         Task<Role> GetUserRole(Guid userId);
         Task ChangePassword(ChangePasswordDTO changePasswordDTO);
+        Task<string> GetUserName(Guid guid);
     }
 }

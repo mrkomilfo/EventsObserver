@@ -2,6 +2,7 @@
 import queryString from 'query-string';
 import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import Chat from './Chat';
 import AuthHelper from '../../Utils/AuthHelper.js';
 
 export default class EventDetail extends Component {
@@ -30,7 +31,7 @@ export default class EventDetail extends Component {
             image: '',
             deleteModal: false,
             userRole: AuthHelper.getRole(),
-            userId: AuthHelper.getId()
+            userId: AuthHelper.getId(),
         }
         this.deleteEvent = this.deleteEvent.bind(this);
         this.subscribe = this.subscribe.bind(this);
@@ -141,6 +142,10 @@ export default class EventDetail extends Component {
 
         const bottomButtonPanel = this.renderBottomButtonPanel();
 
+        const chat = this.state.userId === this.state.organizerId || Object.keys(this.state.participants).includes(this.state.userId)
+            ? <Chat eventId={this.state.id} />
+            : null;
+
         return(
             <>
                 <div style={inlineStyle}><h2 style={inlineFirst}>{this.state.name}</h2><p style={inlineSecond}>Опубликовано: {this.state.publicationTime}</p></div>
@@ -169,6 +174,7 @@ export default class EventDetail extends Component {
                     </tbody>
                 </Table>
                 {bottomButtonPanel}
+                {chat}
             </>
         ) 
     }

@@ -9,21 +9,19 @@ namespace TrainingProject.Data
         public AppContext(DbContextOptions<AppContext> options) : base(options)
         {
             Database.EnsureCreated();
-            this.ChangeTracker.LazyLoadingEnabled = false;
+            ChangeTracker.LazyLoadingEnabled = false;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-            optionsBuilder
-                //Log parameter values
-                .EnableSensitiveDataLogging();
+            optionsBuilder.EnableSensitiveDataLogging();
 
-        public Microsoft.EntityFrameworkCore.DbSet<Event> Events { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<Category> Categories { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<Tag> Tags { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<User> Users { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<Role> Roles { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<EventsTags> EventsTags { get; set; }
-        public Microsoft.EntityFrameworkCore.DbSet<EventsUsers> EventsUsers { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<EventsTags> EventsTags { get; set; }
+        public DbSet<EventsUsers> EventsUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

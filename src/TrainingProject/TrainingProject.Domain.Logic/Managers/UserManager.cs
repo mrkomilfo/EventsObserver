@@ -268,6 +268,16 @@ namespace TrainingProject.DomainLogic.Managers
             return userRoleDTO;
         }
 
+        public async Task<string> GetUserName(Guid userId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
+            {
+                throw new KeyNotFoundException($"Event with id={userId} not found");
+            }
+            return await _appContext.Users.Where(u => Equals(u.Id, userId)).Select(u => u.UserName).FirstOrDefaultAsync();
+        }
+
         public async Task<Role> GetUserRole(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });

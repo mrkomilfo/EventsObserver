@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
@@ -16,6 +17,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task Subscribe(Guid userId, int eventId);
         Task Unsubscribe(Guid userId, int eventId);
         Task<Guid?> GetEventOrganizerId(int eventId);
+        Task<IList<string>> GetEventInvolvedUsersId(int eventId);
         void Notificate();
     }
 }

@@ -23,6 +23,9 @@ using TrainingProject.Web.Jobs;
 using TrainingProject.Common;
 using Serilog;
 using TrainingProject.Web.Filters;
+using TrainingProject.Web.Hubs;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace TrainingProject.Web
 {
@@ -63,6 +66,23 @@ namespace TrainingProject.Web
                     ValidateIssuerSigningKey = true,
                     ClockSkew = TimeSpan.Zero
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // если запрос направлен хабу
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/chat")))
+                        {
+                            // получаем токен из строки запроса
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             var mappingConfig = new MapperConfiguration(mc =>
@@ -83,6 +103,8 @@ namespace TrainingProject.Web
             services.AddScoped<ExceptionHandlingFilter>();
             services.AddSingleton<ILogger>(Log.Logger);
             services.AddScoped<ILogHelper, LogHelper>();
+            services.AddSignalR();
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -106,6 +128,7 @@ namespace TrainingProject.Web
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chat");
             });
 
             app.UseSpa(spa =>

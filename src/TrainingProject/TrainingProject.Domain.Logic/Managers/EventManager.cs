@@ -322,5 +322,18 @@ namespace TrainingProject.DomainLogic.Managers
                 _notificator.Notificate(eu);
             }
         }
+
+        public async Task<IList<string>> GetEventInvolvedUsersId(int eventId)
+        {
+            IList<string> ids = new List<string>();
+            var targetEvent = await GetEvent(eventId);
+            ids.Add(targetEvent.OrganizerId);
+            var participantsIds = targetEvent.Participants.Keys;
+            foreach (string participantId in participantsIds)
+            {
+                ids.Add(participantId);
+            }
+            return ids;
+        }
     }
 }
