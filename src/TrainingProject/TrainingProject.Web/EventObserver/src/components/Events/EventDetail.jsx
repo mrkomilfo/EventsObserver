@@ -147,7 +147,7 @@ export default class EventDetail extends Component {
             : null;
 
         return(
-            <>
+            <div>
                 <div style={inlineStyle}><h2 style={inlineFirst}>{this.state.name}</h2><p style={inlineSecond}>Опубликовано: {this.state.publicationTime}</p></div>
                 <h4>Категория: <Link to={`/events?categoryId=${this.state.categoryId}`}>{this.state.category}</Link></h4>
                 <div style={tagBlockStyle}>{tags}</div>
@@ -158,7 +158,7 @@ export default class EventDetail extends Component {
                     <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>
                     <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
                     <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
-                    <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +'BYN' : 'Бесплатно'}</td></tr>
+                    <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +' BYN' : 'Бесплатно'}</td></tr>
                     </tbody>
                 </table>
                 <br/>
@@ -175,7 +175,7 @@ export default class EventDetail extends Component {
                 </Table>
                 {bottomButtonPanel}
                 {chat}
-            </>
+            </div>
         ) 
     }
 

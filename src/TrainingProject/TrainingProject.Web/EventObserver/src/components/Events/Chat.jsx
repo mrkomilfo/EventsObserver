@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@aspnet/signalr';
+import {Input, Button} from 'reactstrap';
 import AuthHelper from '../../Utils/AuthHelper.js';
 import PropTypes from 'prop-types';
+import Draggable from 'react-draggable';
+import './Chat.css'
 
 export default class Chat extends Component {
     constructor(props) {
@@ -30,17 +33,25 @@ export default class Chat extends Component {
                 .start()
                 .then(() => console.log('Connection started!'))
                 .catch(err => console.log('Error while establishing connection :('));
-            var today = new Date();
-            var time = this.pad(today.getHours(), 2) + ":" + this.pad(today.getMinutes(), 2) + ":" + this.pad(today.getSeconds(), 2);
             this.state.hubConnection.on('Send', (nick, receivedMessage) => {
-                const text = `[${time}] ${nick}: ${receivedMessage}`;
-                const messages = this.state.messages.concat([text]);
+                var today = new Date();
+                var time = this.pad(today.getHours(), 2) + ":" + this.pad(today.getMinutes(), 2) + ":" + this.pad(today.getSeconds(), 2);
+                const message = {
+                    time: time,
+                    nick: nick,
+                    text: receivedMessage
+                }
+                const messages = this.state.messages.concat([message]);
                 this.setState({ messages });
             });
         });
     };
 
     sendMessage = () => {
+        if(!this.state.message.trim())
+        {
+            return;
+        }
         this.state.hubConnection
             .invoke('Send', this.props.eventId, this.state.message)
             .catch(err => console.error(err));
@@ -50,22 +61,20 @@ export default class Chat extends Component {
 
     render() {
         return (
-            <div>
-                <br />
-                <input
-                type="text"
-                value={this.state.message}
-                onChange={e => this.setState({ message: e.target.value })}
-                />
-    
-                <button onClick={this.sendMessage}>Send</button>
-    
-                <div>
-                {this.state.messages.map((message, index) => (
-                    <span style={{display: 'block'}} key={index}> {message} </span>
-                ))}
+            <Draggable handle=".chatHeader">
+                <div className="chat">
+                    <p className="chatHeader">Чат мероприятия</p>
+                    <div id="chatTextBlock" className="chatTextBlock">
+                    {this.state.messages.map((message, index) => (
+                        <span className="chatMessage" key={index}><b>{`[${message.time}] ${message.nick}: `}</b>{message.text}</span>
+                    ))}
+                    </div>
+                    <div className="chatFooter">
+                        <Input className="chatInput" type="text" value={this.state.message} onChange={e => this.setState({ message: e.target.value })}/>        
+                        <Button className="chatButton" color="primary" onClick={this.sendMessage}>Send</Button>
+                    </div>
                 </div>
-            </div>
+            </Draggable>
             );
         }
 }

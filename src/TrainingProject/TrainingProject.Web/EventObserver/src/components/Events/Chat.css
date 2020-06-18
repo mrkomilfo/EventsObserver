@@ -1,0 +1,84 @@
+body{
+    overflow-x: hidden;
+}
+
+.chat{
+    position: fixed;
+    bottom: 4px;
+    right: 4px;
+    width: 320px;
+    height: 380px;
+    min-width: 200px;
+    min-height: 200px;
+    border: solid 1px grey;
+    border-radius: 8px;
+    background-color: white;
+    resize: both;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column;
+}
+
+.chatHeader{
+    flex: 0 1 auto;
+    padding: 8px;
+    border-bottom: solid 1px grey;
+    background-color: #DDD;
+    border-radius: 8px 8px 0px 0px;
+    cursor: grab;
+}
+
+.chatHeader:active{
+    cursor: grabbing;
+}
+
+.chatTextBlock{
+    overflow-y: auto;
+    border: solid 1px #AAA;
+    border-radius: 4px;
+    height: 306px;
+    width: calc(100% - 16px);
+    margin: 0px auto 8px;
+    position: relative;
+    top: -4px;
+    padding-left: 4px;
+    flex: 1 1 auto;
+}
+
+.chatTextBlock::-webkit-scrollbar {
+    width: 8px;
+    
+  }
+  
+  /* Track */
+  .chatTextBlock::-webkit-scrollbar-track {
+    border: solid 1px lightgray;
+    border-radius: 4px;
+  }
+   
+  /* Handle */
+  .chatTextBlock::-webkit-scrollbar-thumb {
+    background: lightgrey; 
+    border-radius: 4px;
+  }
+  
+  /* Handle on hover */
+  .chatTextBlock::-webkit-scrollbar-thumb:hover {
+    background: #AAA; 
+  }
+
+.chatMessage{
+    display: block;
+    word-wrap: break-word;
+}
+
+.chatFooter{
+    display: flex;
+    width: calc(100% - 16px);
+    margin: 0px auto 8px;
+    flex: 0 1
+}
+
+.chatInput{
+    margin-right: 8px;
+}

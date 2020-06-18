@@ -28,7 +28,8 @@ namespace TrainingProject.Common
 
         public void LogMethodCalling()
         {
-            _logger.Information($"Call method {new StackTrace().GetFrame(1).GetMethod().DeclaringType.FullName}");
+            var method = new StackTrace().GetFrame(1).GetMethod();
+            _logger.Information($"Call method {method.DeclaringType.FullName}.{method.Name}");
         }
 
         public void LogMethodCallingWithObject(object obj, string hide = "")

@@ -26,6 +26,10 @@ namespace TrainingProject.Web.Hubs
         public async Task Send(int eventId, string message)
         {
             _logger.LogMethodCallingWithObject(new { eventId, message });
+            if (message.Trim().Length == 0)
+            {
+                return;
+            }
             var userName = await _userManager.GetUserName(Guid.Parse(Context.User.Identity.Name));
             IReadOnlyList<string> usersIds = (IReadOnlyList<string>) await _eventManager.GetEventInvolvedUsersId(eventId);
             await Clients.Users(usersIds).SendAsync("Send", userName, message);
