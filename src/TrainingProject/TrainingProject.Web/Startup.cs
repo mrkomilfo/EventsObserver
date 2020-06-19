@@ -105,6 +105,8 @@ namespace TrainingProject.Web
             services.AddScoped<ILogHelper, LogHelper>();
             services.AddSignalR();
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            services.AddScoped<ISwearingProvider, SwearingProvider>();
+            services.AddScoped<ICensor, Censor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

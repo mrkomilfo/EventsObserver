@@ -24,6 +24,5 @@ namespace TrainingProject.Logic.Tests
             Assert.Empty(parsedTagLists[2]);
             Assert.Empty(parsedTagLists[3]);
         }
-
     } 
 }

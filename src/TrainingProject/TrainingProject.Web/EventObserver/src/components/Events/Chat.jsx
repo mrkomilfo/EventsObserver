@@ -14,6 +14,7 @@ export default class Chat extends Component {
             messages: [],
             hubConnection: null,
         };
+        this.enterPressed = this.enterPressed.bind(this)
     };
 
     pad = (n, width, z) => {
@@ -59,6 +60,13 @@ export default class Chat extends Component {
         this.setState({message: ''});      
     };
 
+    enterPressed(event) {
+        var code = event.keyCode || event.which;
+        if (code === 13) { 
+            this.sendMessage();
+        }
+    };
+
     render() {
         return (
             <Draggable handle=".chatHeader">
@@ -70,7 +78,7 @@ export default class Chat extends Component {
                     ))}
                     </div>
                     <div className="chatFooter">
-                        <Input className="chatInput" type="text" value={this.state.message} onChange={e => this.setState({ message: e.target.value })}/>        
+                        <Input className="chatInput" type="text" value={this.state.message} onKeyPress={this.enterPressed} onChange={e => this.setState({ message: e.target.value })}/>        
                         <Button className="chatButton" color="primary" onClick={this.sendMessage}>Send</Button>
                     </div>
                 </div>
