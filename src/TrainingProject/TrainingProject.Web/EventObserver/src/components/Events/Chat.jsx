@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@aspnet/signalr';
 import {Input, Button} from 'reactstrap';
-import AuthHelper from '../../Utils/AuthHelper.js';
+import AuthHelper from '../../Utils/authHelper.js';
 import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
 import './Chat.css'

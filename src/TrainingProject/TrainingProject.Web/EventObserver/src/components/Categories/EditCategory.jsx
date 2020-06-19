@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/AuthHelper'
+import AuthHelper from '../../Utils/authHelper'
 
 export default class EditCategory extends Component {
     constructor(props) {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, 
     Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/AuthHelper.js';
+import AuthHelper from '../../Utils/authHelper.js';
 
 import './NavMenu.css';
 

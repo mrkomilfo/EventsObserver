@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import queryString from 'query-string';
 import { Alert, Button, Badge } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/AuthHelper.js';
+import AuthHelper from '../../Utils/authHelper.js';
 
 export default class Profile extends Component {
     constructor(props)

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/AuthHelper';
+import AuthHelper from '../../Utils/authHelper';
 
 export default class SignUp extends Component {
     constructor(props) {

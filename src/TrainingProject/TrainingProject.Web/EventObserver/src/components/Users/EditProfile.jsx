@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/AuthHelper.js';
+import AuthHelper from '../../Utils/authHelper.js';
 
 export default class EditProfile extends Component {
     constructor(props) {

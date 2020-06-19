@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Chat from './Chat';
-import AuthHelper from '../../Utils/AuthHelper.js';
+import AuthHelper from '../../Utils/authHelper.js';
 
 export default class EventDetail extends Component {
     constructor(props)

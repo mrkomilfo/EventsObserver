@@ -17,7 +17,7 @@ import Categories from './components/Categories/Categories';
 import CategoryDetail from './components/Categories/CategoryDetail';
 import NewCategory from './components/Categories/NewCategory';
 import EditCategory from './components/Categories/EditCategory';
-import AuthHelper from './Utils/AuthHelper';
+import AuthHelper from './Utils/authHelper';
 import Error404 from './components/Common/404';
 import Error403 from './components/Common/403';
 

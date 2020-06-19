@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, Table, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import AuthHelper from '../../Utils/AuthHelper';
+import AuthHelper from '../../Utils/authHelper';
 
 export default class Categories extends Component {
     constructor(props) {

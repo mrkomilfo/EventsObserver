@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/AuthHelper'
+import AuthHelper from '../../Utils/authHelper'
 
 export default class EditEvent extends Component{
     constructor(props) {
