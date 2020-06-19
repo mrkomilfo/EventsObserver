@@ -4,6 +4,6 @@ namespace TrainingProject.Data
 {
     public interface ISwearingProvider
     {
-        IList<string> GetSwearing();
+        List<string> GetSwearing();
     }
 }

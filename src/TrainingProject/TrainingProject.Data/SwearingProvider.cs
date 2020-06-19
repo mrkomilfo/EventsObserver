@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrainingProject.Data
 {
     public class SwearingProvider : ISwearingProvider
     {
-        private IEnumerable<string> Swear;
+        private readonly IEnumerable<string> Swear;
 
         public SwearingProvider()
         {
-            Swear = new HashSet<string>
+            Swear = new List<string>
             {
                 "fuck",
                 "bullshit",
@@ -25,7 +22,7 @@ namespace TrainingProject.Data
             };
         }
 
-        public IList<string> GetSwearing()
+        public List<string> GetSwearing()
         {
             return Swear.ToList();
         }

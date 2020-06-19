@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Moq;
+using Serilog;
 using System.Collections.Generic;
 using TrainingProject.Common;
 using TrainingProject.Data;
@@ -12,7 +13,24 @@ namespace TrainingProject.Logic.Tests
         private readonly ICensor _censor;
         public CensoringTests()
         {
-            _censor = new Censor(new SwearingProvider(), new LogHelper(Log.Logger));
+            var list = new List<string>
+            {
+                "fuck",
+                "bullshit",
+                "shit",
+                "asshole",
+                "bitch",
+                "cunt",
+                "slut",
+                "whore"
+            };
+
+            var swearingProviderMock = new Mock<ISwearingProvider>();
+            swearingProviderMock.Setup(provider=>
+                provider.GetSwearing()).Returns(list);
+            var logMock = new Mock<ILogHelper>();
+
+            _censor = new Censor(swearingProviderMock.Object, logMock.Object);
         }
 
         [Fact]
