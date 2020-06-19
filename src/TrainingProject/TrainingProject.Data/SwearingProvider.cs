@@ -25,9 +25,9 @@ namespace TrainingProject.Data
             };
         }
 
-        public async Task<IList<string>> GetSwearingAsync()
+        public IList<string> GetSwearing()
         {
-            return await Task.FromResult(Swear.ToList());
+            return Swear.ToList();
         }
     }
 }

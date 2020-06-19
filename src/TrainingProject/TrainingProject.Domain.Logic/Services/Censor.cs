@@ -26,7 +26,7 @@ namespace TrainingProject.DomainLogic.Services
         {
             _logger.LogMethodCallingWithObject(new { message });
 
-            var swears = await _swearingProvider.GetSwearingAsync();
+            var swears = _swearingProvider.GetSwearing();
             foreach (string word in swears)
             {
                 string pattern = MakeRegex(word);
