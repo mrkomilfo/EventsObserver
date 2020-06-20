@@ -50,8 +50,8 @@ namespace TrainingProject.Web
                     var context = (AppContext)services.GetRequiredService<IAppContext>();
                     Log.Information("Migrate database");
                     context.Database.Migrate();
-                    await DBInitializer.InitializeUsers(context);
-                    await DBInitializer.InitializeEvents(context);
+                    await DBInitializer.InitializeUsersAsync(context);
+                    await DBInitializer.InitializeEventsAsync(context);
                 }
                 catch (Exception ex)
                 {

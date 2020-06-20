@@ -9,7 +9,7 @@ namespace TrainingProject.Data
 {
     public static class DBInitializer
     {
-        public static async Task InitializeEvents(IAppContext context)
+        public static async Task InitializeEventsAsync(IAppContext context)
         {
             if (!await context.Categories.AnyAsync())
             {
@@ -98,7 +98,7 @@ namespace TrainingProject.Data
             }
         }
 
-        public static async Task InitializeUsers(AppContext context)
+        public static async Task InitializeUsersAsync(AppContext context)
         {
             if (!(await context.Roles.AnyAsync() || await context.Users.AnyAsync()))
             {

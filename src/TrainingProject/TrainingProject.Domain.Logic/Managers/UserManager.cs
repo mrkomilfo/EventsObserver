@@ -32,7 +32,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task<UserFullDTO> GetUser(Guid userId)
+        public async Task<UserFullDTO> GetUserAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
@@ -50,7 +50,7 @@ namespace TrainingProject.DomainLogic.Managers
             return user;
         }
 
-        public async Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize, string search)
+        public async Task<Page<UserLiteDTO>> GetUsersAsync(int index, int pageSize, string search)
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search });
             var result = new Page<UserLiteDTO>() { CurrentPage = index, PageSize = pageSize };
@@ -64,7 +64,7 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task RegisterUser(RegisterDTO user)
+        public async Task RegisterUserAsync(RegisterDTO user)
         {
             _logger.LogMethodCallingWithObject(user, "Password, PasswordConfirm");
             if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
@@ -77,7 +77,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UpdateUser(UserUpdateDTO user, string hostRoot)
+        public async Task UpdateUserAsync(UserUpdateDTO user, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(user);
             User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(user.Id)));
@@ -96,7 +96,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<UserToUpdateDTO> GetUserToUpdate(Guid userId)
+        public async Task<UserToUpdateDTO> GetUserToUpdateAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FindAsync(userId);
@@ -112,7 +112,7 @@ namespace TrainingProject.DomainLogic.Managers
             return userToUpdate;
         }
 
-        public async Task DeleteUser(Guid userId, bool force, string hostRoot)
+        public async Task DeleteUserAsync(Guid userId, bool force, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(new { userId, force, hostRoot });
             var user = await _appContext.Users.IgnoreQueryFilters()
@@ -135,7 +135,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<UserToBanDTO> GetUserToBan(Guid userId)
+        public async Task<UserToBanDTO> GetUserToBanAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
@@ -147,7 +147,7 @@ namespace TrainingProject.DomainLogic.Managers
             return userToBan;
         }
 
-        public async Task BanUser(BanDTO banDTO)
+        public async Task BanUserAsync(BanDTO banDTO)
         {
             _logger.LogMethodCallingWithObject(banDTO);
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDTO.Id)));
@@ -160,7 +160,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UnbanUser(Guid userId)
+        public async Task UnbanUserAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
@@ -172,7 +172,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task ChangeRole(ChangeRoleDTO changeRoleDTO)
+        public async Task ChangeRoleAsync(ChangeRoleDTO changeRoleDTO)
         {
             _logger.LogMethodCallingWithObject(changeRoleDTO);
             var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDTO.UserId));
@@ -187,7 +187,7 @@ namespace TrainingProject.DomainLogic.Managers
             user.RoleId = changeRoleDTO.RoleId;
             await _appContext.SaveChangesAsync(default);
         }
-        public async Task<DateTime?> GetUnlockTime(Guid userId)
+        public async Task<DateTime?> GetUnlockTimeAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
@@ -196,7 +196,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             return (await _appContext.Users.FirstAsync(u => Equals(u.Id, userId))).UnlockTime;
         }
-        public async Task<LoginResponseDTO> Login(LoginDTO loginDto)
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
         {
             _logger.LogMethodCallingWithObject(loginDto, "Password");
             var identity = await GetIdentity(loginDto.Login, loginDto.Password);
@@ -204,7 +204,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new UnauthorizedAccessException($"Wrong login or password");
             }
-            var unlockTime = await GetUnlockTime(Guid.Parse(identity.Name));
+            var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
             if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
             {
                 throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
@@ -250,13 +250,13 @@ namespace TrainingProject.DomainLogic.Managers
             return identity;
         }
 
-        public async Task<IEnumerable<Role>> GetRoles()
+        public async Task<IEnumerable<Role>> GetRolesAsync()
         {
             _logger.LogMethodCalling();
             return await _appContext.Roles.ToListAsync();
         }
 
-        public async Task<UserRoleDTO> GetUserWithRole(Guid userId)
+        public async Task<UserRoleDTO> GetUserWithRoleAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
@@ -268,7 +268,7 @@ namespace TrainingProject.DomainLogic.Managers
             return userRoleDTO;
         }
 
-        public async Task<string> GetUserName(Guid userId)
+        public async Task<string> GetUserNameAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
@@ -278,7 +278,7 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Users.Where(u => Equals(u.Id, userId)).Select(u => u.UserName).FirstOrDefaultAsync();
         }
 
-        public async Task<Role> GetUserRole(Guid userId)
+        public async Task<Role> GetUserRoleAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
@@ -288,7 +288,7 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Users.Include(u => u.Role).Where(u => Equals(u.Id, userId)).Select(u => u.Role).FirstOrDefaultAsync();
         }
 
-        public async Task ChangePassword(ChangePasswordDTO changePasswordDTO)
+        public async Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
             _logger.LogMethodCallingWithObject(changePasswordDTO, "OldPassword, NewPassword, NewPasswordConfirm");
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));

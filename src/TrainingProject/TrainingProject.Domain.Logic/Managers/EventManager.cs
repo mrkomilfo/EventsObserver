@@ -31,7 +31,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task AddEvent(EventCreateDTO @event, string hostRoot)
+        public async Task AddEventAsync(EventCreateDTO @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
             var newEvent = _mapper.Map<EventCreateDTO, Event>(@event);
@@ -65,7 +65,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UpdateEvent(EventUpdateDTO @event, string hostRoot)
+        public async Task UpdateEventAsync(EventUpdateDTO @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
@@ -109,7 +109,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<EventToUpdateDTO> GetEventToUpdate(int eventId)
+        public async Task<EventToUpdateDTO> GetEventToUpdateAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
@@ -128,7 +128,7 @@ namespace TrainingProject.DomainLogic.Managers
             return eventToUpdate;
         }
 
-        public async Task DeleteEvent(int eventId, bool force, string hostRoot)
+        public async Task DeleteEventAsync(int eventId, bool force, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(new { eventId, force, hostRoot });
             var @event = await _appContext.Events.IgnoreQueryFilters()
@@ -151,7 +151,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<EventFullDTO> GetEvent(int eventId)
+        public async Task<EventFullDTO> GetEventAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
@@ -180,7 +180,7 @@ namespace TrainingProject.DomainLogic.Managers
             return eventFullDTO;
         }
 
-        public async Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, 
+        public async Task<Page<EventLiteDTO>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, 
             bool? upComing, bool onlyFree, bool vacancies, Guid organizerId = new Guid(), Guid participantId = new Guid())
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
@@ -240,7 +240,7 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task Subscribe(Guid userId, int eventId)
+        public async Task SubscribeAsync(Guid userId, int eventId)
         {
             _logger.LogMethodCallingWithObject(new { userId, eventId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
@@ -269,7 +269,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task Unsubscribe(Guid userId, int eventId)
+        public async Task UnsubscribeAsync(Guid userId, int eventId)
         {
             _logger.LogMethodCallingWithObject(new { userId, eventId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
@@ -297,7 +297,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<Guid?> GetEventOrganizerId(int eventId)
+        public async Task<Guid?> GetEventOrganizerIdAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
@@ -323,10 +323,10 @@ namespace TrainingProject.DomainLogic.Managers
             }
         }
 
-        public async Task<IList<string>> GetEventInvolvedUsersId(int eventId)
+        public async Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId)
         {
             IList<string> ids = new List<string>();
-            var targetEvent = await GetEvent(eventId);
+            var targetEvent = await GetEventAsync(eventId);
             ids.Add(targetEvent.OrganizerId);
             var participantsIds = targetEvent.Participants.Keys;
             foreach (string participantId in participantsIds)

@@ -8,16 +8,16 @@ namespace TrainingProject.DomainLogic.Interfaces
 {
     public interface IEventManager
     {
-        Task AddEvent(EventCreateDTO @event, string hostRoot);
-        Task UpdateEvent(EventUpdateDTO @event, string hostRoot);
-        Task<EventToUpdateDTO> GetEventToUpdate(int eventId);
-        Task DeleteEvent(int eventId, bool force, string hostRoot);
-        Task<EventFullDTO> GetEvent(int eventId);
-        Task<Page<EventLiteDTO>> GetEvents(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, Guid organizerId, Guid participantId);
-        Task Subscribe(Guid userId, int eventId);
-        Task Unsubscribe(Guid userId, int eventId);
-        Task<Guid?> GetEventOrganizerId(int eventId);
-        Task<IList<string>> GetEventInvolvedUsersId(int eventId);
+        Task AddEventAsync(EventCreateDTO @event, string hostRoot);
+        Task UpdateEventAsync(EventUpdateDTO @event, string hostRoot);
+        Task<EventToUpdateDTO> GetEventToUpdateAsync(int eventId);
+        Task DeleteEventAsync(int eventId, bool force, string hostRoot);
+        Task<EventFullDTO> GetEventAsync(int eventId);
+        Task<Page<EventLiteDTO>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, Guid organizerId, Guid participantId);
+        Task SubscribeAsync(Guid userId, int eventId);
+        Task UnsubscribeAsync(Guid userId, int eventId);
+        Task<Guid?> GetEventOrganizerIdAsync(int eventId);
+        Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId);
         void Notificate();
     }
 }

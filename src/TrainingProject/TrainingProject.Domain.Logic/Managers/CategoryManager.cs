@@ -25,7 +25,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task AddCategory(CategoryCreateDTO category)
+        public async Task AddCategoryAsync(CategoryCreateDTO category)
         {
             _logger.LogMethodCallingWithObject(category);
             if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name.ToLower(), category.Name.ToLower())))
@@ -36,7 +36,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UpdateCategory(Category category)
+        public async Task UpdateCategoryAsync(Category category)
         {
             _logger.LogMethodCallingWithObject(category);
             var update = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
@@ -49,7 +49,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task DeleteCategory(int categoryId, bool force = false)
+        public async Task DeleteCategoryAsync(int categoryId, bool force = false)
         {
             _logger.LogMethodCallingWithObject(new { categoryId, force});
             var category = await _appContext.Categories.IgnoreQueryFilters()
@@ -69,7 +69,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<CategoryFullDTO> GetCategory(int categoryId)
+        public async Task<CategoryFullDTO> GetCategoryAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
             var category = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
@@ -79,7 +79,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             return _mapper.Map<CategoryFullDTO>(category);
         }
-        public async Task<ICollection<CategoryLiteDTO>> GetCategories()
+        public async Task<ICollection<CategoryLiteDTO>> GetCategoriesAsync()
         {
             _logger.LogMethodCalling();
             return await _appContext.Categories.Select(c => new CategoryLiteDTO{ Id=c.Id, Name = c.Name }).ToListAsync();

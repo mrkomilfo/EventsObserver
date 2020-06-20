@@ -24,27 +24,27 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> Index()
+        public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> IndexAsync()
         {
             _logger.LogMethodCalling();
-            return Ok(await _categoryManager.GetCategories());
+            return Ok(await _categoryManager.GetCategoriesAsync());
         }
 
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<CategoryFullDTO>> Details(int categoryId)
+        public async Task<ActionResult<CategoryFullDTO>> DetailsAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
-            return Ok(await _categoryManager.GetCategory(categoryId));
+            return Ok(await _categoryManager.GetCategoryAsync(categoryId));
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        public async Task<ActionResult> Create([FromBody] CategoryCreateDTO categoryCreateDTO)
+        public async Task<ActionResult> CreateAsync([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             _logger.LogMethodCallingWithObject(categoryCreateDTO);
             if (ModelState.IsValid)
             {
-                await _categoryManager.AddCategory(categoryCreateDTO);
+                await _categoryManager.AddCategoryAsync(categoryCreateDTO);
                 return Ok();
             }
             return BadRequest("Model state is not valid");
@@ -52,12 +52,12 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        public async Task<ActionResult> Update([FromBody] Category category)
+        public async Task<ActionResult> UpdateAsync([FromBody] Category category)
         {
             _logger.LogMethodCallingWithObject(category);
             if (ModelState.IsValid)
             {
-                await _categoryManager.UpdateCategory(category);
+                await _categoryManager.UpdateCategoryAsync(category);
                 return Ok();
             }
             return BadRequest("Model state is not valid");
@@ -65,10 +65,10 @@ namespace TrainingProject.Web.Controllers
 
         [HttpDelete("{categoryId}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        public async Task<ActionResult> Delete(int categoryId)
+        public async Task<ActionResult> DeleteAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
-            await _categoryManager.DeleteCategory(categoryId, false);
+            await _categoryManager.DeleteCategoryAsync(categoryId, false);
             return Ok();
         }
     }

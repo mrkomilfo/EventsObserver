@@ -9,22 +9,22 @@ namespace TrainingProject.DomainLogic.Interfaces
 {
     public interface IUserManager
     {
-        Task<UserFullDTO> GetUser(Guid userId);
-        Task<Page<UserLiteDTO>> GetUsers(int index, int pageSize, string search);
-        Task RegisterUser(RegisterDTO user);
-        Task UpdateUser(UserUpdateDTO user, string hostRoot);
-        Task<UserToUpdateDTO> GetUserToUpdate(Guid userId);
-        Task DeleteUser(Guid userId, bool force, string hostRoot);
-        Task<UserToBanDTO> GetUserToBan(Guid userId);
-        Task BanUser(BanDTO banDTO);
-        Task UnbanUser(Guid userId);
-        Task<DateTime?> GetUnlockTime(Guid userId);
-        Task<LoginResponseDTO> Login(LoginDTO loginDto);
-        Task ChangeRole(ChangeRoleDTO changeRoleDTO);
-        Task<IEnumerable<Role>> GetRoles();
-        Task<UserRoleDTO> GetUserWithRole(Guid userId);
-        Task<Role> GetUserRole(Guid userId);
-        Task ChangePassword(ChangePasswordDTO changePasswordDTO);
-        Task<string> GetUserName(Guid guid);
+        Task<UserFullDTO> GetUserAsync(Guid userId);
+        Task<Page<UserLiteDTO>> GetUsersAsync(int index, int pageSize, string search);
+        Task RegisterUserAsync(RegisterDTO user);
+        Task UpdateUserAsync(UserUpdateDTO user, string hostRoot);
+        Task<UserToUpdateDTO> GetUserToUpdateAsync(Guid userId);
+        Task DeleteUserAsync(Guid userId, bool force, string hostRoot);
+        Task<UserToBanDTO> GetUserToBanAsync(Guid userId);
+        Task BanUserAsync(BanDTO banDTO);
+        Task UnbanUserAsync(Guid userId);
+        Task<DateTime?> GetUnlockTimeAsync(Guid userId);
+        Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
+        Task ChangeRoleAsync(ChangeRoleDTO changeRoleDTO);
+        Task<IEnumerable<Role>> GetRolesAsync();
+        Task<UserRoleDTO> GetUserWithRoleAsync(Guid userId);
+        Task<Role> GetUserRoleAsync(Guid userId);
+        Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO);
+        Task<string> GetUserNameAsync(Guid guid);
     }
 }
