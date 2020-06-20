@@ -42,11 +42,13 @@ namespace TrainingProject.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
+            
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "EventObserver/build";
             });
+
+            services.AddSwaggerDocument();
 
             services.AddAuthentication(x =>
             {
@@ -103,10 +105,10 @@ namespace TrainingProject.Web
             services.AddScoped<ExceptionHandlingFilter>();
             services.AddSingleton<ILogger>(Log.Logger);
             services.AddScoped<ILogHelper, LogHelper>();
-            services.AddSignalR();
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             services.AddScoped<ISwearingProvider, SwearingProvider>();
             services.AddScoped<ICensor, Censor>();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -128,8 +130,13 @@ namespace TrainingProject.Web
                     context.Context.Response.Headers.Add("Expires", "-1");
                 }
             });
-            app.UseSpaStaticFiles(); 
+            app.UseSpaStaticFiles();
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+
             app.UseRouting();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
