@@ -126,7 +126,7 @@ export default class NewEvent extends Component {
                 fieldValidationErrors.participantsLimit = participantsLimitValid ? '' : 'Количество участников указано неверно';
                 break;
             case 'tags':
-                tagsValid = value.match(/^[\d\s\w\,а-я]*$/ui)
+                tagsValid = value.match(/^[\d\s\w,а-я]*$/ui)
                 fieldValidationErrors.tags = tagsValid ? '' : 'Допустимы только буквы, числа, пробелы, символы нижнего подчёркивания и запятые для разделения тегов';
                 break;
             case 'imageFile':

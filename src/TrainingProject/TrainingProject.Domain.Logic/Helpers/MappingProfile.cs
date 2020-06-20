@@ -17,7 +17,7 @@ namespace TrainingProject.DomainLogic.Helpers
             CreateMap<Category, CategoryFullDTO>();
 
             CreateMap<EventCreateDTO, Event>()
-                .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture)))
+                .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy H:m", CultureInfo.InvariantCulture)))
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => Guid.Parse(m.OrganizerId)))
                 .ForMember(m => m.HasImage, opt => opt.MapFrom(m => m.Image != null))
                 .ForMember(m => m.Tags, opt=>opt.Ignore())
@@ -27,7 +27,7 @@ namespace TrainingProject.DomainLogic.Helpers
             CreateMap<Tag, string>()
                .ConvertUsing(source => source.Name ?? string.Empty);
             CreateMap<EventUpdateDTO, Event>()
-                .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture)))
+                .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy H:m", CultureInfo.InvariantCulture)))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
             CreateMap<Event, EventToUpdateDTO>()
                 .ForMember(m => m.Tags, opt => opt.Ignore())

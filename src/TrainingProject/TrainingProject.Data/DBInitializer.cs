@@ -72,6 +72,7 @@ namespace TrainingProject.Data
                         ParticipantsLimit = 20,
                         OrganizerId = context.Users.Select(u => u.Id).FirstOrDefault(),
                         PublicationTime = DateTime.Now,
+                        HasImage = true
                     }
                 };
                 await context.Events.AddRangeAsync(events);
