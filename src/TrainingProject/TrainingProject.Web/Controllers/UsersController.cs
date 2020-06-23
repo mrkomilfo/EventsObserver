@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -215,6 +216,27 @@ namespace TrainingProject.Web.Controllers
                 return Ok();
             }
             return BadRequest("Model state is not valid");
+        }
+
+        [HttpPost]
+        public IActionResult Refresh(string token, string refreshToken)
+        {
+            var principal = GetPrincipalFromExpiredToken(token);
+            var username = principal.Identity.Name;
+            var savedRefreshToken = GetRefreshToken(username); //retrieve the refresh token from a data store
+            if (savedRefreshToken != refreshToken)
+                throw new SecurityTokenException("Invalid refresh token");
+
+            var newJwtToken = GenerateToken(principal.Claims);
+            var newRefreshToken = GenerateRefreshToken();
+            DeleteRefreshToken(username, refreshToken);
+            SaveRefreshToken(username, newRefreshToken);
+
+            return new ObjectResult(new
+            {
+                token = newJwtToken,
+                refreshToken = newRefreshToken
+            });
         }
     }
 }

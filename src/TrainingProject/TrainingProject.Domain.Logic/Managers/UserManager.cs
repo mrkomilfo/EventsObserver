@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -196,59 +198,6 @@ namespace TrainingProject.DomainLogic.Managers
             }
             return (await _appContext.Users.FirstAsync(u => Equals(u.Id, userId))).UnlockTime;
         }
-        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
-        {
-            _logger.LogMethodCallingWithObject(loginDto, "Password");
-            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
-            if (identity == null)
-            {
-                throw new UnauthorizedAccessException($"Wrong login or password");
-            }
-            var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
-            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
-            {
-                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
-            }
-
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            var response = new LoginResponseDTO
-            {
-                AccessToken = encodedJwt,
-                Name = identity.Name,
-                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
-            };
-            return response;
-        }
-        private async Task<ClaimsIdentity> GetIdentity(string login, string password)
-        {
-            _logger.LogMethodCallingWithObject(new { login, password }, "password");
-            ClaimsIdentity identity = null;
-            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => string.Equals(u.Login, login));
-            if (user == null)
-            {
-                return null;
-            }
-            var passwordHash = HashGenerator.Encrypt(password);
-            if (passwordHash == user.Password)
-            {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
-                };
-                identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            }
-            return identity;
-        }
 
         public async Task<IEnumerable<Role>> GetRolesAsync()
         {
@@ -302,6 +251,89 @@ namespace TrainingProject.DomainLogic.Managers
             }
             user.Password = HashGenerator.Encrypt(changePasswordDTO.NewPassword);
             await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
+        {
+            _logger.LogMethodCallingWithObject(loginDto, "Password");
+            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
+            if (identity == null)
+            {
+                throw new UnauthorizedAccessException($"Wrong login or password");
+            }
+            var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
+            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
+            {
+                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
+            }
+
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: identity.Claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            var response = new LoginResponseDTO
+            {
+                AccessToken = encodedJwt,
+                Name = identity.Name,
+                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
+            };
+            return response;
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (!(securityToken is JwtSecurityToken jwtSecurityToken)
+                || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+        }
+
+        private async Task<ClaimsIdentity> GetIdentity(string login, string password)
+        {
+            _logger.LogMethodCallingWithObject(new { login, password }, "password");
+            ClaimsIdentity identity = null;
+            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => string.Equals(u.Login, login));
+            if (user == null)
+            {
+                return null;
+            }
+            var passwordHash = HashGenerator.Encrypt(password);
+            if (passwordHash == user.Password)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
+                };
+                identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            }
+            return identity;
         }
     }
 }
