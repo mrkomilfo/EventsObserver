@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,13 +22,13 @@ namespace TrainingProject.Web.Filters
             HttpStatusCode status = HttpStatusCode.InternalServerError;
             string message = context.Exception.Message;
             var exceptionType = context.Exception.GetType();
-            if (exceptionType == typeof(UnauthorizedAccessException))
+            if (exceptionType == typeof(UnauthorizedAccessException) || exceptionType == typeof(SecurityTokenException))
             {
                 status = HttpStatusCode.Unauthorized;
             }
             else if (exceptionType == typeof(KeyNotFoundException))
             {
-                status = HttpStatusCode.NotFound;
+                status = HttpStatusCode.NoContent;
             }
             else if (exceptionType == typeof(ArgumentOutOfRangeException))
             {

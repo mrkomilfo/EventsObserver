@@ -253,67 +253,6 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
-        {
-            _logger.LogMethodCallingWithObject(loginDto, "Password");
-            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
-            if (identity == null)
-            {
-                throw new UnauthorizedAccessException($"Wrong login or password");
-            }
-            var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
-            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
-            {
-                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
-            }
-
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            var response = new LoginResponseDTO
-            {
-                AccessToken = encodedJwt,
-                Name = identity.Name,
-                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
-            };
-            return response;
-        }
-
-        public string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
-
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            if (!(securityToken is JwtSecurityToken jwtSecurityToken)
-                || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
-
-            return principal;
-        }
-
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
         {
             _logger.LogMethodCallingWithObject(new { login, password }, "password");
@@ -334,6 +273,116 @@ namespace TrainingProject.DomainLogic.Managers
                 identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             }
             return identity;
+        }
+
+        public async Task<string> GetRefreshTokenAsync(string userId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(userId)));
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with id={userId} not found");
+            }
+            return user.RefreshToken;
+        }
+
+        public async Task SaveRefreshTokenAsync(string userId, string refreshToken)
+        {
+            _logger.LogMethodCallingWithObject(new { userId, refreshToken });
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(userId)));
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with id={userId} not found");
+            }
+            user.RefreshToken = refreshToken;
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task DeleteRefreshTokenAsync(string userId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(userId)));
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with id={userId} not found");
+            }
+            user.RefreshToken = null;
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
+        {
+            _logger.LogMethodCallingWithObject(loginDto, "Password");
+            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
+            if (identity == null)
+            {
+                throw new UnauthorizedAccessException($"Wrong login or password");
+            }
+            var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
+            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
+            {
+                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
+            }
+
+            var accessToken = GenerateToken(identity.Claims);
+            var refreshToken = GenerateRefreshToken();
+            await SaveRefreshTokenAsync(identity.Name, refreshToken);
+            var response = new LoginResponseDTO
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                Name = identity.Name,
+                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
+            };
+            return response;
+        }
+
+        public string GenerateToken(IEnumerable<Claim> claims)
+        {
+            _logger.LogMethodCallingWithObject(new 
+            { 
+                claims = String.Join(", ", claims.ToList().ConvertAll(delegate (Claim c) { return c.ToString(); }).ToArray())
+            });
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+
+            return new JwtSecurityTokenHandler().WriteToken(jwt); //the method is called WriteToken but returns a string
+        }
+
+        public string GenerateRefreshToken()
+        {
+            _logger.LogMethodCalling();
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            _logger.LogMethodCallingWithObject(new { token });
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (!(securityToken is JwtSecurityToken jwtSecurityToken)
+                || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
         }
     }
 }

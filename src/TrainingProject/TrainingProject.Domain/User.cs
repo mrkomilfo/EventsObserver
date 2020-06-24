@@ -26,6 +26,7 @@ namespace TrainingProject.Domain
         public ICollection<Event> OrganizedEvents { get; set; }
         public ICollection<Event> VisitedEvents { get; set; }
         public bool HasPhoto { get; set; }
+        public string RefreshToken { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

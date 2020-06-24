@@ -192,18 +192,6 @@ namespace TrainingProject.Web.Controllers
             return BadRequest("Model state is not valid");
         }
 
-        [HttpPost]
-        [Route("signIn")]
-        public async Task<ActionResult> SignInAsync([FromBody] LoginDTO loginDTO)
-        {
-            _logger.LogMethodCallingWithObject(loginDTO, "Password");
-            if (ModelState.IsValid)
-            {
-                return Ok(await _userManager.LoginAsync(loginDTO));
-            }
-            return BadRequest("Model state is not valid");
-        }
-
         [HttpPut]
         [Route("changePassword")]
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -219,24 +207,54 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Refresh(string token, string refreshToken)
+        [Route("signIn")]
+        public async Task<ActionResult> SignInAsync([FromBody] LoginDTO loginDTO)
         {
-            var principal = GetPrincipalFromExpiredToken(token);
-            var username = principal.Identity.Name;
-            var savedRefreshToken = GetRefreshToken(username); //retrieve the refresh token from a data store
-            if (savedRefreshToken != refreshToken)
+            _logger.LogMethodCallingWithObject(loginDTO, "Password");
+            if (ModelState.IsValid)
+            {
+                return Ok(await _userManager.LoginAsync(loginDTO));
+            }
+            return BadRequest("Model state is not valid");
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh(string token, string refreshToken)
+        {
+            _logger.LogMethodCallingWithObject(new { token, refreshToken});
+            var principal = _userManager.GetPrincipalFromExpiredToken(token);
+            var userId = principal.Identity.Name;
+            var savedRefreshToken = await _userManager.GetRefreshTokenAsync(userId); //retrieve the refresh token from a data store
+            if (savedRefreshToken != refreshToken || string.IsNullOrEmpty(savedRefreshToken))
                 throw new SecurityTokenException("Invalid refresh token");
 
-            var newJwtToken = GenerateToken(principal.Claims);
-            var newRefreshToken = GenerateRefreshToken();
-            DeleteRefreshToken(username, refreshToken);
-            SaveRefreshToken(username, newRefreshToken);
+            var newJwtToken = _userManager.GenerateToken(principal.Claims);
+            var newRefreshToken = _userManager.GenerateRefreshToken();
+            await _userManager.DeleteRefreshTokenAsync(userId);
+            await _userManager.SaveRefreshTokenAsync(userId, newRefreshToken);
 
             return new ObjectResult(new
             {
                 token = newJwtToken,
                 refreshToken = newRefreshToken
             });
+        }
+
+        [HttpPut]
+        [Route("{userId}/logout")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> LogOut(string userId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            if (role != "Admin" && role != "Account manager" && !Equals(Guid.Parse(userId), currentUserId))
+            {
+                return Forbid("Access denied");
+            }
+            await _userManager.DeleteRefreshTokenAsync(userId);
+            return Ok();
         }
     }
 }

@@ -128,31 +128,30 @@ export default class Users extends Component {
         if (search) {
             queryTrailer += `&search=${search}`
         }
-        const token = await AuthHelper.getToken();
-        fetch(`api/Users${queryTrailer}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-        })
-        .then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({errorMessage: data});
-            }
-            else {
-                this.setState({ 
-                    users: data.records, 
-                    currentPage: data.currentPage, 
-                    pageSize: data.pageSize, 
-                    totalRecords: data.totalRecords, 
-                    loading: false  
-                });
-            }
-        }).catch((ex) => {
-            this.setState({errorMessage: ex.toString()});
-        });
+        AuthHelper.fetchWithCredentials(`api/Users${queryTrailer}`)
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({errorMessage: data});
+                }
+                else {
+                    this.setState({ 
+                        users: data.records, 
+                        currentPage: data.currentPage, 
+                        pageSize: data.pageSize, 
+                        totalRecords: data.totalRecords, 
+                        loading: false  
+                    });
+                }
+            }).catch((ex) => {
+                this.setState({errorMessage: ex.toString()});
+            });
     }
 }

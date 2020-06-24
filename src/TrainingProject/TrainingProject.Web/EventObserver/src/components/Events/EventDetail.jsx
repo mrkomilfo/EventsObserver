@@ -238,20 +238,18 @@ export default class EventDetail extends Component {
     }
 
     async deleteEvent() {
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Events/' + this.state.id, {
+        AuthHelper.fetchWithCredentials('api/Events/' + this.state.id, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json'
             }
         }).then((response) => {
             if (response.ok) {
                 this.props.history.push("/events");                   
             } 
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
             else {
                 this.setState({error: true})
                 return response.json()
@@ -271,20 +269,18 @@ export default class EventDetail extends Component {
     }
 
     async subscribe() {
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch(`api/Events/${this.state.id}/subscribe`, {
+        AuthHelper.fetchWithCredentials(`api/Events/${this.state.id}/subscribe`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json'
             }
         }).then((response) => {
             if (response.ok) {
                 window.location.reload();    
             } 
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
             else {
                 this.setState({error: true})
                 return response.json()
@@ -304,20 +300,18 @@ export default class EventDetail extends Component {
     }
 
     async unsubscribe() {
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch(`api/Events/${this.state.id}/unsubscribe`, {
+        AuthHelper.fetchWithCredentials(`api/Events/${this.state.id}/unsubscribe`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json'
             }
         }).then((response) => {
             if (response.ok) {
                 window.location.reload();             
             } 
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
             else {
                 this.setState({error: true})
                 return response.json()

@@ -127,20 +127,18 @@ export default class ChangePassword extends Component {
             newPasswordConfirm: this.state.newPasswordConfirm
         };
 
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Users/changePassword', {
+        AuthHelper.fetchWithCredentials('api/Users/changePassword', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json; charset=utf-8'
             },
             body: JSON.stringify(data)
         }).then((response) => {
             if (response.ok){
                 AuthHelper.clearAuth();
+                this.props.history.push("/signIn");
+            }
+            else if (response.status === 401) {
                 this.props.history.push("/signIn");
             }
             else {

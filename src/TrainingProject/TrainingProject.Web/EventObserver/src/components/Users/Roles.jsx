@@ -83,63 +83,62 @@ export default class EditEvent extends Component{
     }
 
     async loadRoles() {
-        const token = await AuthHelper.getToken();
-        fetch('api/Users/roles', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        })
-        .then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
+        AuthHelper.fetchWithCredentials('api/Users/roles')
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({
+                        errorMessage: data
+                    });
+                }
+                else {
+                    this.setState({ 
+                        roles: data 
+                    });
+                }
+            }).catch((ex) => {
                 this.setState({
-                    errorMessage: data
+                    errorMessage: ex.toString()
                 });
-            }
-            else {
-                this.setState({ 
-                    roles: data 
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async loadUser(userId) {
-        const token = await AuthHelper.getToken();
-        fetch(`api/Users/${userId}/role`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }).then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
+        AuthHelper.fetchWithCredentials(`api/Users/${userId}/role`)
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({ 
+                        errorMessage: data 
+                    });
+                }
+                else {
+                    this.setState({ 
+                        userId: data.userId,
+                        userName: data.userName,
+                        roleId: data.roleId,
+                        loading: false
+                    });
+                }
+            }).catch((ex) => {
+                this.setState({
+                    errorMessage: ex.toString()
                 });
-            }
-            else {
-                this.setState({ 
-                    userId: data.userId,
-                    userName: data.userName,
-                    roleId: data.roleId,
-                    loading: false
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async changeRole()
@@ -148,20 +147,19 @@ export default class EditEvent extends Component{
             userId: this.state.userId,
             roleId: parseInt(this.state.roleId, 10),
         }
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Users/role', {
+
+        AuthHelper.fetchWithCredentials('api/Users/role', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json; charset=utf-8'
             },
             body: JSON.stringify(data)
         }).then((response) => {
             if (response.ok){
                 this.props.history.push(`/user?id=${this.state.userId}`);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({

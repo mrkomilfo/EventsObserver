@@ -1,92 +1,44 @@
 ﻿export default class AuthHelper {
-    static decryptJWT(token) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-    }
-
-    static isTokenValid() {  
-        const token = sessionStorage.getItem('tokenKey');
-        if (!token)
-            return false;
-        if (JSON.parse(token).exp < (new Date()).getTime() / 1000) {
-            this.clearAuth();
-            return false;
-        }
-        return true;
-    }
-
-    static saveAuth(id, token, role, login, password) {
-        const decrypted = this.decryptJWT(token);
-        sessionStorage.setItem('tokenKey', JSON.stringify({ userId: id, access_token: token, role: role, login: login, password: password, exp: decrypted.exp }));
+    static saveAuth(id, role, accessToken, refreshToken) {
+        sessionStorage.setItem('userId', id);
+        sessionStorage.setItem('role', role);
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
     }
 
     static clearAuth () {
-        sessionStorage.removeItem('tokenKey');
+        sessionStorage.removeItem('userId');
+        sessionStorage.setItem('role', 'Guest');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
     }
 
     static getId () {
-        if (this.isTokenValid()) {
-            const token = sessionStorage.getItem('tokenKey');
-            return JSON.parse(token).userId;
-        }
-        return null;
+        return sessionStorage.getItem('userId');
     }
 
     static getRole() {
-        if (this.isTokenValid()) {
-            const token = sessionStorage.getItem('tokenKey');
-            return JSON.parse(token).role;
-        }
-        return 'Guest';
+        return sessionStorage.getItem('role') || 'Guest';
     }
 
-    static async refreshToken() {
-        const token = sessionStorage.getItem('tokenKey');
-        if (!token)
-            return;
-        const auth_data = {
-            login: JSON.parse(token).login,
-            password: JSON.parse(token).password
-        };
-        let error = false;
-        await fetch('api/Users/signIn', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-            },
-            body: JSON.stringify(auth_data)
-        }).then(async (response) => {
-            error = !response.ok;
-            return await response.json();
-        }).then((data) => {
-            if (!error) {
-                this.saveAuth(data.name, data.accessToken, data.role, auth_data.login, auth_data.password);
-            }
-            else {
-                this.clearAuth();
-            }
-        }).catch((ex) => {
-            this.clearAuth();
-        });
+    static getAccessToken() {
+        return sessionStorage.getItem('accessToken');
     }
 
-    static async getToken() {
-        await this.refreshToken();
-        if (this.isTokenValid()) {            
-            const token = sessionStorage.getItem('tokenKey');
-            if (!!token)
-                return JSON.parse(token).access_token;
-            this.clearAuth();
-        }
-        return null;
+    static getRefreshToken() {
+        return sessionStorage.getItem('refreshToken');
+    }
+
+    static saveAccessToken(accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+    }
+
+    static saveRefreshToken(refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
     }
 
     static async fetchWithCredentials(url, options) {
-        var jwtToken = getJwtToken();
+        var jwtToken = this.getAccessToken();
         options = options || {};
         options.headers = options.headers || {};
         options.headers['Authorization'] = 'Bearer ' + jwtToken;
@@ -96,19 +48,29 @@
         }
 
         if (response.status === 401 && response.headers.has('Token-Expired')) {
-            var refreshToken = getRefreshToken();
+            var refreshToken = this.getRefreshToken();
 
-            var refreshResponse = await refresh(jwtToken, refreshToken);
+            var refreshResponse = await this.refresh(jwtToken, refreshToken);
             if (!refreshResponse.ok) {
                 return response; //failed to refresh so return original 401 response
             }
             var jsonRefreshResponse = await refreshResponse.json(); //read the json with the new tokens
 
-            saveJwtToken(jsonRefreshResponse.token);
-            saveRefreshToken(jsonRefreshResponse.refreshToken);
-            return await fetchWithCredentials(url, options); //repeat the original request
+            this.saveAccessToken(jsonRefreshResponse.accessToken);
+            this.saveRefreshToken(jsonRefreshResponse.refreshToken);
+            return await this.fetchWithCredentials(url, options); //repeat the original request
         } else { //status is not 401 and/or there's no Token-Expired header
             return response; //return the original 401 response
         }
+    }
+
+    static async refresh() {
+        return fetch('api/Users/refresh', {
+            method: 'POST',
+            body: `token=${encodeURIComponent(this.getAccessToken())}&refreshToken=${encodeURIComponent(this.getRefreshToken())}`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
     }
 }

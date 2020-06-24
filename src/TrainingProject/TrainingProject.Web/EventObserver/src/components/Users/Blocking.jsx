@@ -124,39 +124,36 @@ export default class Blocking extends Component {
     }
 
     async loadUser(userId) {
-        const token = await AuthHelper.getToken();
-        fetch(`api/Users/${userId}/ban`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-        })
-        .then((response) => {
-            if (!response.ok) {
+        AuthHelper.fetchWithCredentials(`api/Users/${userId}/ban`)
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else if (!response.ok) {
+                    this.setState({
+                        error: true
+                    });
+                }
+                return response.json();
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({ 
+                        errorMessage: data,
+                    });
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        userName: data.userName,
+                        isBanned: data.isBanned,
+                        loading: false
+                    });
+                }
+            }).catch((ex) => {
                 this.setState({
-                    error: true
+                    errorMessage: ex.toString()
                 });
-            }
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data,
-                });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    userName: data.userName,
-                    isBanned: data.isBanned,
-                    loading: false
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async ban(){
@@ -172,20 +169,18 @@ export default class Blocking extends Component {
             days: parseInt(this.state.days, 10),
             hours: parseInt(this.state.hours, 10),
         }
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Users/ban', {
+        AuthHelper.fetchWithCredentials('api/Users/ban', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': 'Bearer ' + token     
+                'Content-Type': 'application/json; charset=utf-8'
             },
             body: JSON.stringify(data)
         }).then((response) => {
             if (response.ok){
                 this.props.history.push(`/user?id=${this.state.id}`);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({error: true});
@@ -205,19 +200,15 @@ export default class Blocking extends Component {
         });
     }
 
-    async unban(){
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch(`api/Users/${this.state.id}/unban`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
+    async unban() {
+        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/unban`, {
+            method: 'PUT'
         }).then((response) => {
             if (response.ok){
                 this.props.history.push(`/user?id=${this.state.id}`);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({error: true});

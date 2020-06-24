@@ -83,51 +83,46 @@ export default class CategoryDetail extends Component {
     }
 
     async loadData(categoryId) {
-        const token = await AuthHelper.getToken();
-        fetch('api/Categories/' + categoryId, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        })
-        .then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
+        AuthHelper.fetchWithCredentials('api/Categories/' + categoryId)
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({ 
+                        errorMessage: data 
+                    });
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        name: data.name,
+                        description: data.description,
+                        loading: false
+                    });
+                }
+            }).catch((ex) => {
+                this.setState({
+                    errorMessage: ex.toString()
                 });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    name: data.name,
-                    description: data.description,
-                    loading: false
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async deleteCategory() {
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Categories/' + this.state.id, {
+        AuthHelper.fetchWithCredentials('api/Categories/' + this.state.id, {
             method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
         }).then((response) => {
             if (response.ok) {
                 this.props.history.push("/categories");                   
             } 
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
             else {
                 this.setState({error: true})
                 return response.json()

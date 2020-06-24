@@ -29,7 +29,6 @@ export default class NavMenu extends Component {
             role: AuthHelper.getRole(),
             id: AuthHelper.getId()
         });
-        AuthHelper.getToken();
     }
 
     toggleNavbar () {

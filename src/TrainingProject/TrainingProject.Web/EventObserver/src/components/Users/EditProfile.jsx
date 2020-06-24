@@ -217,38 +217,37 @@ export default class EditProfile extends Component {
     }
 
     async loadUser(userId) {
-        const token = await AuthHelper.getToken();
-        fetch(`api/Users/${userId}/update`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-        })
-        .then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data,
+        AuthHelper.fetchWithCredentials(`api/Users/${userId}/update`)
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({ 
+                        errorMessage: data,
+                    });
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        userName: data.userName,
+                        contactEmail: data.contactEmail || "",
+                        contactPhone: data.contactPhone || "",
+                        hasImage: data.hasPhoto,
+                        imagePath: data.photo,
+                        loading: false
+                    });
+                }
+            }).catch((ex) => {
+                this.setState({
+                    errorMessage: ex.toString()
                 });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    userName: data.userName,
-                    contactEmail: data.contactEmail || "",
-                    contactPhone: data.contactPhone || "",
-                    hasImage: data.hasPhoto,
-                    imagePath: data.photo,
-                    loading: false
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async editProfile(){
@@ -269,19 +268,15 @@ export default class EditProfile extends Component {
         {
             formdata.append('photo', this.state.imageFile);
         }
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Users', {
+        AuthHelper.fetchWithCredentials('api/Users', {
             method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
             body: formdata
         }).then((response) => {
             if (response.ok){
                 this.props.history.push(`/user?id=${this.state.id}`);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({error: true})

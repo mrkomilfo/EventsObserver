@@ -335,19 +335,16 @@ export default class NewEvent extends Component {
         {
             formdata.append('image', this.state.imageFile);
         }
-        const token = AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Events', {
+
+        AuthHelper.fetchWithCredentials('api/Events', {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
             body: formdata
         }).then((response) => {
             if (response.ok){
                 this.props.history.push("/events");
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 return response.json();

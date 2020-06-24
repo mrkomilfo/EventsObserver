@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Models.Common;
@@ -26,5 +27,11 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Role> GetUserRoleAsync(Guid userId);
         Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO);
         Task<string> GetUserNameAsync(Guid guid);
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        Task<string> GetRefreshTokenAsync(string userId);
+        string GenerateToken(IEnumerable<Claim> claims);
+        string GenerateRefreshToken();
+        Task DeleteRefreshTokenAsync(string userId);
+        Task SaveRefreshTokenAsync(string userId, string newRefreshToken);
     }
 }

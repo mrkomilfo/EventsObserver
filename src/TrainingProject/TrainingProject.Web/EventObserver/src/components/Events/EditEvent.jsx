@@ -342,43 +342,43 @@ export default class EditEvent extends Component{
     }
 
     async loadEvent(eventId) {
-        const token = await AuthHelper.getToken();
-        fetch('api/Events/' + eventId + '/update', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }).then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
+        AuthHelper.fetchWithCredentials('api/Events/' + eventId + '/update')
+            .then((response) => {
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ error: !response.ok });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    this.setState({ 
+                        errorMessage: data 
+                    });
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        name: data.name,
+                        category: data.categoryId,
+                        description: data.description,
+                        date: data.date,
+                        time: data.time,
+                        place: data.place,
+                        fee: data.fee,
+                        participantsLimit: data.participantsLimit,
+                        tags: data.tags,
+                        imagePath: data.image,
+                        hasImage: !!data.image,
+                        loading: false
+                    });
+                }
+            }).catch((ex) => {
+                this.setState({
+                    errorMessage: ex.toString()
                 });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    name: data.name,
-                    category: data.categoryId,
-                    description: data.description,
-                    date: data.date,
-                    time: data.time,
-                    place: data.place,
-                    fee: data.fee,
-                    participantsLimit: data.participantsLimit,
-                    tags: data.tags,
-                    imagePath: data.image,
-                    hasImage: !!data.image,
-                    loading: false
-                });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async editEvent()
@@ -408,19 +408,15 @@ export default class EditEvent extends Component{
         if (this.state.imageFile) {
             formdata.append('image', this.state.imageFile);
         }
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Events', {
+        AuthHelper.fetchWithCredentials('api/Events', {
             method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
             body: formdata
         }).then((response) => {
             if (response.ok){
                 this.props.history.push(`/event?id=${this.state.id}`);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({error: true});

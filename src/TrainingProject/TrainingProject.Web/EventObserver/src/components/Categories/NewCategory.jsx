@@ -118,20 +118,18 @@ export default class NewCategory extends Component {
             name: this.state.name,
             description: this.state.description
         }
-        const token = await AuthHelper.getToken();
-        if (!token) {
-            this.props.history.push("/signIn");
-        }
-        fetch('api/Categories', {
+        AuthHelper.fetchWithCredentials('api/Categories', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json; charset=utf-8'
             },
             body: JSON.stringify(data)
         }).then((response) => {
             if (response.ok){
                 this.props.history.push("/categories");
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
             }
             else {
                 this.setState({error: true});
