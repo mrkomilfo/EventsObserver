@@ -39,28 +39,22 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        [ModelStateValidation]
         public async Task<ActionResult> CreateAsync([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             _logger.LogMethodCallingWithObject(categoryCreateDTO);
-            if (ModelState.IsValid)
-            {
-                await _categoryManager.AddCategoryAsync(categoryCreateDTO);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _categoryManager.AddCategoryAsync(categoryCreateDTO);
+            return Ok();
         }
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        [ModelStateValidation]
         public async Task<ActionResult> UpdateAsync([FromBody] Category category)
         {
             _logger.LogMethodCallingWithObject(category);
-            if (ModelState.IsValid)
-            {
-                await _categoryManager.UpdateCategoryAsync(category);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _categoryManager.UpdateCategoryAsync(category);
+            return Ok();
         }
 
         [HttpDelete("{categoryId}")]

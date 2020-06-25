@@ -50,16 +50,13 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [ModelStateValidation]
         public async Task<ActionResult> CreateAsync([FromForm] EventCreateDTO eventCreateDTO)
         {
             _logger.LogMethodCallingWithObject(eventCreateDTO);
-            if (ModelState.IsValid)
-            {
-                var hostRoot = _hostServices.GetHostPath();
-                await _eventManager.AddEventAsync(eventCreateDTO, hostRoot);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            var hostRoot = _hostServices.GetHostPath();
+            await _eventManager.AddEventAsync(eventCreateDTO, hostRoot);
+            return Ok();
         }
 
         [HttpGet("{eventId}/update")]
@@ -79,6 +76,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [ModelStateValidation]
         public async Task<ActionResult> UpdateAsync([FromForm] EventUpdateDTO eventUpdateDTO)
         {
             _logger.LogMethodCallingWithObject(eventUpdateDTO);
@@ -89,13 +87,9 @@ namespace TrainingProject.Web.Controllers
             {
                 return Forbid("Access denied");
             }
-            if (ModelState.IsValid)
-            {
-                var hostRoot = _hostServices.GetHostPath();
-                await _eventManager.UpdateEventAsync(eventUpdateDTO, hostRoot);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            var hostRoot = _hostServices.GetHostPath();
+            await _eventManager.UpdateEventAsync(eventUpdateDTO, hostRoot);
+            return Ok();
         }
 
         [HttpDelete("{eventId}")]

@@ -8,6 +8,7 @@ export default class SignUp extends Component {
         this.state = { login: '', password: '', errorMessage: '', error: false };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.logIn = this.logIn.bind(this);
+        this.enterPressed = this.enterPressed.bind(this);
     }
 
     handleInputChange(event) {
@@ -19,6 +20,13 @@ export default class SignUp extends Component {
           [name]: value
         });
     }
+
+    enterPressed(event) {
+        var code = event.keyCode || event.which;
+        if (code === 13) {
+            this.logIn();
+        }
+    };
 
     render(){
         const errorBaner = this.state.errorMessage ? 
@@ -37,13 +45,13 @@ export default class SignUp extends Component {
             <Form style={signInStyle}>    
                 <FormGroup>
                     <Label for="login">Логин</Label>
-                    <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange}/>
+                        <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                 </FormGroup>
                 <FormGroup>
                     <Label for="password">Пароль</Label>
-                    <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange}/>
+                        <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                 </FormGroup>
-                <Button color="primary" onClick={() => this.logIn()}>Войти</Button>
+                <Button color="primary" onClick={this.logIn}>Войти</Button>
             </Form>
             </>
         )

@@ -47,20 +47,16 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<UserFullDTO>> DetailsAsync(string userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
-            var hostRoot = _hostServices.GetHostPath();
             return Ok(await _userManager.GetUserAsync(Guid.Parse(userId)));
         }
 
         [HttpPost]
+        [ModelStateValidation]
         public async Task<ActionResult> CreateAsync([FromBody] RegisterDTO registerDTO)
         {
             _logger.LogMethodCallingWithObject(registerDTO, "Password, PasswordConfirm");
-            if (ModelState.IsValid)
-            {
-                await _userManager.RegisterUserAsync(registerDTO);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _userManager.RegisterUserAsync(registerDTO);
+            return Ok();
         }
 
         [HttpGet("{userId}/update")]
@@ -80,6 +76,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [ModelStateValidation]
         public async Task<ActionResult> UpdateAsync([FromForm] UserUpdateDTO userUpdateDTO)
         {
             _logger.LogMethodCallingWithObject(userUpdateDTO);
@@ -89,13 +86,9 @@ namespace TrainingProject.Web.Controllers
             {
                 return Forbid("Access denied");
             }
-            if (ModelState.IsValid)
-            {
-                var hostRoot = _hostServices.GetHostPath();
-                await _userManager.UpdateUserAsync(userUpdateDTO, hostRoot);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            var hostRoot = _hostServices.GetHostPath();
+            await _userManager.UpdateUserAsync(userUpdateDTO, hostRoot);
+            return Ok();
         }
 
         [HttpDelete("{userId}")]
@@ -125,6 +118,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPut]
         [Route("ban")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
+        [ModelStateValidation]
         public async Task<ActionResult> BanAsync([FromBody]BanDTO banDTO)
         {
             _logger.LogMethodCallingWithObject(banDTO);
@@ -134,12 +128,8 @@ namespace TrainingProject.Web.Controllers
             {
                 return Forbid("Lack of rights");
             }
-            if (ModelState.IsValid)
-            {
-                await _userManager.BanUserAsync(banDTO);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _userManager.BanUserAsync(banDTO);
+            return Ok();
         }
 
         [HttpPut("{userId}/unban")]
@@ -181,45 +171,37 @@ namespace TrainingProject.Web.Controllers
         [HttpPut]
         [Route("role")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Account manager")]
+        [ModelStateValidation]
         public async Task<ActionResult> ChangeRoleAsync([FromBody] ChangeRoleDTO changeRoleDTO)
         {
             _logger.LogMethodCallingWithObject(changeRoleDTO);
-            if (ModelState.IsValid)
-            {
-                await _userManager.ChangeRoleAsync(changeRoleDTO);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _userManager.ChangeRoleAsync(changeRoleDTO);
+            return Ok();
         }
 
         [HttpPut]
         [Route("changePassword")]
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [ModelStateValidation]
         public async Task<ActionResult> ChangePasswordAsync([FromBody]ChangePasswordDTO changePasswordDTO)
         {
             _logger.LogMethodCallingWithObject(changePasswordDTO, "OldPassword, NewPassword, NewPasswordConfirm");
-            if (ModelState.IsValid)
-            {
-                await _userManager.ChangePasswordAsync(changePasswordDTO);
-                return Ok();
-            }
-            return BadRequest("Model state is not valid");
+            await _userManager.ChangePasswordAsync(changePasswordDTO);
+            return Ok();
         }
 
         [HttpPost]
         [Route("signIn")]
+        [ModelStateValidation]
         public async Task<ActionResult> SignInAsync([FromBody] LoginDTO loginDTO)
         {
             _logger.LogMethodCallingWithObject(loginDTO, "Password");
-            if (ModelState.IsValid)
-            {
-                return Ok(await _userManager.LoginAsync(loginDTO));
-            }
-            return BadRequest("Model state is not valid");
+            return Ok(await _userManager.LoginAsync(loginDTO));
         }
 
         [HttpPost]
         [Route("refresh")]
+        [ModelStateValidation]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshDto refreshDto)
         {
             _logger.LogMethodCallingWithObject(refreshDto);
