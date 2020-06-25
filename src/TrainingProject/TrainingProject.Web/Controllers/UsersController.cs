@@ -220,23 +220,22 @@ namespace TrainingProject.Web.Controllers
 
         [HttpPost]
         [Route("refresh")]
-        public async Task<IActionResult> Refresh(string token, string refreshToken)
+        public async Task<IActionResult> RefreshAsync([FromBody] RefreshDto refreshDto)
         {
-            _logger.LogMethodCallingWithObject(new { token, refreshToken});
-            var principal = _userManager.GetPrincipalFromExpiredToken(token);
+            _logger.LogMethodCallingWithObject(refreshDto);
+            var principal = _userManager.GetPrincipalFromExpiredToken(refreshDto.Token);
             var userId = principal.Identity.Name;
-            var savedRefreshToken = await _userManager.GetRefreshTokenAsync(userId); //retrieve the refresh token from a data store
-            if (savedRefreshToken != refreshToken || string.IsNullOrEmpty(savedRefreshToken))
+            var savedRefreshToken = await _userManager.GetRefreshTokenAsync(userId);
+            if (savedRefreshToken != refreshDto.RefreshToken || string.IsNullOrEmpty(savedRefreshToken))
                 throw new SecurityTokenException("Invalid refresh token");
 
             var newJwtToken = _userManager.GenerateToken(principal.Claims);
             var newRefreshToken = _userManager.GenerateRefreshToken();
-            await _userManager.DeleteRefreshTokenAsync(userId);
             await _userManager.SaveRefreshTokenAsync(userId, newRefreshToken);
 
             return new ObjectResult(new
             {
-                token = newJwtToken,
+                accessToken = newJwtToken,
                 refreshToken = newRefreshToken
             });
         }

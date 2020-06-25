@@ -30,11 +30,11 @@
     }
 
     static saveAccessToken(accessToken) {
-        localStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('accessToken', accessToken);
     }
 
     static saveRefreshToken(refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
     }
 
     static async fetchWithCredentials(url, options) {
@@ -49,13 +49,12 @@
 
         if (response.status === 401 && response.headers.has('Token-Expired')) {
             var refreshToken = this.getRefreshToken();
-
             var refreshResponse = await this.refresh(jwtToken, refreshToken);
             if (!refreshResponse.ok) {
                 return response; //failed to refresh so return original 401 response
             }
             var jsonRefreshResponse = await refreshResponse.json(); //read the json with the new tokens
-
+            debugger;
             this.saveAccessToken(jsonRefreshResponse.accessToken);
             this.saveRefreshToken(jsonRefreshResponse.refreshToken);
             return await this.fetchWithCredentials(url, options); //repeat the original request
@@ -64,13 +63,17 @@
         }
     }
 
-    static async refresh() {
+    static async refresh(jwtToken, refreshToken) {
+        let tokens = {
+            token: jwtToken,
+            refreshToken: refreshToken
+        }
         return fetch('api/Users/refresh', {
             method: 'POST',
-            body: `token=${encodeURIComponent(this.getAccessToken())}&refreshToken=${encodeURIComponent(this.getRefreshToken())}`,
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+                'Content-Type': 'application/json; charset=utf-8'
+            },
+            body: JSON.stringify(tokens)
         });
     }
 }

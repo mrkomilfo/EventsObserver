@@ -160,6 +160,7 @@ namespace TrainingProject.DomainLogic.Managers
             user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
             user.UnlockTime = user.UnlockTime?.AddHours(banDTO?.Hours ?? 0);
             await _appContext.SaveChangesAsync(default);
+            await DeleteRefreshTokenAsync(banDTO.Id);
         }
 
         public async Task UnbanUserAsync(Guid userId)
@@ -188,6 +189,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             user.RoleId = changeRoleDTO.RoleId;
             await _appContext.SaveChangesAsync(default);
+            await DeleteRefreshTokenAsync(changeRoleDTO.UserId);
         }
         public async Task<DateTime?> GetUnlockTimeAsync(Guid userId)
         {
@@ -251,6 +253,7 @@ namespace TrainingProject.DomainLogic.Managers
             }
             user.Password = HashGenerator.Encrypt(changePasswordDTO.NewPassword);
             await _appContext.SaveChangesAsync(default);
+            await DeleteRefreshTokenAsync(changePasswordDTO.Id);
         }
 
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
@@ -369,10 +372,10 @@ namespace TrainingProject.DomainLogic.Managers
             _logger.LogMethodCallingWithObject(new { token });
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
+                ValidIssuer = AuthOptions.ISSUER,
+                ValidAudience = AuthOptions.AUDIENCE,
                 IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                ValidateIssuerSigningKey = true,
                 ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
             };
 

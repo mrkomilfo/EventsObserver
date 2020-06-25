@@ -34,8 +34,8 @@ namespace TrainingProject.Common
 
         public void LogMethodCallingWithObject(object obj, string hide = "")
         {
-            StringBuilder log = new StringBuilder($"Call method " +
-                $"{new StackTrace().GetFrame(1).GetMethod().DeclaringType.FullName}");
+            var method = new StackTrace().GetFrame(1).GetMethod();
+            StringBuilder log = new StringBuilder($"Call method {method.DeclaringType.FullName}.{method.Name}");
             IList<PropertyInfo> props = new List<PropertyInfo>(obj.GetType().GetProperties());
             IList<string> toHide = hide.ParseSubstrings(",").ToList();
             foreach (PropertyInfo prop in props)

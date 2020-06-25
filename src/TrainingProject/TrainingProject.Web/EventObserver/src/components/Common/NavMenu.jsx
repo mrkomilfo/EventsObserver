@@ -43,14 +43,6 @@ export default class NavMenu extends Component {
         });
     }
 
-    logout(){
-        AuthHelper.clearAuth();
-        this.setState({
-            role: 'Guest',
-            logoutModal: false
-        });
-    }
-
     render () {
         const events = 
             <NavItem>
@@ -122,5 +114,20 @@ export default class NavMenu extends Component {
                 </Navbar>
             </header>
         );
+    }
+
+    async logout() {
+        AuthHelper.clearAuth();
+        this.setState({
+            role: 'Guest',
+            logoutModal: false
+        });
+
+        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/logout`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     }
 }
