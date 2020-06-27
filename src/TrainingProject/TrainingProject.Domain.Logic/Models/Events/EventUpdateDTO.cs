@@ -4,7 +4,7 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public sealed class EventUpdateDTO
+    public sealed class EventUpdateDto
     {
         [Required]
         public int Id { get; set; }

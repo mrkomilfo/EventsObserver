@@ -3,7 +3,7 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class BanDTO
+    public class BanDto
     {
         [Required]
         [ValidGuid]

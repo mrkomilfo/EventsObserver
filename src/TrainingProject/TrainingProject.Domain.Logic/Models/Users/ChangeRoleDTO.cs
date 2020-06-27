@@ -3,7 +3,7 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class ChangeRoleDTO
+    public class ChangeRoleDto
     {
         [Required]
         [ValidGuid]

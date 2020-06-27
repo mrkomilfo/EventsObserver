@@ -10,22 +10,22 @@ namespace TrainingProject.DomainLogic.Interfaces
 {
     public interface IUserManager
     {
-        Task<UserFullDTO> GetUserAsync(Guid userId);
-        Task<Page<UserLiteDTO>> GetUsersAsync(int index, int pageSize, string search);
-        Task RegisterUserAsync(RegisterDTO user);
-        Task UpdateUserAsync(UserUpdateDTO user, string hostRoot);
-        Task<UserToUpdateDTO> GetUserToUpdateAsync(Guid userId);
+        Task<UserFullDto> GetUserAsync(Guid userId);
+        Task<Page<UserLiteDto>> GetUsersAsync(int index, int pageSize, string search);
+        Task RegisterUserAsync(RegisterDto user);
+        Task UpdateUserAsync(UserUpdateDto user, string hostRoot);
+        Task<UserToUpdateDto> GetUserToUpdateAsync(Guid userId);
         Task DeleteUserAsync(Guid userId, bool force, string hostRoot);
-        Task<UserToBanDTO> GetUserToBanAsync(Guid userId);
-        Task BanUserAsync(BanDTO banDTO);
+        Task<UserToBanDto> GetUserToBanAsync(Guid userId);
+        Task BanUserAsync(BanDto banDto);
         Task UnbanUserAsync(Guid userId);
         Task<DateTime?> GetUnlockTimeAsync(Guid userId);
-        Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
-        Task ChangeRoleAsync(ChangeRoleDTO changeRoleDTO);
+        Task<LoginResponseDto> LoginAsync(LoginDto loginDto);
+        Task ChangeRoleAsync(ChangeRoleDto changeRoleDto);
         Task<IEnumerable<Role>> GetRolesAsync();
-        Task<UserRoleDTO> GetUserWithRoleAsync(Guid userId);
+        Task<UserRoleDto> GetUserWithRoleAsync(Guid userId);
         Task<Role> GetUserRoleAsync(Guid userId);
-        Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO);
+        Task ChangePasswordAsync(ChangePasswordDto changePasswordDto);
         Task<string> GetUserNameAsync(Guid guid);
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
         Task<string> GetRefreshTokenAsync(string userId);

@@ -12,11 +12,11 @@ namespace TrainingProject.DomainLogic.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<CategoryCreateDTO, Category>();
-            CreateMap<Category, CategoryLiteDTO>();
-            CreateMap<Category, CategoryFullDTO>();
+            CreateMap<CategoryCreateDto, Category>();
+            CreateMap<Category, CategoryLiteDto>();
+            CreateMap<Category, CategoryFullDto>();
 
-            CreateMap<EventCreateDTO, Event>()
+            CreateMap<EventCreateDto, Event>()
                 .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy H:m", CultureInfo.InvariantCulture)))
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => Guid.Parse(m.OrganizerId)))
                 .ForMember(m => m.HasImage, opt => opt.MapFrom(m => m.Image != null))
@@ -26,14 +26,14 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.Name, opt => opt.MapFrom(m => m.ToLower()));
             CreateMap<Tag, string>()
                .ConvertUsing(source => source.Name ?? string.Empty);
-            CreateMap<EventUpdateDTO, Event>()
+            CreateMap<EventUpdateDto, Event>()
                 .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy H:m", CultureInfo.InvariantCulture)))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
-            CreateMap<Event, EventToUpdateDTO>()
+            CreateMap<Event, EventToUpdateDto>()
                 .ForMember(m => m.Tags, opt => opt.Ignore())
                 .ForMember(m => m.Time, opt => opt.MapFrom(m => m.Start.ToString("HH:mm")))
                 .ForMember(m => m.Date, opt => opt.MapFrom(m => m.Start.ToString("yyyy-MM-dd")));
-            CreateMap<Event, EventFullDTO>()
+            CreateMap<Event, EventFullDto>()
                 .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
                 .ForMember(m => m.Organizer, opt => opt.MapFrom(m => m.Organizer.UserName))
                 .ForMember(m => m.OrganizerId, opt => opt.MapFrom(m => m.Organizer.Id.ToString()))
@@ -41,33 +41,33 @@ namespace TrainingProject.DomainLogic.Helpers
                 .ForMember(m => m.StartParsable, opt => opt.MapFrom(m => m.Start.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds))
                 .ForMember(m => m.PublicationTime, opt => opt.MapFrom(m => m.PublicationTime.ToString("f")))
                 .ForMember(m => m.Tags, opt => opt.Ignore());
-            CreateMap<Event, EventLiteDTO>()
+            CreateMap<Event, EventLiteDto>()
                 .ForMember(m => m.Category, opt => opt.MapFrom(m => m.Category.Name))
                 .ForMember(m => m.Start, opt => opt.MapFrom(m => m.Start.ToString("f")));
 
-            CreateMap<User, UserFullDTO>()
+            CreateMap<User, UserFullDto>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
                 .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime == null || m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"))
                 .ForMember(m => m.RegistrationDate, opt => opt.MapFrom(m => m.RegistrationDate.ToString("f")))
                 .ForMember(m => m.OrganizedEvents, opt => opt.MapFrom(m => m.OrganizedEvents.Count))
                 .ForMember(m => m.VisitedEvents, opt => opt.Ignore());
-            CreateMap<User, UserLiteDTO>()
+            CreateMap<User, UserLiteDto>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Role, opt => opt.MapFrom(m => m.Role.Name))
                 .ForMember(m => m.Status, opt => opt.MapFrom(m => m.UnlockTime == null || m.UnlockTime < DateTime.Now ? null : $"Заблокирован до {m.UnlockTime}"));
-            CreateMap<User, ChangeRoleDTO>()
+            CreateMap<User, ChangeRoleDto>()
                 .ForMember(m => m.UserId, opt => opt.MapFrom(m => m.Id.ToString()));
-            CreateMap<User, UserToBanDTO>()
+            CreateMap<User, UserToBanDto>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.IsBanned, opt => opt.MapFrom(m => m.UnlockTime != null && m.UnlockTime > DateTime.Now));
-            CreateMap<UserUpdateDTO, User>()
+            CreateMap<UserUpdateDto, User>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => Guid.Parse(m.Id)));
-            CreateMap<User, UserToUpdateDTO>()
+            CreateMap<User, UserToUpdateDto>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Id.ToString()));
-            CreateMap<User, UserRoleDTO>()
+            CreateMap<User, UserRoleDto>()
                 .ForMember(m => m.UserId, opt => opt.MapFrom(m => m.Id.ToString()));
-            CreateMap<RegisterDTO, User>()
+            CreateMap<RegisterDto, User>()
                 .ForMember(m => m.Password, opt => opt.MapFrom(m => HashGenerator.Encrypt(m.Password)))
                 .ForMember(m => m.RegistrationDate, opt => opt.MapFrom(m => DateTime.Now));
         }

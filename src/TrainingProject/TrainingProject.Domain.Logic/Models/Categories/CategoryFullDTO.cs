@@ -2,7 +2,7 @@
 
 namespace TrainingProject.DomainLogic.Models.Categories
 {
-    public class CategoryFullDTO
+    public class CategoryFullDto
     {
         [Required]
         public int Id { get; set; }

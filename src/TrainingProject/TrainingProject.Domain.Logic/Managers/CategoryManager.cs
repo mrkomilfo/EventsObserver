@@ -25,7 +25,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task AddCategoryAsync(CategoryCreateDTO category)
+        public async Task AddCategoryAsync(CategoryCreateDto category)
         {
             _logger.LogMethodCallingWithObject(category);
             if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name.ToLower(), category.Name.ToLower())))
@@ -69,7 +69,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<CategoryFullDTO> GetCategoryAsync(int categoryId)
+        public async Task<CategoryFullDto> GetCategoryAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
             var category = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
@@ -77,12 +77,12 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"Category with id={categoryId} not found");
             }
-            return _mapper.Map<CategoryFullDTO>(category);
+            return _mapper.Map<CategoryFullDto>(category);
         }
-        public async Task<ICollection<CategoryLiteDTO>> GetCategoriesAsync()
+        public async Task<ICollection<CategoryLiteDto>> GetCategoriesAsync()
         {
             _logger.LogMethodCalling();
-            return await _appContext.Categories.Select(c => new CategoryLiteDTO{ Id=c.Id, Name = c.Name }).ToListAsync();
+            return await _appContext.Categories.Select(c => new CategoryLiteDto{ Id=c.Id, Name = c.Name }).ToListAsync();
         }
     }
 }

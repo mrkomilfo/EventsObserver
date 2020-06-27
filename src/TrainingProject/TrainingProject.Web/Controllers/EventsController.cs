@@ -30,7 +30,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Page<EventLiteDTO>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null, 
+        public async Task<ActionResult<Page<EventLiteDto>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null, 
             int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizerId = null, string participantId = null)
         {
@@ -42,7 +42,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet("{eventId}")]
-        public async Task<ActionResult<EventFullDTO>> DetailsAsync(int eventId)
+        public async Task<ActionResult<EventFullDto>> DetailsAsync(int eventId)
         {
             _logger.LogMethodCalling();
             return Ok(await _eventManager.GetEventAsync(eventId));
@@ -51,17 +51,17 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [ModelStateValidation]
-        public async Task<ActionResult> CreateAsync([FromForm] EventCreateDTO eventCreateDTO)
+        public async Task<ActionResult> CreateAsync([FromForm] EventCreateDto eventCreateDto)
         {
-            _logger.LogMethodCallingWithObject(eventCreateDTO);
+            _logger.LogMethodCallingWithObject(eventCreateDto);
             var hostRoot = _hostServices.GetHostPath();
-            await _eventManager.AddEventAsync(eventCreateDTO, hostRoot);
+            await _eventManager.AddEventAsync(eventCreateDto, hostRoot);
             return Ok();
         }
 
         [HttpGet("{eventId}/update")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<EventToUpdateDTO>> UpdateAsync(int eventId)
+        public async Task<ActionResult<EventToUpdateDto>> UpdateAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -77,18 +77,18 @@ namespace TrainingProject.Web.Controllers
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [ModelStateValidation]
-        public async Task<ActionResult> UpdateAsync([FromForm] EventUpdateDTO eventUpdateDTO)
+        public async Task<ActionResult> UpdateAsync([FromForm] EventUpdateDto eventUpdateDto)
         {
-            _logger.LogMethodCallingWithObject(eventUpdateDTO);
+            _logger.LogMethodCallingWithObject(eventUpdateDto);
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventUpdateDTO.Id);
+            var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventUpdateDto.Id);
             if (role != "Admin" && Guid.Parse(userId) != organizerId)
             {
                 return Forbid("Access denied");
             }
             var hostRoot = _hostServices.GetHostPath();
-            await _eventManager.UpdateEventAsync(eventUpdateDTO, hostRoot);
+            await _eventManager.UpdateEventAsync(eventUpdateDto, hostRoot);
             return Ok();
         }
 

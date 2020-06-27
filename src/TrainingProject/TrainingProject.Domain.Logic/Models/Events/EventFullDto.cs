@@ -2,9 +2,9 @@
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public sealed class EventFullDTO
+    public sealed class EventFullDto
     {
-        public EventFullDTO()
+        public EventFullDto()
         {
             Tags = new Dictionary<string, string>();
         }

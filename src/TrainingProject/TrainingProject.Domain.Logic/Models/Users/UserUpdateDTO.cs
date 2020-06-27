@@ -4,7 +4,7 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class UserUpdateDTO
+    public class UserUpdateDto
     {
         [Required]
         [ValidGuid]

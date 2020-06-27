@@ -1,6 +1,6 @@
 ﻿namespace TrainingProject.DomainLogic.Models.Events
 {
-    public sealed class EventLiteDTO
+    public sealed class EventLiteDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

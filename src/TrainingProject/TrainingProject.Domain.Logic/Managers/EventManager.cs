@@ -31,10 +31,10 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task AddEventAsync(EventCreateDTO @event, string hostRoot)
+        public async Task AddEventAsync(EventCreateDto @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
-            var newEvent = _mapper.Map<EventCreateDTO, Event>(@event);
+            var newEvent = _mapper.Map<EventCreateDto, Event>(@event);
             await _appContext.Events.AddAsync(newEvent);
             await _appContext.SaveChangesAsync(default);
 
@@ -65,7 +65,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UpdateEventAsync(EventUpdateDTO @event, string hostRoot)
+        public async Task UpdateEventAsync(EventUpdateDto @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
@@ -109,7 +109,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<EventToUpdateDTO> GetEventToUpdateAsync(int eventId)
+        public async Task<EventToUpdateDto> GetEventToUpdateAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
@@ -117,7 +117,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
-            EventToUpdateDTO eventToUpdate = _mapper.Map<EventToUpdateDTO>(@event);
+            EventToUpdateDto eventToUpdate = _mapper.Map<EventToUpdateDto>(@event);
 
             if (@event.HasImage)
             {
@@ -151,7 +151,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<EventFullDTO> GetEventAsync(int eventId)
+        public async Task<EventFullDto> GetEventAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
             var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
@@ -159,32 +159,32 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
-            var eventFullDTO = _mapper.Map<EventFullDTO>(DBEvent);
+            var eventFullDto = _mapper.Map<EventFullDto>(DBEvent);
 
             var participants = await _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).ToListAsync();
             foreach (var participant in participants)
             {
-                eventFullDTO.Participants.Add(participant.Id.ToString(), participant.UserName);
+                eventFullDto.Participants.Add(participant.Id.ToString(), participant.UserName);
             }
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag).ToHashSet();
             foreach (var tag in tags)
             {
-                eventFullDTO.Tags.Add(tag.Id.ToString(), tag.Name);
+                eventFullDto.Tags.Add(tag.Id.ToString(), tag.Name);
             }
 
             if (DBEvent.HasImage)
             {
-                eventFullDTO.Image = $"img\\events\\{eventId}.jpg";
+                eventFullDto.Image = $"img\\events\\{eventId}.jpg";
             }
 
-            return eventFullDTO;
+            return eventFullDto;
         }
 
-        public async Task<Page<EventLiteDTO>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, 
+        public async Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, 
             bool? upComing, bool onlyFree, bool vacancies, Guid organizerId = new Guid(), Guid participantId = new Guid())
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            var result = new Page<EventLiteDTO>() { CurrentPage = index, PageSize = pageSize };           
+            var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };           
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
             if (search != null)
             {
@@ -227,7 +227,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
             }
-            result.Records = await _mapper.ProjectTo<EventLiteDTO>(query).ToListAsync(default);
+            result.Records = await _mapper.ProjectTo<EventLiteDto>(query).ToListAsync(default);
            
             for (int i = 0; i < result.Records.Count; i++)
             {

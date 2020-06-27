@@ -42,21 +42,19 @@ namespace TrainingProject.Web
 
         private static async Task CreateDbIfNotExists(IHost host)
         {
-            using (var scope = host.Services.CreateScope())
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            try
             {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = (AppContext)services.GetRequiredService<IAppContext>();
-                    Log.Information("Migrate database");
-                    context.Database.Migrate();
-                    await DBInitializer.InitializeUsersAsync(context);
-                    await DBInitializer.InitializeEventsAsync(context);
-                }
-                catch (Exception ex)
-                {
-                    Log.Fatal(ex, "An error occurred creating the DB.");
-                }
+                var context = (AppContext)services.GetRequiredService<IAppContext>();
+                Log.Information("Migrate database");
+                context.Database.Migrate();
+                await DBInitializer.InitializeUsersAsync(context);
+                await DBInitializer.InitializeEventsAsync(context);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "An error occurred creating the DB.");
             }
         }
 

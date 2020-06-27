@@ -1,6 +1,6 @@
 ﻿namespace TrainingProject.DomainLogic.Models.Users
 {
-    public class UserToBanDTO
+    public class UserToBanDto
     {
         public string Id { get; set; }
         public string UserName { get; set; }

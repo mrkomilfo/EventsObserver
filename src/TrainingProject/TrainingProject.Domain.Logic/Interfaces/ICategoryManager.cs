@@ -7,10 +7,10 @@ namespace TrainingProject.DomainLogic.Interfaces
 {
     public interface ICategoryManager
     {
-        Task AddCategoryAsync(CategoryCreateDTO category);
+        Task AddCategoryAsync(CategoryCreateDto category);
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(int categoryId, bool force);
-        Task<CategoryFullDTO> GetCategoryAsync(int categoryId);
-        Task<ICollection<CategoryLiteDTO>> GetCategoriesAsync();
+        Task<CategoryFullDto> GetCategoryAsync(int categoryId);
+        Task<ICollection<CategoryLiteDto>> GetCategoriesAsync();
     }
 }

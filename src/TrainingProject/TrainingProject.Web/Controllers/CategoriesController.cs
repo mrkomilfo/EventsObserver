@@ -24,14 +24,14 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryLiteDTO>>> IndexAsync()
+        public async Task<ActionResult<IEnumerable<CategoryLiteDto>>> IndexAsync()
         {
             _logger.LogMethodCalling();
             return Ok(await _categoryManager.GetCategoriesAsync());
         }
 
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<CategoryFullDTO>> DetailsAsync(int categoryId)
+        public async Task<ActionResult<CategoryFullDto>> DetailsAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
             return Ok(await _categoryManager.GetCategoryAsync(categoryId));
@@ -40,10 +40,10 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         [ModelStateValidation]
-        public async Task<ActionResult> CreateAsync([FromBody] CategoryCreateDTO categoryCreateDTO)
+        public async Task<ActionResult> CreateAsync([FromBody] CategoryCreateDto categoryCreateDto)
         {
-            _logger.LogMethodCallingWithObject(categoryCreateDTO);
-            await _categoryManager.AddCategoryAsync(categoryCreateDTO);
+            _logger.LogMethodCallingWithObject(categoryCreateDto);
+            await _categoryManager.AddCategoryAsync(categoryCreateDto);
             return Ok();
         }
 

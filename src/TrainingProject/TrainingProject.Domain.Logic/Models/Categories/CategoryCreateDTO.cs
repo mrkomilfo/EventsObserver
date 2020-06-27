@@ -2,7 +2,7 @@
 
 namespace TrainingProject.DomainLogic.Models.Categories
 {
-    public class CategoryCreateDTO
+    public class CategoryCreateDto
     {
         [Required]
         public string Name { get; set; }

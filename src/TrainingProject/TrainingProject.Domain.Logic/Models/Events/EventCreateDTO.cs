@@ -4,7 +4,7 @@ using TrainingProject.DomainLogic.Annotations;
 
 namespace TrainingProject.DomainLogic.Models.Events
 {
-    public class EventCreateDTO
+    public class EventCreateDto
     {
         [Required]
         public string Name { get; set; }

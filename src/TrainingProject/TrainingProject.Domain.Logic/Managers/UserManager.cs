@@ -34,7 +34,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger = logger;
         }
 
-        public async Task<UserFullDTO> GetUserAsync(Guid userId)
+        public async Task<UserFullDto> GetUserAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
@@ -42,7 +42,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
-            var user = _mapper.Map<UserFullDTO>(DBUser);
+            var user = _mapper.Map<UserFullDto>(DBUser);
             user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
 
             string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
@@ -52,21 +52,21 @@ namespace TrainingProject.DomainLogic.Managers
             return user;
         }
 
-        public async Task<Page<UserLiteDTO>> GetUsersAsync(int index, int pageSize, string search)
+        public async Task<Page<UserLiteDto>> GetUsersAsync(int index, int pageSize, string search)
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search });
-            var result = new Page<UserLiteDTO>() { CurrentPage = index, PageSize = pageSize };
+            var result = new Page<UserLiteDto>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Users.Include(e => e.Role).AsQueryable();
             if (search != null)
             {
                 query = query.Where(u => u.UserName.ToLower().Contains(search.ToLower()));
             }
             result.TotalRecords = await query.CountAsync();
-            result.Records = await _mapper.ProjectTo<UserLiteDTO>(query).ToListAsync(default);
+            result.Records = await _mapper.ProjectTo<UserLiteDto>(query).ToListAsync(default);
             return result;
         }
 
-        public async Task RegisterUserAsync(RegisterDTO user)
+        public async Task RegisterUserAsync(RegisterDto user)
         {
             _logger.LogMethodCallingWithObject(user, "Password, PasswordConfirm");
             if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
@@ -79,7 +79,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task UpdateUserAsync(UserUpdateDTO user, string hostRoot)
+        public async Task UpdateUserAsync(UserUpdateDto user, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(user);
             User updatedUser = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(user.Id)));
@@ -98,7 +98,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<UserToUpdateDTO> GetUserToUpdateAsync(Guid userId)
+        public async Task<UserToUpdateDto> GetUserToUpdateAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FindAsync(userId);
@@ -106,7 +106,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            UserToUpdateDTO userToUpdate = _mapper.Map<UserToUpdateDTO>(user);
+            UserToUpdateDto userToUpdate = _mapper.Map<UserToUpdateDto>(user);
             if (userToUpdate.HasPhoto)
             {
                 userToUpdate.Photo = $"img\\users\\{userId}.jpg";
@@ -137,7 +137,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<UserToBanDTO> GetUserToBanAsync(Guid userId)
+        public async Task<UserToBanDto> GetUserToBanAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
@@ -145,22 +145,22 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            UserToBanDTO userToBan = _mapper.Map<UserToBanDTO>(user);
+            UserToBanDto userToBan = _mapper.Map<UserToBanDto>(user);
             return userToBan;
         }
 
-        public async Task BanUserAsync(BanDTO banDTO)
+        public async Task BanUserAsync(BanDto banDto)
         {
-            _logger.LogMethodCallingWithObject(banDTO);
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDTO.Id)));
+            _logger.LogMethodCallingWithObject(banDto);
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDto.Id)));
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            user.UnlockTime = DateTime.Now.AddDays(banDTO?.Days ?? 0);
-            user.UnlockTime = user.UnlockTime?.AddHours(banDTO?.Hours ?? 0);
+            user.UnlockTime = DateTime.Now.AddDays(banDto?.Days ?? 0);
+            user.UnlockTime = user.UnlockTime?.AddHours(banDto?.Hours ?? 0);
             await _appContext.SaveChangesAsync(default);
-            await DeleteRefreshTokenAsync(banDTO.Id);
+            await DeleteRefreshTokenAsync(banDto.Id);
         }
 
         public async Task UnbanUserAsync(Guid userId)
@@ -175,21 +175,21 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task ChangeRoleAsync(ChangeRoleDTO changeRoleDTO)
+        public async Task ChangeRoleAsync(ChangeRoleDto changeRoleDto)
         {
-            _logger.LogMethodCallingWithObject(changeRoleDTO);
-            var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDTO.UserId));
+            _logger.LogMethodCallingWithObject(changeRoleDto);
+            var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDto.UserId));
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            if (!await _appContext.Roles.AnyAsync(r => r.Id == changeRoleDTO.RoleId))
+            if (!await _appContext.Roles.AnyAsync(r => r.Id == changeRoleDto.RoleId))
             {
-                throw new KeyNotFoundException($"Role with id={changeRoleDTO.RoleId} not found");
+                throw new KeyNotFoundException($"Role with id={changeRoleDto.RoleId} not found");
             }
-            user.RoleId = changeRoleDTO.RoleId;
+            user.RoleId = changeRoleDto.RoleId;
             await _appContext.SaveChangesAsync(default);
-            await DeleteRefreshTokenAsync(changeRoleDTO.UserId);
+            await DeleteRefreshTokenAsync(changeRoleDto.UserId);
         }
         public async Task<DateTime?> GetUnlockTimeAsync(Guid userId)
         {
@@ -207,7 +207,7 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Roles.ToListAsync();
         }
 
-        public async Task<UserRoleDTO> GetUserWithRoleAsync(Guid userId)
+        public async Task<UserRoleDto> GetUserWithRoleAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
@@ -215,8 +215,8 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            UserRoleDTO userRoleDTO = _mapper.Map<UserRoleDTO>(user);
-            return userRoleDTO;
+            UserRoleDto userRoleDto = _mapper.Map<UserRoleDto>(user);
+            return userRoleDto;
         }
 
         public async Task<string> GetUserNameAsync(Guid userId)
@@ -239,21 +239,21 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Users.Include(u => u.Role).Where(u => Equals(u.Id, userId)).Select(u => u.Role).FirstOrDefaultAsync();
         }
 
-        public async Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)
+        public async Task ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
-            _logger.LogMethodCallingWithObject(changePasswordDTO, "OldPassword, NewPassword, NewPasswordConfirm");
-            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDTO.Id)));
+            _logger.LogMethodCallingWithObject(changePasswordDto, "OldPassword, NewPassword, NewPasswordConfirm");
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDto.Id)));
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            if (!String.Equals(HashGenerator.Encrypt(changePasswordDTO.OldPassword), user.Password))
+            if (!String.Equals(HashGenerator.Encrypt(changePasswordDto.OldPassword), user.Password))
             {
                 throw new ArgumentException("Wrong old password");
             }
-            user.Password = HashGenerator.Encrypt(changePasswordDTO.NewPassword);
+            user.Password = HashGenerator.Encrypt(changePasswordDto.NewPassword);
             await _appContext.SaveChangesAsync(default);
-            await DeleteRefreshTokenAsync(changePasswordDTO.Id);
+            await DeleteRefreshTokenAsync(changePasswordDto.Id);
         }
 
         private async Task<ClaimsIdentity> GetIdentity(string login, string password)
@@ -313,7 +313,7 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
+        public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
             _logger.LogMethodCallingWithObject(loginDto, "Password");
             var identity = await GetIdentity(loginDto.Login, loginDto.Password);
@@ -330,7 +330,7 @@ namespace TrainingProject.DomainLogic.Managers
             var accessToken = GenerateToken(identity.Claims);
             var refreshToken = GenerateRefreshToken();
             await SaveRefreshTokenAsync(identity.Name, refreshToken);
-            var response = new LoginResponseDTO
+            var response = new LoginResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
