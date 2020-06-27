@@ -35,7 +35,7 @@ namespace TrainingProject.Web.Hubs
             }
             message = await _censor.HandleMessageAsync(message);
             var userName = await _userManager.GetUserNameAsync(Guid.Parse(Context.User.Identity.Name));
-            IReadOnlyList<string> usersIds = (IReadOnlyList<string>) await _eventManager.GetEventInvolvedUsersIdAsync(eventId);
+            IReadOnlyList<string> usersIds = (IReadOnlyList<string>)await _eventManager.GetEventInvolvedUsersIdAsync(eventId);
             await Clients.Users(usersIds).SendAsync("Send", userName, message);
         }
     }

@@ -9,11 +9,11 @@ namespace TrainingProject.Logic.Tests
     {
         [Fact]
         public void ParseTags()
-        { 
-            string[] tagLists = { 
+        {
+            string[] tagLists = {
                 "Tag1, tag2 ",
                 "Tag1, taG1, ",
-                "," , 
+                "," ,
                 ", ,"
             };
 
@@ -24,5 +24,5 @@ namespace TrainingProject.Logic.Tests
             Assert.Empty(parsedTagLists[2]);
             Assert.Empty(parsedTagLists[3]);
         }
-    } 
+    }
 }

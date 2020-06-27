@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
+using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
-using System.Linq;
-using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Services;
-using System.Collections.Generic;
-using TrainingProject.Common;
 
 namespace TrainingProject.DomainLogic.Managers
 {
@@ -180,11 +180,11 @@ namespace TrainingProject.DomainLogic.Managers
             return eventFullDto;
         }
 
-        public async Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, 
+        public async Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag,
             bool? upComing, bool onlyFree, bool vacancies, Guid organizerId = new Guid(), Guid participantId = new Guid())
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };           
+            var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
             if (search != null)
             {
@@ -228,7 +228,7 @@ namespace TrainingProject.DomainLogic.Managers
                 query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
             }
             result.Records = await _mapper.ProjectTo<EventLiteDto>(query).ToListAsync(default);
-           
+
             for (int i = 0; i < result.Records.Count; i++)
             {
                 if (result.Records[i].HasImage)
@@ -264,7 +264,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
             }
-            var eu = new EventsUsers { ParticipantId = userId, EventId = eventId};
+            var eu = new EventsUsers { ParticipantId = userId, EventId = eventId };
             await _appContext.EventsUsers.AddAsync(eu);
             await _appContext.SaveChangesAsync(default);
         }

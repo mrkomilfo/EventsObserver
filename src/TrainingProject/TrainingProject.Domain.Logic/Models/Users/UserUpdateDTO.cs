@@ -15,7 +15,7 @@ namespace TrainingProject.DomainLogic.Models.Users
         public string ContactPhone { get; set; }
         [Required]
         public bool HasPhoto { get; set; }
-        [MaxFileSize(8*1024*1024)]
+        [MaxFileSize(8 * 1024 * 1024)]
         public IFormFile Photo { get; set; }
     }
 }

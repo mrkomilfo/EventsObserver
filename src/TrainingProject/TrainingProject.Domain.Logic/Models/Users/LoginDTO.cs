@@ -3,7 +3,7 @@
 namespace TrainingProject.DomainLogic.Models.Users
 {
     public class LoginDto
-    { 
+    {
         [Required]
         public string Login { get; set; }
         [Required]

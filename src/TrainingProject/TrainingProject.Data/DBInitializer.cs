@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using TrainingProject.Domain;
 
@@ -31,7 +31,7 @@ namespace TrainingProject.Data
                         Description =
                             "Активисты из различных общественных организаций регулярно проводят тренинги на социальные и общеобразовательные темы."
                     },
-                    
+
                 };
                 await context.Categories.AddRangeAsync(categories);
                 await context.SaveChangesAsync(default);
@@ -107,7 +107,7 @@ namespace TrainingProject.Data
                     new Role { Name = "Account manager"},
                     new Role { Name = "Admin"},
                     new Role { Name = "User"},
-                }; 
+                };
                 context.Roles.AddRange(roles);
                 await context.SaveChangesAsync();
 

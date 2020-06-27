@@ -17,7 +17,7 @@ namespace TrainingProject.DomainLogic.Services
 
         public void SendMessage(string title, string body, string receiver)
         {
-            _logger.LogMethodCallingWithObject(new { title, body, receiver});
+            _logger.LogMethodCallingWithObject(new { title, body, receiver });
 
             MailAddress from = new MailAddress("events.observer.notificator@gmail.com", "Events Observer");
             MailAddress to = new MailAddress(receiver);

@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Serilog;
 using System.Collections.Generic;
 using TrainingProject.Common;
 using TrainingProject.Data;
@@ -26,7 +25,7 @@ namespace TrainingProject.Logic.Tests
             };
 
             var swearingProviderMock = new Mock<ISwearingProvider>();
-            swearingProviderMock.Setup(provider=>
+            swearingProviderMock.Setup(provider =>
                 provider.GetSwearing()).Returns(list);
             var logMock = new Mock<ILogHelper>();
 

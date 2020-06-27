@@ -1,15 +1,14 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
@@ -342,8 +341,8 @@ namespace TrainingProject.DomainLogic.Managers
 
         public string GenerateToken(IEnumerable<Claim> claims)
         {
-            _logger.LogMethodCallingWithObject(new 
-            { 
+            _logger.LogMethodCallingWithObject(new
+            {
                 claims = String.Join(", ", claims.ToList().ConvertAll(delegate (Claim c) { return c.ToString(); }).ToArray())
             });
             var now = DateTime.UtcNow;

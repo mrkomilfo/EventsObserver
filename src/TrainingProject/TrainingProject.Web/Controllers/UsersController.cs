@@ -34,7 +34,7 @@ namespace TrainingProject.Web.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult<Page<UserLiteDto>>> IndexAsync([FromQuery] int index = 0, int pageSize = 20, string search = null)
         {
-            _logger.LogMethodCallingWithObject(new { index, pageSize, search});
+            _logger.LogMethodCallingWithObject(new { index, pageSize, search });
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             if (role != "Admin" && role != "Account manager")
             {
@@ -119,7 +119,7 @@ namespace TrainingProject.Web.Controllers
         [Route("ban")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         [ModelStateValidation]
-        public async Task<ActionResult> BanAsync([FromBody]BanDto banDto)
+        public async Task<ActionResult> BanAsync([FromBody] BanDto banDto)
         {
             _logger.LogMethodCallingWithObject(banDto);
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -183,7 +183,7 @@ namespace TrainingProject.Web.Controllers
         [Route("changePassword")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [ModelStateValidation]
-        public async Task<ActionResult> ChangePasswordAsync([FromBody]ChangePasswordDto changePasswordDto)
+        public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePasswordDto)
         {
             _logger.LogMethodCallingWithObject(changePasswordDto, "OldPassword, NewPassword, NewPasswordConfirm");
             await _userManager.ChangePasswordAsync(changePasswordDto);

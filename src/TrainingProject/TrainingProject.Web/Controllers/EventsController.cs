@@ -30,7 +30,7 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Page<EventLiteDto>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null, 
+        public async Task<ActionResult<Page<EventLiteDto>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null,
             int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
             bool vacancies = false, string organizerId = null, string participantId = null)
         {

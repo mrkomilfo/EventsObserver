@@ -1,13 +1,13 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using AppContext = TrainingProject.Data.AppContext;
-using TrainingProject.Data;
 using Serilog.Events;
+using System;
+using System.Threading.Tasks;
+using TrainingProject.Data;
+using AppContext = TrainingProject.Data.AppContext;
 
 namespace TrainingProject.Web
 {
@@ -60,7 +60,7 @@ namespace TrainingProject.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog()    
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }

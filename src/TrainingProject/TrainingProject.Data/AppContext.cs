@@ -26,7 +26,7 @@ namespace TrainingProject.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Tag>()
-                .HasMany(t=>t.Events)
+                .HasMany(t => t.Events)
                 .WithMany(e => e.Tags)
                 .UsingEntity<EventsTags>(
                     et => et
@@ -44,8 +44,8 @@ namespace TrainingProject.Data
                 .HasMany(u => u.VisitedEvents)
                 .WithMany(e => e.Participants)
                 .UsingEntity<EventsUsers>(
-                    eu=>eu
-                        .HasOne(e=>e.Event)
+                    eu => eu
+                        .HasOne(e => e.Event)
                         .WithMany()
                         .HasForeignKey("EventId"),
                     eu => eu
@@ -53,7 +53,7 @@ namespace TrainingProject.Data
                         .WithMany()
                         .HasForeignKey("ParticipantId"))
                 .ToTable("EventsUsers")
-                .HasKey(eu=>new { eu.EventId, eu.ParticipantId});
+                .HasKey(eu => new { eu.EventId, eu.ParticipantId });
 
             builder.Entity<User>()
                 .HasKey(u => u.Id);

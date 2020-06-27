@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TrainingProject.Common;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Categories;
-using TrainingProject.Common;
 using TrainingProject.Web.Filters;
 
 namespace TrainingProject.Web.Controllers

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using Serilog;
-using System;
-using System.Linq;
 using TrainingProject.Common.Helpers;
 
 namespace TrainingProject.Common
@@ -12,7 +12,8 @@ namespace TrainingProject.Common
     public class LogHelper : ILogHelper
     {
         private ILogger _logger;
-        public LogHelper(ILogger logger) {
+        public LogHelper(ILogger logger)
+        {
             _logger = logger;
         }
 

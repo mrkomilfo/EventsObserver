@@ -9,8 +9,6 @@ export default class SignUp extends Component {
             login: '', 
             password: '', 
             errorMessage: '', 
-            explanation: '',
-            path: '/events',
             error: false 
         };
         this.handleInputChange = this.handleInputChange.bind(this);

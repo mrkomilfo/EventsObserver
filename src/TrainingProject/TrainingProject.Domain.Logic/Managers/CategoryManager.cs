@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using TrainingProject.DomainLogic.Models.Categories;
-using System;
-using TrainingProject.Common;
 
 namespace TrainingProject.DomainLogic.Managers
 {
-    public class CategoryManager: ICategoryManager
+    public class CategoryManager : ICategoryManager
     {
         private readonly IAppContext _appContext;
         private readonly IMapper _mapper;
@@ -51,7 +51,7 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task DeleteCategoryAsync(int categoryId, bool force = false)
         {
-            _logger.LogMethodCallingWithObject(new { categoryId, force});
+            _logger.LogMethodCallingWithObject(new { categoryId, force });
             var category = await _appContext.Categories.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(c => c.Id == categoryId);
             if (category == null)
@@ -82,7 +82,7 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<ICollection<CategoryLiteDto>> GetCategoriesAsync()
         {
             _logger.LogMethodCalling();
-            return await _appContext.Categories.Select(c => new CategoryLiteDto{ Id=c.Id, Name = c.Name }).ToListAsync();
+            return await _appContext.Categories.Select(c => new CategoryLiteDto { Id = c.Id, Name = c.Name }).ToListAsync();
         }
     }
 }

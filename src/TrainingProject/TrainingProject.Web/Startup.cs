@@ -1,31 +1,31 @@
-using System;
 using AutoMapper;
+using FluentScheduler;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System;
+using System.Threading.Tasks;
+using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Managers;
-using AppContext = TrainingProject.Data.AppContext;
-using TrainingProject.Web.Interfaces;
-using TrainingProject.Web.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using TrainingProject.Web.Helpers;
 using TrainingProject.DomainLogic.Services;
-using FluentScheduler;
-using TrainingProject.Web.Jobs;
-using TrainingProject.Common;
-using Serilog;
 using TrainingProject.Web.Filters;
+using TrainingProject.Web.Helpers;
 using TrainingProject.Web.Hubs;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
+using TrainingProject.Web.Interfaces;
+using TrainingProject.Web.Jobs;
+using TrainingProject.Web.Services;
+using AppContext = TrainingProject.Data.AppContext;
 
 namespace TrainingProject.Web
 {
@@ -42,7 +42,7 @@ namespace TrainingProject.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "EventObserver/build";
@@ -124,8 +124,8 @@ namespace TrainingProject.Web
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
-            
-            app.UseSerilogRequestLogging();            
+
+            app.UseSerilogRequestLogging();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles(new StaticFileOptions()
