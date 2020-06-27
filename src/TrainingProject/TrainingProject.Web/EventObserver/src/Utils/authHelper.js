@@ -1,40 +1,40 @@
 ﻿export default class AuthHelper {
     static saveAuth(id, role, accessToken, refreshToken) {
-        sessionStorage.setItem('userId', id);
-        sessionStorage.setItem('role', role);
-        sessionStorage.setItem('accessToken', accessToken);
-        sessionStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('userId', id);
+        localStorage.setItem('role', role);
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
     }
 
     static clearAuth () {
-        sessionStorage.removeItem('userId');
-        sessionStorage.setItem('role', 'Guest');
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
+        localStorage.removeItem('userId');
+        localStorage.setItem('role', 'Guest');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
     }
 
     static getId () {
-        return sessionStorage.getItem('userId');
+        return localStorage.getItem('userId');
     }
 
     static getRole() {
-        return sessionStorage.getItem('role') || 'Guest';
+        return localStorage.getItem('role') || 'Guest';
     }
 
     static getAccessToken() {
-        return sessionStorage.getItem('accessToken');
+        return localStorage.getItem('accessToken');
     }
 
     static getRefreshToken() {
-        return sessionStorage.getItem('refreshToken');
+        return localStorage.getItem('refreshToken');
     }
 
     static saveAccessToken(accessToken) {
-        sessionStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('accessToken', accessToken);
     }
 
     static saveRefreshToken(refreshToken) {
-        sessionStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('refreshToken', refreshToken);
     }
 
     static async fetchWithCredentials(url, options) {

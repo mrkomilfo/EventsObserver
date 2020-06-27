@@ -23,7 +23,7 @@ export default class Chat extends Component {
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
     };
 
-    componentDidMount = () => {
+    componentDidMount() {
         const token = AuthHelper.getToken();
         const hubConnection = new HubConnectionBuilder()
             .withUrl('/chat', { accessTokenFactory: () => token })
@@ -48,7 +48,7 @@ export default class Chat extends Component {
         });
     };
 
-    sendMessage = () => {
+    sendMessage() {
         if(!this.state.message.trim())
         {
             return;

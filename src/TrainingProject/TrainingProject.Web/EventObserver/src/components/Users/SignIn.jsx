@@ -5,7 +5,14 @@ import AuthHelper from '../../Utils/authHelper';
 export default class SignUp extends Component {
     constructor(props) {
         super(props);
-        this.state = { login: '', password: '', errorMessage: '', error: false };
+        this.state = { 
+            login: '', 
+            password: '', 
+            errorMessage: '', 
+            explanation: '',
+            path: '/events',
+            error: false 
+        };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.logIn = this.logIn.bind(this);
         this.enterPressed = this.enterPressed.bind(this);
@@ -79,7 +86,7 @@ export default class SignUp extends Component {
             }
             else {
                 AuthHelper.saveAuth(data.name, data.role, data.accessToken, data.refreshToken);
-                this.props.history.push("/events");
+                this.props.history.goBack();
             }
         }).catch((ex) => {
             this.setState({
