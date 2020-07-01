@@ -54,7 +54,6 @@
                 return response; //failed to refresh so return original 401 response
             }
             var jsonRefreshResponse = await refreshResponse.json(); //read the json with the new tokens
-            debugger;
             this.saveAccessToken(jsonRefreshResponse.accessToken);
             this.saveRefreshToken(jsonRefreshResponse.refreshToken);
             return await this.fetchWithCredentials(url, options); //repeat the original request

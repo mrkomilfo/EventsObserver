@@ -14,7 +14,8 @@ export default class Chat extends Component {
             messages: [],
             hubConnection: null,
         };
-        this.enterPressed = this.enterPressed.bind(this)
+        this.enterPressed = this.enterPressed.bind(this);
+        this.sendMessage = this.sendMessage.bind(this)
     };
 
     pad = (n, width, z) => {
@@ -24,7 +25,7 @@ export default class Chat extends Component {
     };
 
     componentDidMount() {
-        const token = AuthHelper.getToken();
+        const token = AuthHelper.getAccessToken();
         const hubConnection = new HubConnectionBuilder()
             .withUrl('/chat', { accessTokenFactory: () => token })
             .build();
@@ -32,8 +33,12 @@ export default class Chat extends Component {
         this.setState({ hubConnection }, () => {
             this.state.hubConnection
                 .start()
-                .then(() => console.log('Connection started!'))
-                .catch(err => console.log('Error while establishing connection :('));
+                .then(() => {
+                    console.log('Connection started!')
+                }).catch(err => {
+                    console.log('Error while establishing connection :(')
+                });
+
             this.state.hubConnection.on('Send', (nick, receivedMessage) => {
                 var today = new Date();
                 var time = this.pad(today.getHours(), 2) + ":" + this.pad(today.getMinutes(), 2) + ":" + this.pad(today.getSeconds(), 2);
