@@ -18,6 +18,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task UnsubscribeAsync(Guid userId, int eventId);
         Task<Guid?> GetEventOrganizerIdAsync(int eventId);
         Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId);
+        Task CheckUserInvolvementInTheEventAsync(string userId, int eventId);
         void Notificate();
     }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { HubConnectionBuilder } from '@aspnet/signalr';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 import {Input, Button} from 'reactstrap';
 import AuthHelper from '../../Utils/authHelper.js';
 import PropTypes from 'prop-types';
@@ -15,7 +15,8 @@ export default class Chat extends Component {
             hubConnection: null,
         };
         this.enterPressed = this.enterPressed.bind(this);
-        this.sendMessage = this.sendMessage.bind(this)
+        this.sendMessage = this.sendMessage.bind(this);
+        this.getAccessToken = this.getAccessToken.bind(this)
     };
 
     pad = (n, width, z) => {
@@ -25,9 +26,11 @@ export default class Chat extends Component {
     };
 
     componentDidMount() {
-        const token = AuthHelper.getAccessToken();
         const hubConnection = new HubConnectionBuilder()
-            .withUrl('/chat', { accessTokenFactory: () => token })
+            .withUrl('/chat', {
+                accessTokenFactory: () => this.getAccessToken()
+            })
+            .withAutomaticReconnect()
             .build();
 
         this.setState({ hubConnection }, () => {
@@ -52,6 +55,10 @@ export default class Chat extends Component {
             });
         });
     };
+
+    componentWillUnmount() {
+        this.state.hubConnection.Close()
+    }
 
     sendMessage() {
         if(!this.state.message.trim())
@@ -88,8 +95,16 @@ export default class Chat extends Component {
                     </div>
                 </div>
             </Draggable>
-            );
+         );
+    }
+
+    async getAccessToken() {
+        const response = await AuthHelper.fetchWithCredentials(`api/Events/${this.props.eventId}/checkInvolvement`);
+        if (response.status === 401) {
+            window.location.reload();
         }
+        return AuthHelper.getAccessToken();
+    }
 }
 
 Chat.propTypes = {

@@ -335,5 +335,14 @@ namespace TrainingProject.DomainLogic.Managers
             }
             return ids;
         }
+
+        public async Task CheckUserInvolvementInTheEventAsync(string userId, int eventId)
+        {
+            IList<string> involvedUsers = await GetEventInvolvedUsersIdAsync(eventId);
+            if (!involvedUsers.Contains(userId))
+            {
+                throw new UnauthorizedAccessException($"User(id={userId}) does not have access to event(id={eventId}) chat");
+            }
+        }
     }
 }

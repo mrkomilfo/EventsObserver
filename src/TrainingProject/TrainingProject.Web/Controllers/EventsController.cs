@@ -128,5 +128,15 @@ namespace TrainingProject.Web.Controllers
             await _eventManager.UnsubscribeAsync(Guid.Parse(userId), eventId);
             return Ok();
         }
+
+        [HttpGet("{eventId}/checkInvolvement")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult> IsUserInvolved(int eventId)
+        {
+            _logger.LogMethodCallingWithObject(new { eventId });
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            await _eventManager.CheckUserInvolvementInTheEventAsync(userId, eventId);
+            return Ok();
+        }
     }
 }
