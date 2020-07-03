@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Authentication;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace TrainingProject.DomainLogic.Models.Users
 {
@@ -8,5 +10,6 @@ namespace TrainingProject.DomainLogic.Models.Users
         public string Login { get; set; }
         [Required]
         public string Password { get; set; }
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
     }
 }

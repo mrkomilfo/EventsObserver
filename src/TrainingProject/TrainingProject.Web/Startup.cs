@@ -1,5 +1,6 @@
 using AutoMapper;
 using FluentScheduler;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -91,7 +92,13 @@ namespace TrainingProject.Web
                         return Task.CompletedTask;
                     }
                 };
+            })
+            .AddGoogle(options =>
+            {
+                options.ClientId = "573251226406-6ubk6kmrdvn698ug6nuskodgneb4g9q8.apps.googleusercontent.com";
+                options.ClientSecret = "kewmcA1o0j9WDBpXwcbZ3JbT";
             });
+
 
             var mappingConfig = new MapperConfiguration(mc =>
             {

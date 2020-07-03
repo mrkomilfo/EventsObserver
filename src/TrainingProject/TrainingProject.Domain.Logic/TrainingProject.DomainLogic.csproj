@@ -13,7 +13,8 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="9.0.0" />
       <PackageReference Include="FluentValidation" Version="8.6.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="1.1.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.0-preview.6.20312.15" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.1.20120.4" />
     </ItemGroup>
 

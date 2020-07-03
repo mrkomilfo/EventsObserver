@@ -1,0 +1,7 @@
+.googleButton {
+    background: url('/icons/google.png');
+    background-size: contain;
+    background-position: center;
+    height: 38px;
+    width: 38px;
+}

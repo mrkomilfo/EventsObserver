@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import AuthHelper from '../../Utils/authHelper';
+import './SignIn.css';
 
 export default class SignUp extends Component {
     constructor(props) {
@@ -55,8 +56,11 @@ export default class SignUp extends Component {
                 <FormGroup>
                     <Label for="password">Пароль</Label>
                         <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
-                </FormGroup>
-                <Button color="primary" onClick={this.logIn}>Войти</Button>
+                    </FormGroup>
+                    <div>
+                        <Button color="primary" onClick={this.logIn}>Войти</Button>{' '}
+                        <Button className="googleButton" outline color="primary"></Button>{' '}
+                    </div>
             </Form>
             </>
         )
