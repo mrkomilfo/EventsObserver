@@ -10,10 +10,10 @@ export default class UsersPaginator extends Component {
 
         let params = queryString.parse(window.location.search);
         let queryTrailer = '';
-        if (params.pageSize){
+        if (params.pageSize) {
             queryTrailer += `&pageSize=${params.pageSize}`
         }
-        if (params.search){
+        if (params.search) {
             queryTrailer += `&search=${params.search}`
         }
 
@@ -91,7 +91,7 @@ export default class UsersPaginator extends Component {
                 {nextnext}
                 {rightArrows}
             </Pagination>
-            )
+        )
     }
 }
 

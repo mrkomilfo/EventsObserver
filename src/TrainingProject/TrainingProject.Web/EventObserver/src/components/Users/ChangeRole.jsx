@@ -3,14 +3,14 @@ import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import queryString from 'query-string';
 import AuthHelper from '../../Utils/authHelper'
 
-export default class EditEvent extends Component{
+export default class ChangeRole extends Component{
     constructor(props) {
         super(props);
         this.state = { 
             loading: true,
 
             error: false,
-            errorMessage: '',
+            noContent: false,
 
             userId: null,
             userName: '',
@@ -32,15 +32,16 @@ export default class EditEvent extends Component{
     }
 
     handleChange(event) {
-        this.setState({ roleId: event.target.value });
+        this.setState({ 
+            roleId: event.target.value 
+        });
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/user?id=${this.state.userId}`);
     }
 
-    renderContent(){
+    renderContent() {
         const formStyle = {
             maxWidth: '256px'
         }
@@ -64,20 +65,19 @@ export default class EditEvent extends Component{
         )
     }
 
-    render(){
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
+    render() {
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderContent();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегестрирован"}
+                </Alert>
+                : this.renderContent()
+            );
 
         return(
             <>
-            {errorBaner}
-            {content}
+                {content}
             </>
         )
     }
@@ -89,14 +89,14 @@ export default class EditEvent extends Component{
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({ 
+                        error: !response.ok 
+                    });
                     return response.json();
                 }
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({
-                        errorMessage: data
-                    });
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
@@ -104,9 +104,7 @@ export default class EditEvent extends Component{
                     });
                 }
             }).catch((ex) => {
-                this.setState({
-                    errorMessage: ex.toString()
-                });
+                console.log(ex.toString());
             });
     }
 
@@ -117,26 +115,28 @@ export default class EditEvent extends Component{
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({
+                        error: !response.ok,
+                        noContent: response.status === 204
+                    });
                     return response.json();
                 }
             }).then((data) => {
-                if (this.state.error){
-                    this.setState({ 
-                        errorMessage: data 
-                    });
+                if (this.state.error) {
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
                         userId: data.userId,
                         userName: data.userName,
                         roleId: data.roleId,
-                        loading: false
                     });
                 }
             }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
                 this.setState({
-                    errorMessage: ex.toString()
+                    loading: false
                 });
             });
     }
@@ -155,7 +155,7 @@ export default class EditEvent extends Component{
             },
             body: JSON.stringify(data)
         }).then((response) => {
-            if (response.ok){
+            if (response.ok) {
                 this.props.history.push(`/user?id=${this.state.userId}`);
             }
             else if (response.status === 401) {
@@ -168,16 +168,11 @@ export default class EditEvent extends Component{
                 return response.json();
             }
         }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

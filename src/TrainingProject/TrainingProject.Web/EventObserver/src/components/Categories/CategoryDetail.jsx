@@ -11,7 +11,7 @@ export default class CategoryDetail extends Component {
         this.state = {
             loading: true,
             error: false,
-            errorMessage: '',
+            noContent: false,
             id: null,
             name: '',
             description: '',
@@ -34,7 +34,7 @@ export default class CategoryDetail extends Component {
         });
     }
 
-    renderCategory(){
+    renderCategory() {
         const deleteModal = 
             <Modal isOpen={this.state.deleteModal} toggle={this.toggleDeleteModal}>
                 <ModalHeader toggle={this.toggleDeleteModal}>Подтвердите действие</ModalHeader>
@@ -62,20 +62,18 @@ export default class CategoryDetail extends Component {
         )
     }
 
-    render()
-    {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
+    render() {
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderCategory();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Категория удалена или ещё не создана"}
+                  </Alert> 
+                : this.renderCategory()
+            );
 
         return(
             <>
-                {errorBaner}
                 <h2>Информация о категории</h2>
                 {content}
             </>
@@ -89,26 +87,28 @@ export default class CategoryDetail extends Component {
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({ 
+                        error: !response.ok,
+                        noContent: response.status === 204
+                    });
                     return response.json();
                 }
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({ 
-                        errorMessage: data 
-                    });
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
                         id: data.id,
                         name: data.name,
                         description: data.description,
-                        loading: false
                     });
                 }
             }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
                 this.setState({
-                    errorMessage: ex.toString()
+                    loading: false
                 });
             });
     }
@@ -124,20 +124,17 @@ export default class CategoryDetail extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true})
+                this.setState({
+                    error: true
+                });
                 return response.json()
             }
         }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                })
+            if (this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            })
+            console.log(ex.toString());
         });
     }
 }

@@ -8,14 +8,23 @@ export default class Blocking extends Component {
         super(props);
         this.state = { 
             loading: true,
+
+            error: false,
+            errorMessage: '',
+            noContent: false,
+            
             id: null,
             userName: '',
             isBanned: false,
-            days: 0, hours: 0,
-            formErrors: { days: 0, hours: 0 },
-            formValid: true, daysValid: true, hoursValid: true,
-            errorMessage: '', error: false
-            
+            days: 0, 
+            hours: 0,
+            formErrors: { 
+                days: 0, 
+                hours: 0 
+            },
+            formValid: true, 
+            daysValid: true, 
+            hoursValid: true,
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
@@ -42,7 +51,7 @@ export default class Blocking extends Component {
         );
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let daysValid = this.state.daysValid;
@@ -62,8 +71,8 @@ export default class Blocking extends Component {
         }
         this.setState({
             formErrors: fieldValidationErrors,
-            daysValid: daysValid,
-            hoursValid: hoursValid
+            daysValid,
+            hoursValid
           }, this.validateForm);
     }
 
@@ -80,7 +89,7 @@ export default class Blocking extends Component {
         this.props.history.push(`/user?id=${this.state.id}`);
     }
 
-    renderContent(){
+    renderContent() {
         return(
             <>
             <h2>Блокировка пользователя {this.state.userName}</h2>
@@ -105,7 +114,7 @@ export default class Blocking extends Component {
         )
     }
 
-    render(){
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -113,12 +122,17 @@ export default class Blocking extends Component {
 
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderContent();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегестрирован"}
+                </Alert>
+                : this.renderContent()
+            );
 
         return(
             <>
-            {errorBaner}
-            {content}
+                {errorBaner}
+                {content}
             </>
         )
     }
@@ -131,27 +145,27 @@ export default class Blocking extends Component {
                 }
                 else if (!response.ok) {
                     this.setState({
-                        error: true
+                        error: !response.ok,
+                        noContent: response.status === 204
                     });
                 }
                 return response.json();
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({ 
-                        errorMessage: data,
-                    });
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
                         id: data.id,
                         userName: data.userName,
-                        isBanned: data.isBanned,
-                        loading: false
+                        isBanned: data.isBanned
                     });
                 }
             }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
                 this.setState({
-                    errorMessage: ex.toString()
+                    loading: false
                 });
             });
     }
@@ -183,20 +197,18 @@ export default class Blocking extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
             if(this.state.error)
             {
-                this.setState({
-                    errorMessage: data
-                });
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 
@@ -211,20 +223,18 @@ export default class Blocking extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
             if(this.state.error)
             {
-                this.setState({
-                    errorMessage: data
-                });
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

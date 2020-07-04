@@ -46,8 +46,8 @@ export default class Chat extends Component {
                 var today = new Date();
                 var time = this.pad(today.getHours(), 2) + ":" + this.pad(today.getMinutes(), 2) + ":" + this.pad(today.getSeconds(), 2);
                 const message = {
-                    time: time,
-                    nick: nick,
+                    time,
+                    nick,
                     text: receivedMessage
                 }
                 const messages = this.state.messages.concat([message]);
@@ -57,7 +57,7 @@ export default class Chat extends Component {
     };
 
     componentWillUnmount() {
-        this.state.hubConnection.Close()
+        this.state.hubConnection.stop()
     }
 
     sendMessage() {

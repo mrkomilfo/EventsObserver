@@ -36,7 +36,7 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<UserFullDto> GetUserAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
-            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
+            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (DBUser == null)
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
@@ -100,10 +100,10 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<UserToUpdateDto> GetUserToUpdateAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
-            User user = await _appContext.Users.FindAsync(userId);
+            User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             UserToUpdateDto userToUpdate = _mapper.Map<UserToUpdateDto>(user);
             if (userToUpdate.HasPhoto)
@@ -116,11 +116,10 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task DeleteUserAsync(Guid userId, bool force, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(new { userId, force, hostRoot });
-            var user = await _appContext.Users.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _appContext.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             if (force)
             {
@@ -142,7 +141,7 @@ namespace TrainingProject.DomainLogic.Managers
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             UserToBanDto userToBan = _mapper.Map<UserToBanDto>(user);
             return userToBan;
@@ -154,7 +153,7 @@ namespace TrainingProject.DomainLogic.Managers
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(banDto.Id)));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={banDto.Id} not found");
             }
             user.UnlockTime = DateTime.Now.AddDays(banDto?.Days ?? 0);
             user.UnlockTime = user.UnlockTime?.AddHours(banDto?.Hours ?? 0);
@@ -168,7 +167,7 @@ namespace TrainingProject.DomainLogic.Managers
             var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             user.UnlockTime = DateTime.Now;
             await _appContext.SaveChangesAsync(default);
@@ -180,7 +179,7 @@ namespace TrainingProject.DomainLogic.Managers
             var user = await _appContext.Users.FindAsync(Guid.Parse(changeRoleDto.UserId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={changeRoleDto.UserId} not found");
             }
             if (!await _appContext.Roles.AnyAsync(r => r.Id == changeRoleDto.RoleId))
             {
@@ -212,7 +211,7 @@ namespace TrainingProject.DomainLogic.Managers
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             UserRoleDto userRoleDto = _mapper.Map<UserRoleDto>(user);
             return userRoleDto;
@@ -244,7 +243,7 @@ namespace TrainingProject.DomainLogic.Managers
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(changePasswordDto.Id)));
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={user.Id} not found");
+                throw new KeyNotFoundException($"User with id={changePasswordDto.Id} not found");
             }
             if (!String.Equals(HashGenerator.Encrypt(changePasswordDto.OldPassword), user.Password))
             {

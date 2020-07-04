@@ -4,7 +4,7 @@ import './403.css';
 
 export default class Page403 extends Component
 {
-    render(){
+    render() {
         return(
             <div className="overlay403">
                 <div className="body403">

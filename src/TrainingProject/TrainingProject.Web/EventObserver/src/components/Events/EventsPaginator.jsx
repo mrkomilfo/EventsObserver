@@ -10,31 +10,31 @@ export default class EventsPaginator extends Component {
 
         let params = queryString.parse(window.location.search);
         let queryTrailer = '';
-        if (params.pageSize){
+        if (params.pageSize) {
             queryTrailer += `&pageSize=${params.pageSize}`
         }
-        if (params.search){
+        if (params.search) {
             queryTrailer += `&search=${params.search}`
         }
-        if (params.categoryId){
+        if (params.categoryId) {
             queryTrailer += `&categoryId=${params.categoryId}`
         }
-        if (params.tag){
+        if (params.tag) {
             queryTrailer += `&tag=${params.tag}`
         }
-        if (params.upComing){
+        if (params.upComing) {
             queryTrailer += `&upComing=${params.upComing}`
         }
-        if (params.onlyFree){
+        if (params.onlyFree) {
             queryTrailer += `&onlyFree=${params.onlyFree}`
         }
-        if (params.vacancies){
+        if (params.vacancies) {
             queryTrailer += `&vacancies=${params.vacancies}`
         }
-        if (params.organizer){
+        if (params.organizer) {
             queryTrailer += `&organizer=${params.organizer}`
         }
-        if (params.participant){
+        if (params.participant) {
             queryTrailer += `&participant=${params.participant}`
         }
 

@@ -7,10 +7,20 @@ export default class ChangePassword extends Component {
         super(props);
         this.state = { 
             id: AuthHelper.getId(), 
-            oldPassword: '', newPassword: '', newPasswordConfirm: '',
-            formErrors: { oldPassword: '', newPassword: '', newPasswordConfirm: '', },
-            formValid: false, oldPasswordValid: false, newPasswordValid: false, newPasswordConfirmValid: false,
-            error: false, errorMessage: ''
+            oldPassword: '', 
+            newPassword: '', 
+            newPasswordConfirm: '',
+            formErrors: { 
+                oldPassword: '', 
+                newPassword: '', 
+                newPasswordConfirm: ''
+            },
+            formValid: false, 
+            oldPasswordValid: false, 
+            newPasswordValid: false, 
+            newPasswordConfirmValid: false,
+            error: false, 
+            errorMessage: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
@@ -29,7 +39,7 @@ export default class ChangePassword extends Component {
         );
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let oldPasswordValid = this.state.oldPasswordValid;
@@ -53,27 +63,27 @@ export default class ChangePassword extends Component {
                 break;
         }
         this.setState({
-            oldPasswordValid: oldPasswordValid,
-            newPasswordValid: newPasswordValid,
-            newPasswordConfirmValid: newPasswordConfirmValid
+            formErrors: fieldValidationErrors,
+            oldPasswordValid,
+            newPasswordValid,
+            newPasswordConfirmValid
           }, this.validateForm);
     }
 
     validateForm() {
         this.setState({
             formValid: 
-            this.state.oldPasswordValid &&
-            this.state.newPasswordValid &&
-            this.state.newPasswordConfirmValid
+                this.state.oldPasswordValid &&
+                this.state.newPasswordValid &&
+                this.state.newPasswordConfirmValid
         });
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/user?id=${this.state.id}`);
     }
 
-    render(){
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -85,34 +95,34 @@ export default class ChangePassword extends Component {
         
         return(
             <>
-            {errorBaner}
-            <h2>Изменение пароля</h2>
-            <Form style={formStyle}>
-                <FormGroup>
-                    <Label for="oldPassword">Старый пароль</Label>
-                    <Input invalid={!this.state.oldPasswordValid} required type="password" name="oldPassword" id="oldPassword" value={this.state.oldPassword} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.oldPassword}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="newPassword">Новый пароль</Label>
-                    <Input invalid={!this.state.newPasswordValid} required type="password" name="newPassword" id="newPassword" value={this.state.newPassword} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.newPassword}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="newPasswordConfirm">Повторите новый пароль</Label>
-                    <Input invalid={!this.state.newPasswordConfirmValid} required type="password" name="newPasswordConfirm" id="newPasswordConfirm" value={this.state.newPasswordConfirm} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.newPasswordConfirm}</FormFeedback>
-                </FormGroup>
-                <div>
-                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.changePassword()}>Сохранить</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
-                </div>
-            </Form>
+                {errorBaner}
+                <h2>Изменение пароля</h2>
+                <Form style={formStyle}>
+                    <FormGroup>
+                        <Label for="oldPassword">Старый пароль</Label>
+                        <Input invalid={!this.state.oldPasswordValid} required type="password" name="oldPassword" id="oldPassword" value={this.state.oldPassword} onChange={this.handleInputChange}/>
+                        <FormFeedback>{this.state.formErrors.oldPassword}</FormFeedback>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="newPassword">Новый пароль</Label>
+                        <Input invalid={!this.state.newPasswordValid} required type="password" name="newPassword" id="newPassword" value={this.state.newPassword} onChange={this.handleInputChange}/>
+                        <FormFeedback>{this.state.formErrors.newPassword}</FormFeedback>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="newPasswordConfirm">Повторите новый пароль</Label>
+                        <Input invalid={!this.state.newPasswordConfirmValid} required type="password" name="newPasswordConfirm" id="newPasswordConfirm" value={this.state.newPasswordConfirm} onChange={this.handleInputChange}/>
+                        <FormFeedback>{this.state.formErrors.newPasswordConfirm}</FormFeedback>
+                    </FormGroup>
+                    <div>
+                        <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.changePassword()}>Сохранить</Button>{' '}
+                        <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                    </div>
+                </Form>
             </>
         )
     }
 
-    async changePassword(){
+    async changePassword() {
         if (!this.state.formValid)
         {
             this.setState({
@@ -142,20 +152,17 @@ export default class ChangePassword extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

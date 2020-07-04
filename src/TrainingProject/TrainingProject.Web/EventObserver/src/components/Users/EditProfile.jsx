@@ -11,6 +11,7 @@ export default class EditProfile extends Component {
 
             error: false, 
             errorMessage: '',
+            noContent: false,
 
             id: '', 
             userName: '', 
@@ -60,7 +61,7 @@ export default class EditProfile extends Component {
                 () => { this.validateField(name, target.files[0]) }
             )
         }
-        else{
+        else {
             this.setState({
                 [name]: value
             }, 
@@ -69,7 +70,7 @@ export default class EditProfile extends Component {
         }
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let userNameValid = this.state.userNameValid;
@@ -99,24 +100,23 @@ export default class EditProfile extends Component {
         }
         this.setState({
             formErrors: fieldValidationErrors,
-            userNameValid: userNameValid,
-            contactEmailValid: contactEmailValid,
-            contactPhoneValid: contactPhoneValid,
-            imageFileValid: imageFileValid,
+            userNameValid,
+            contactEmailValid,
+            contactPhoneValid,
+            imageFileValid,
           }, this.validateForm);
     }
 
     validateForm() {
         this.setState({
             formValid: 
-            this.state.userNameValid &&
-            this.state.contactEmailValid &&
-            this.state.contactPhoneValid
+                this.state.userNameValid &&
+                this.state.contactEmailValid &&
+                this.state.contactPhoneValid
         });
     }
 
-    removeImage()
-    {
+    removeImage() {
         this.setState({
             imageFile: null,
             hasImage: false,
@@ -126,12 +126,11 @@ export default class EditProfile extends Component {
         }, this.validateForm)
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/user?id=${this.state.id}`);
     }
 
-    renderProfile(){
+    renderProfile() {
         const formStyle = {
             maxWidth: '420px'
         }
@@ -148,22 +147,17 @@ export default class EditProfile extends Component {
         }
         
         let imageBlock;
-        if (this.state.imageFile)
-        {
+        if (this.state.imageFile) {
             imageBlock = <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="profile photo" onClick={(e) => this.removeImage()}/>
         }
-        else if (this.state.imagePath)
-        {
+        else if (this.state.imagePath) {
             imageBlock = <img style={imageStyle} src={this.state.imagePath} alt="profile photo" onClick={(e) => this.removeImage()}/>
         }
-        else
-        {
+        else {
             imageBlock = <img style={imageStyle} src='img\users\default.jpg' alt="profile photo" onClick={(e) => this.removeImage()}/>
         }
 
         return(
-            <>           
-            <h2>Редактирование профиля</h2>
             <Form style={formStyle}>
                 <FormGroup>
                     <Label for="userName">Имя пользователя</Label>
@@ -194,11 +188,10 @@ export default class EditProfile extends Component {
                     <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
-            </>
         )
     }
 
-    render(){
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -206,11 +199,17 @@ export default class EditProfile extends Component {
 
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderProfile();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегестрирован"}
+                </Alert>
+                : this.renderProfile()
+            );
 
         return(
             <>
                 {errorBaner}
+                <h2>Редактирование профиля</h2>
                 {content}
             </>
         )
@@ -223,14 +222,15 @@ export default class EditProfile extends Component {
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({
+                        error: !response.ok,
+                        noContent: response.status === 204
+                    });
                     return response.json();
                 }
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({ 
-                        errorMessage: data,
-                    });
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
@@ -239,18 +239,19 @@ export default class EditProfile extends Component {
                         contactEmail: data.contactEmail || "",
                         contactPhone: data.contactPhone || "",
                         hasImage: data.hasPhoto,
-                        imagePath: data.photo,
-                        loading: false
+                        imagePath: data.photo
                     });
                 }
             }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
                 this.setState({
-                    errorMessage: ex.toString()
+                    loading: false
                 });
             });
     }
 
-    async editProfile(){
+    async editProfile() {
         if (!this.state.formValid)
         {
             this.setState({
@@ -279,20 +280,17 @@ export default class EditProfile extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true})
+                this.setState({
+                    error: true
+                })
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

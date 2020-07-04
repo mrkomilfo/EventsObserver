@@ -5,7 +5,15 @@ import { Link } from 'react-router-dom';
 export default class EventsSideBar extends Component {
     constructor(props) {
         super(props);
-        this.state = { categories: [], name: '', category: 0, tag: '', free: false, vacancies: false, upComing: null };
+        this.state = { 
+            categories: [], 
+            name: '', 
+            category: 0, 
+            tag: '', 
+            free: false, 
+            vacancies: false, 
+            upComing: null 
+        };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
@@ -13,15 +21,13 @@ export default class EventsSideBar extends Component {
         const target = event.target;
         const name = target.name;
         let value;
-        switch(name)
-        {
+        switch(name) {
             case 'free': 
             case 'vacancies':
                 value = target.checked;
                 break;
             case 'upComing':
-                switch(target.value)
-                {
+                switch(target.value) {
                     case 'true':
                         value = true
                         break;
@@ -41,41 +47,35 @@ export default class EventsSideBar extends Component {
         });
     }
 
-    getQuerryTrailer(){
+    getQuerryTrailer() {
         let isFirst = true
         let queryTrailer = '';
-        if (this.state.name)
-        {
+        if (this.state.name) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `search=${this.state.name}`;
             isFirst = false;
         }
-        if (this.state.category != 0)
-        {
+        if (this.state.category != 0) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `categoryId=${this.state.category}`;
             isFirst = false;
         }
-        if (this.state.tag)
-        {
+        if (this.state.tag) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `tag=${this.state.tag}`;
             isFirst = false;
         }
-        if (this.state.free)
-        {
+        if (this.state.free) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `onlyFree=${this.state.free}`;
             isFirst = false;
         }
-        if (this.state.vacancies)
-        {
+        if (this.state.vacancies) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `vacancies=${this.state.vacancies}`;
             isFirst = false;
         }
-        if (this.state.upComing != null)
-        {
+        if (this.state.upComing != null) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `upComing=${this.state.upComing}`;
             isFirst = false;
@@ -90,7 +90,7 @@ export default class EventsSideBar extends Component {
     render() {
         const actualityStyle = {
             marginTop: '16px'
-    }
+        }
 
     const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()}value={c.id}>{c.name}</option>)
     return (
@@ -149,9 +149,27 @@ export default class EventsSideBar extends Component {
     )}
 
     async loadCategories() {
-        const response = await fetch('api/Categories');
-        const data = await response.json();
-        data.unshift({id: 0, name: 'Не выбрано'})
-        this.setState({ categories: data });
+        fetch('api/Categories')
+            .then((response) => {
+                this.setState({
+                    error: !response.ok
+                });
+                return response.json();
+            }).then((data) => {
+                if (this.state.error) {
+                    console.log(data);
+                }
+                else {
+                    data.unshift({
+                        id: 0, 
+                        name: 'Не выбрано'
+                    })
+                    this.setState({ 
+                        categories: data 
+                    });
+                }
+            }).catch((ex) => {
+                console.log(ex.toString)
+            });
     }
 }

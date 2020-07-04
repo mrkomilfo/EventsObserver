@@ -10,8 +10,10 @@ export default class Profile extends Component {
         super(props);
         this.state = {
             loading: true,
+
             error: false,
-            errorMessage: '',
+            noContent: false,
+
             id: '',
             userName: '',
             role: '',
@@ -23,11 +25,24 @@ export default class Profile extends Component {
             visitedEvents: 0,
             photo: '',
             myRole: AuthHelper.getRole(),
-            myId: AuthHelper.getId()
+            myId: AuthHelper.getId(),
+            query: window.location.search
         }
     }
 
     componentDidMount() {
+        this.loadProfile();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        debugger;
+        if (this.state.query !== window.location.search) {
+            this.setState({ query: window.location.search });
+            this.loadProfile();
+        }
+    }
+    
+    loadProfile() {
         const parsed = queryString.parse(window.location.search);
         if (parsed) {
             this.loadData(parsed['id']);
@@ -61,7 +76,7 @@ export default class Profile extends Component {
             return(
                 <div style={buttonPanelStyle}>
                     <Button color="primary" tag={Link} to={`/blocking?id=${this.state.id}`}>Управление блокировкой</Button>{' '}
-                    <Button color="primary" tag={Link} to={`/roles?id=${this.state.id}`}>Управление ролью</Button>
+                    <Button color="primary" tag={Link} to={`/changeRole?id=${this.state.id}`}>Управление ролью</Button>
                 </div>
             )
         }
@@ -96,39 +111,38 @@ export default class Profile extends Component {
 
         return(
         <>
-        <div style={mainStyle}>
-            <img style={photoStyle} src={this.state.photo} alt="user photo"/>
-            <div>
-                <h3>{this.state.userName}{badge}{status}</h3>
-                <table cellPadding='8px'>
-                    <tbody>
-                        <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
-                        <tr><td><b>Email:</b></td><td>{this.state.contactEmail}</td></tr>
-                        <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone}</td></tr>
-                        <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
-                        <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
-                    </tbody>
-                </table>
+            <div style={mainStyle}>
+                <img style={photoStyle} src={this.state.photo} alt="user photo"/>
+                <div>
+                    <h3>{this.state.userName}{badge}{status}</h3>
+                    <table cellPadding='8px'>
+                        <tbody>
+                            <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
+                            <tr><td><b>Email:</b></td><td>{this.state.contactEmail}</td></tr>
+                            <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone}</td></tr>
+                            <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
+                            <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        {buttonPanel}
+            {buttonPanel}
         </>)
     }
 
     render()
     {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderProfile();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегестрирован"}
+                </Alert>
+                : this.renderProfile()
+            );
 
         return(
             <>
-                {errorBaner}
                 {content}
             </>
         )
@@ -137,13 +151,14 @@ export default class Profile extends Component {
     async loadData(userId) {
         fetch('api/Users/' + userId)
         .then((response) => {
-            this.setState({error: !response.ok});
+            this.setState({
+                error: !response.ok,
+                noContent: response.status === 204
+            });
             return response.json();
         }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
-                });
+            if (this.state.error) {
+                console.log(data);
             }
             else {
                 this.setState({ 
@@ -156,13 +171,14 @@ export default class Profile extends Component {
                     registrationDate: data.registrationDate,
                     organizedEvents: data.organizedEvents,
                     visitedEvents: data.visitedEvents,
-                    photo: data.photo,
-                    loading: false
+                    photo: data.photo
                 });
             }
         }).catch((ex) => {
+            console.log(ex.toString());
+        }).finally(() => {
             this.setState({
-                errorMessage: ex.toString()
+                loading: false
             });
         });
     }

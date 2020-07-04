@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Table, Button, Input, InputGroup, InputGroupAddon } from 'reactstrap';
+import { Table, Button, Input, InputGroup, InputGroupAddon } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import UsersPaginator from './UsersPaginator';
 import queryString from 'query-string';
@@ -10,14 +10,15 @@ export default class Users extends Component {
         super(props);
         this.state = { 
             loading: true,
+
+            error: false,
+
             query: window.location.search, 
             users: [], 
             currentPage: 0, 
             pageSize: 20, 
             totalRecords: 0,  
-            userName: '',
-            error: false, 
-            errorMessage: '' 
+            userName: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -43,7 +44,7 @@ export default class Users extends Component {
         });
     }
 
-    getQuerryTrailer(){
+    getQuerryTrailer() {
         let isFirst = true
         let queryTrailer = '';
         if (this.state.userName)
@@ -55,40 +56,35 @@ export default class Users extends Component {
         return queryTrailer;
     }
 
-    renderUsersList(users){
+    renderUsersList(users) {
         return(
             <>
-            <p>{`Найдено пользователей: ${this.state.totalRecords}`}</p>
-            <Table striped>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Имя пользователя</th>
-                        <th>Роль</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.state.users.map((u, index) => 
-                    <tr key={u.id}>
-                        <th scope="row">{this.state.currentPage*this.state.pageSize+index+1}</th>
-                        <td><Link to={`user?id=${u.id}`}>{u.userName}</Link></td>
-                        <td>{u.role}</td>
-                        <td>{u.status || 'без ограничений'}</td>
-                    </tr>)}
-                </tbody>
-            </Table>  
-            <UsersPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>        
+                <p>{`Найдено пользователей: ${this.state.totalRecords}`}</p>
+                <Table striped>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Имя пользователя</th>
+                            <th>Роль</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.users.map((u, index) => 
+                        <tr key={u.id}>
+                            <th scope="row">{this.state.currentPage*this.state.pageSize+index+1}</th>
+                            <td><Link to={`user?id=${u.id}`}>{u.userName}</Link></td>
+                            <td>{u.role}</td>
+                            <td>{u.status || 'без ограничений'}</td>
+                        </tr>)}
+                    </tbody>
+                </Table>  
+                <UsersPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>        
             </> 
         )
     }
 
-    render(){
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
+    render() {
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderUsersList(this.state.users);
@@ -99,24 +95,23 @@ export default class Users extends Component {
             justifyContent: 'space-between'
         }
 
-        return (
+        return(
             <>
-            {errorBaner}
-            <div style={headerStyle}>
-                <h2>Пользователи</h2>
-                <div>
-                    <InputGroup>
-                        <Input type="text" name="userName" id="userName" value={this.state.userName} placeholder="Имя пользователя" onChange={this.handleInputChange} />
-                        <InputGroupAddon addonType="append"><Button color="primary" tag={Link} to={`/users${this.getQuerryTrailer()}`}>Поиск</Button></InputGroupAddon>
-                    </InputGroup>
+                <div style={headerStyle}>
+                    <h2>Пользователи</h2>
+                    <div>
+                        <InputGroup>
+                            <Input type="text" name="userName" id="userName" value={this.state.userName} placeholder="Имя пользователя" onChange={this.handleInputChange} />
+                            <InputGroupAddon addonType="append"><Button color="primary" tag={Link} to={`/users${this.getQuerryTrailer()}`}>Поиск</Button></InputGroupAddon>
+                        </InputGroup>
+                    </div>
                 </div>
-            </div>
-            {content}
+                {content}
             </>
         );
     }
 
-    async loadUsers(){
+    async loadUsers() {
         let page; let search;
         const parsed = queryString.parse(window.location.search);
         if (parsed) {
@@ -134,24 +129,29 @@ export default class Users extends Component {
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({ 
+                        error: !response.ok 
+                    });
                     return response.json();
                 }
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({errorMessage: data});
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
                         users: data.records, 
                         currentPage: data.currentPage, 
                         pageSize: data.pageSize, 
-                        totalRecords: data.totalRecords, 
-                        loading: false  
+                        totalRecords: data.totalRecords
                     });
                 }
             }).catch((ex) => {
-                this.setState({errorMessage: ex.toString()});
+                console.log(ex.toString());
+            }).finally(() => {
+                this.setState({
+                    loading: false
+                });
             });
     }
 }

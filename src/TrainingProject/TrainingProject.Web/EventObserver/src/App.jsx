@@ -12,7 +12,7 @@ import SignIn from './components/Users/SignIn';
 import EditProfile from './components/Users/EditProfile';
 import Blocking from './components/Users/Blocking';
 import ChangePassword from './components/Users/ChangePassword';
-import Roles from './components/Users/Roles';
+import ChangeRole from './components/Users/ChangeRole';
 import Categories from './components/Categories/Categories';
 import CategoryDetail from './components/Categories/CategoryDetail';
 import NewCategory from './components/Categories/NewCategory';
@@ -37,7 +37,7 @@ export default class App extends Component {
                 {AuthHelper.getRole() === 'Guest' ? <Route path='/signIn' component={SignIn} /> : <Route path='/signIn' render={() => (<Redirect to='/events'/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? <Route path='/editProfile' component={EditProfile} /> : <Route path='/editProfile' render={() => (<Redirect to='/signIn' />)} />}
                 {AuthHelper.getRole() !== 'Guest' ? <Route path='/changePassword' component={ChangePassword} /> : <Route path='/changePassword' render={() => (<Redirect to='/signIn' />)} /> }
-                {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Account manager' ? <Route path='/roles' component={Roles} /> : <Route path='/roles' component={Error403} />) : <Route path='/roles' render={() => (<Redirect to='/signIn' push/>)} />}
+                {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Account manager' ? <Route path='/changeRole' component={ChangeRole} /> : <Route path='/changeRole' component={Error403} />) : <Route path='/changeRole' render={() => (<Redirect to='/signIn' push/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'User' ? <Route path='/blocking' component={Error403} /> : <Route path='/blocking' component={Blocking} />) : <Route path='/blocking' render={() => (<Redirect to='/signIn' push/>)} />}
 
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Admin' ? <Route path='/categories' component={Categories} /> : <Route path='/categories' component={Error403} />) : <Route path='/categories' render={() => (<Redirect to='/signIn' push/>)} />}

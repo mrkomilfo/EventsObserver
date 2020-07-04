@@ -33,7 +33,7 @@ export default class SignUp extends Component {
         }
     };
 
-    render(){
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -74,22 +74,26 @@ export default class SignUp extends Component {
             },
             body: JSON.stringify(auth_data)
         }).then((response) => {
-            this.setState({error: !response.ok});
+            this.setState({
+                error: !response.ok
+            });
+            if (response.status === 401)
+            {
+                this.setState({
+                    errorMessage: 'Неверный логин или пароль'
+                })
+            }
             return response.json();
         }).then((data) => {
-            if (this.state.error){
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
             else {
                 AuthHelper.saveAuth(data.name, data.role, data.accessToken, data.refreshToken);
                 this.props.history.goBack();
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

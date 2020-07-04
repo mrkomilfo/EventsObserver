@@ -22,6 +22,7 @@ export default class EditCategory extends Component {
 
             error: false,
             errorMessage: '',
+            noContent: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateField = this.validateField.bind(this);
@@ -48,13 +49,13 @@ export default class EditCategory extends Component {
         });   
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let nameValid = this.state.nameValid;
         let descriptionValid = this.state.descriptionValid;
 
-        switch(fieldName){
+        switch(fieldName) {
             case 'name':
                 nameValid = !!value;
                 fieldValidationErrors.name = nameValid ? '' : 'У мероприятия должно быть название';
@@ -68,8 +69,8 @@ export default class EditCategory extends Component {
         }
         this.setState({
             formErrors: fieldValidationErrors,
-            nameValid: nameValid,
-            descriptionValid: descriptionValid,
+            nameValid,
+            descriptionValid,
           }, this.validateForm);
     }
 
@@ -81,21 +82,24 @@ export default class EditCategory extends Component {
         });
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/category?id=${this.state.id}`);
     }
 
-    render()
-    {
+    render() {
         const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
+            <Alert color="danger">
+                {this.state.errorMessage}
+            </Alert> : null;
 
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderCategory();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Категория удалена или ещё не создана"}
+                  </Alert> 
+                : this.renderCategory()
+            );
 
         return(
             <>
@@ -106,8 +110,7 @@ export default class EditCategory extends Component {
         )
     }
 
-    renderCategory()
-    {
+    renderCategory() {
         return(
             <Form>
                 <FormGroup>
@@ -131,33 +134,37 @@ export default class EditCategory extends Component {
     async loadCategory(categoryId) {
         AuthHelper.fetchWithCredentials('api/Categories/' + categoryId)
             .then((response) => {
-            if (response.status === 401) {
-                this.props.history.push("/signIn");
-            }
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
-                });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    name: data.name,
-                    description: data.description,
+                if (response.status === 401) {
+                    this.props.history.push("/signIn");
+                }
+                else {
+                    this.setState({ 
+                        error: !response.ok,
+                        noContent: response.status === 204
+                    });
+                    return response.json();
+                }
+            }).then((data) => {
+                if (this.state.error){
+                    console.log(data);
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        name: data.name,
+                        description: data.description,
+                    });
+                }
+            }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
+                this.setState({
                     loading: false
                 });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
-    async editCategory(){
+    async editCategory() {
         if (!this.state.formValid)
         {
             this.setState({
@@ -184,20 +191,17 @@ export default class EditCategory extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }
