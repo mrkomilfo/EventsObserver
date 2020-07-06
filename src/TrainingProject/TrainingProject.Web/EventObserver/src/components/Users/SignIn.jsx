@@ -50,11 +50,11 @@ export default class SignUp extends Component {
             <Form style={signInStyle}>    
                 <FormGroup>
                     <Label for="login">Логин</Label>
-                        <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
+                    <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                 </FormGroup>
                 <FormGroup>
                     <Label for="password">Пароль</Label>
-                        <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
+                    <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                 </FormGroup>
                 <Button color="primary" onClick={this.logIn}>Войти</Button>
             </Form>

@@ -45,7 +45,7 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<UserFullDto> GetUserAsync(Guid userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
-            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => u.Id == userId);
+            var DBUser = await _appContext.Users.Include(u => u.Role).Include(u => u.OrganizedEvents).FirstOrDefaultAsync(u => Equals(u.Id, userId));
             if (DBUser == null)
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");

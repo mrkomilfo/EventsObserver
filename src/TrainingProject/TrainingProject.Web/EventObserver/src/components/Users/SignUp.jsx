@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 
 export default class SignUp extends Component {
     constructor(props) {
@@ -116,6 +116,11 @@ export default class SignUp extends Component {
         const formStyle = {
             maxWidth: '256px'
         }
+
+        const tipStyle = {
+            color: '#70757A',
+            textDecoration: 'underline'
+        }
         
         return(
             <>
@@ -128,7 +133,10 @@ export default class SignUp extends Component {
                     <FormFeedback>{this.state.formErrors.name}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="email">Email</Label>
+                    <Label for="email">Email</Label>{'  '}<span style={tipStyle} id="emailTip">?</span>
+                    <UncontrolledTooltip placement="right" target="emailTip">
+                        Почта необходима для восстановления пароля и получения напоминаний о предстоящих мероприятиях
+                    </UncontrolledTooltip>
                     <Input invalid={!this.state.emailValid} type="email" name="email" id="email" value={this.state.email} onChange={this.handleInputChange}/>
                     <FormFeedback>{this.state.formErrors.email}</FormFeedback>
                 </FormGroup>

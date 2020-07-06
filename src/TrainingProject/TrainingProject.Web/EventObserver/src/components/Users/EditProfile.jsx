@@ -171,7 +171,10 @@ export default class EditProfile extends Component {
                     <FormFeedback>{this.state.formErrors.userName}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="contactEmail">Email</Label>
+                    <Label for="contactEmail">Email</Label>{'  '}<span style={tipStyle} id="emailTip">?</span>
+                    <UncontrolledTooltip placement="right" target="emailTip">
+                        Почта необходима для восстановления пароля и получения напоминаний о предстоящих мероприятиях
+                    </UncontrolledTooltip>
                     <Input invalid={!this.state.contactEmailValid} type="email" name="contactEmail" id="contactEmail" value={this.state.contactEmail} onChange={this.handleInputChange}/>
                     <FormFeedback>{this.state.formErrors.contactEmail}</FormFeedback>
                 </FormGroup>

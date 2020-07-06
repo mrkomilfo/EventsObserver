@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
-import { Alert, Button, Badge } from 'reactstrap';
+import { Alert, Button, Badge, UncontrolledTooltip, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import AuthHelper from '../../Utils/authHelper.js';
 
@@ -22,9 +22,16 @@ export default class Profile extends Component {
             organizedEvents: 0,
             visitedEvents: 0,
             photo: '',
+            emailConfirmed: false,
+            emailConfirmModal: false,
+            emailConfirmFail: false,
+            confirmCode: '',
             myRole: AuthHelper.getRole(),
             myId: AuthHelper.getId()
         }
+        this.toggleEmailConfirmModal = this.toggleEmailConfirmModal.bind(this);
+        this.requestEmailConfirm = this.requestEmailConfirm.bind(this);
+        this.confirmEmail = this.confirmEmail.bind(this);
     }
 
     componentDidMount() {
@@ -32,6 +39,22 @@ export default class Profile extends Component {
         if (parsed) {
             this.loadData(parsed['id']);
         }
+    }
+
+    toggleEmailConfirmModal(){
+        this.setState({
+            emailConfirmModal: !this.state.emailConfirmModal
+        });
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const name = target.name;
+        let value = target.value;
+        
+        this.setState({
+          [name]: value
+        });
     }
 
     renderButtonPanel() {
@@ -94,6 +117,31 @@ export default class Profile extends Component {
 
         const buttonPanel = this.renderButtonPanel();
 
+        const emailConfirmedButton = this.state.myId === this.state.id && this.state.contactEmail && !this.state.emailConfirmed 
+            ?
+                <>
+                    <Button color="warning" id="confirmEmailButton" onClick={this.requestEmailConfirm}>Подтвердить email</Button>
+                    <UncontrolledTooltip placement="right" target="confirmEmailButton">
+                        Для возможности восстановить пароль необходимо подтвердить email
+                    </UncontrolledTooltip>
+                </>
+            : null;
+
+        const confirmEmailModal = 
+            <Modal isOpen={this.state.emailConfirmModal} toggle={this.toggleEmailConfirmModal}>
+                <ModalHeader toggle={this.toggleEmailConfirmModal}>Подтверждение email</ModalHeader>
+                <ModalBody>
+                    На почту {this.state.contactEmail} выслан код подтверждения. Введите его в поле ниже, чтобы подтвердить email
+                    <Input type="text" name="confirmCode" id="confirmCode" value={this.state.confirmCode} placeholder="8-значный код" onChange={this.handleInputChange} />
+                    {this.state.emailConfirmFail ? <p style={{color: "red"}}>Не верный код подтверждения</p> : null}
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.confirmEmail}>Подтвердить</Button>{' '}
+                    <Button color="secondary" onClick={this.toggleEmailConfirmModal}>Отмена</Button>{' '}
+                    <Button color="warning" onClick={this.requestEmailConfirm}>Выслать код повторно</Button>
+                </ModalFooter>
+            </Modal>
+
         return(
         <>
         <div style={mainStyle}>
@@ -103,12 +151,13 @@ export default class Profile extends Component {
                 <table cellPadding='8px'>
                     <tbody>
                         <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
-                        <tr><td><b>Email:</b></td><td>{this.state.contactEmail}</td></tr>
-                        <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone}</td></tr>
+                        <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
+                        <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
                         <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
                         <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
                     </tbody>
                 </table>
+                {confirmEmailModal}
             </div>
         </div>
         {buttonPanel}
@@ -151,13 +200,43 @@ export default class Profile extends Component {
                     userName: data.userName,
                     role: data.role,
                     status: data.status,
-                    contactEmail: data.contactEmail || 'Не указан',
-                    contactPhone: data.contactPhone || 'Не указан',
+                    contactEmail: data.contactEmail,
+                    contactPhone: data.contactPhone,
                     registrationDate: data.registrationDate,
                     organizedEvents: data.organizedEvents,
                     visitedEvents: data.visitedEvents,
                     photo: data.photo,
+                    emailConfirmed: data.emailConfirmed,
                     loading: false
+                });
+            }
+        }).catch((ex) => {
+            this.setState({
+                errorMessage: ex.toString()
+            });
+        });
+    }
+
+    requestEmailConfirm(){
+        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail`)
+        .then((response) => {
+            if (response.ok){
+                this.setState({
+                    emailConfirmFail: false,
+                })
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
+            else {
+                this.setState({error: true});
+                return response.json();
+            }
+        }).then((data) => {
+            if(this.state.error)
+            {
+                this.setState({
+                    errorMessage: data,
                 });
             }
         }).catch((ex) => {
