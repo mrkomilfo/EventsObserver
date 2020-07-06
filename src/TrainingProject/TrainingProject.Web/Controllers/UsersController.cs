@@ -237,5 +237,53 @@ namespace TrainingProject.Web.Controllers
             await _userManager.DeleteRefreshTokenAsync(userId);
             return Ok();
         }
+
+        [HttpGet]
+        [Route("{userId}/confirmEmail")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> ConfirmEmail(string userId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            if (!Equals(Guid.Parse(userId), currentUserId))
+            {
+                return Forbid("Access denied");
+            }
+            await _userManager.RequestEmailConfirmAsync(userId);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("{userId}/confirmEmail")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> ConfirmEmail(string userId, [FromQuery] string confirmCode)
+        {
+            _logger.LogMethodCallingWithObject(new { userId });
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+            if (!Equals(Guid.Parse(userId), currentUserId))
+            {
+                return Forbid("Access denied");
+            }
+            await _userManager.ConfirmEmailAsync(userId, confirmCode);
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("/resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery]string login)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            await _userManager.RequestPasswordResetAsync(login);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("/resetPassword")]
+        public async Task<IActionResult> ResetPassword(string login, string confirmCode)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            await _userManager.ResetPasswordAsync(login, confirmCode);
+            return Ok();
+        }
     }
 }

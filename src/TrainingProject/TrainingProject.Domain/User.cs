@@ -28,5 +28,8 @@ namespace TrainingProject.Domain
         public bool HasPhoto { get; set; }
         public string RefreshToken { get; set; }
         public bool IsDeleted { get; set; }
+        public bool EmailConfirmed { get; set; }
+        public string EmailConfirmCodeHash { get; set; }
+        public string PasswordResetCodeHash { get; set; }
     }
 }

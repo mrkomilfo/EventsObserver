@@ -35,7 +35,7 @@ namespace TrainingProject.DomainLogic.Services
         {
             _logger.LogMethodCallingWithObject(eventUser);
 
-            string title = $"{eventUser.Event.Name} уже скоро";
+            string title = $"[EventObserver] {eventUser.Event.Name} уже скоро";
             string body = "<h2>Напоминание о предстоящем событии</h2>" +
                 $"<p>{eventUser.Participant.UserName}, напоминаем, что уже скоро состоится мероприятие {eventUser.Event.Name}, на которое Вы записались.</p>" +
                 $"<p>Время: {eventUser.Event.Start:f}</p>" +

@@ -12,5 +12,6 @@
         public int OrganizedEvents { get; set; }
         public int VisitedEvents { get; set; }
         public string Photo { get; set; }
+        public bool EmailConfirmed { get; set; }
     }
 }

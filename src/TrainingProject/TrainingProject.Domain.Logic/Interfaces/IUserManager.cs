@@ -33,5 +33,9 @@ namespace TrainingProject.DomainLogic.Interfaces
         string GenerateRefreshToken();
         Task DeleteRefreshTokenAsync(string userId);
         Task SaveRefreshTokenAsync(string userId, string newRefreshToken);
+        Task RequestEmailConfirmAsync(string userId);
+        Task ConfirmEmailAsync(string userId, string confirmCode);
+        Task RequestPasswordResetAsync(string login);
+        Task ResetPasswordAsync(string login, string confirmCode);
     }
 }

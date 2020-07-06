@@ -9,7 +9,8 @@ namespace TrainingProject.Web.Services
     {
         public Sheduler(IServiceProvider sp)
         {
-            Schedule(sp.CreateScope().ServiceProvider.GetRequiredService<SendMessageJob>()).ToRunNow().AndEvery(1).Hours();
+            Schedule(sp.CreateScope().ServiceProvider.GetRequiredService<SendMessageJob>())
+                .ToRunNow().AndEvery(1).Hours();
         }
     }
 }

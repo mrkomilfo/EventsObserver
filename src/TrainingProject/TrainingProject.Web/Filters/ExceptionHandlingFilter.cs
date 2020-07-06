@@ -22,7 +22,8 @@ namespace TrainingProject.Web.Filters
             HttpStatusCode status = HttpStatusCode.InternalServerError;
             string message = context.Exception.Message;
             var exceptionType = context.Exception.GetType();
-            if (exceptionType == typeof(UnauthorizedAccessException) || exceptionType == typeof(SecurityTokenException))
+            if (exceptionType == typeof(UnauthorizedAccessException) 
+                || exceptionType == typeof(SecurityTokenException))
             {
                 status = HttpStatusCode.Unauthorized;
             }
@@ -32,7 +33,7 @@ namespace TrainingProject.Web.Filters
             }
             else if (exceptionType == typeof(ArgumentOutOfRangeException))
             {
-                status = HttpStatusCode.InternalServerError;
+                status = HttpStatusCode.BadRequest;
             }
             else if (exceptionType == typeof(ArgumentException))
             {
