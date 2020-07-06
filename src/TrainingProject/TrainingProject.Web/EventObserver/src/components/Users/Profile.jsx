@@ -10,8 +10,10 @@ export default class Profile extends Component {
         super(props);
         this.state = {
             loading: true,
+
             error: false,
-            errorMessage: '',
+            noContent: false,
+
             id: '',
             userName: '',
             role: '',
@@ -27,7 +29,8 @@ export default class Profile extends Component {
             emailConfirmFail: false,
             confirmCode: '',
             myRole: AuthHelper.getRole(),
-            myId: AuthHelper.getId()
+            myId: AuthHelper.getId(),
+            query: window.location.search
         }
         this.toggleEmailConfirmModal = this.toggleEmailConfirmModal.bind(this);
         this.requestEmailConfirm = this.requestEmailConfirm.bind(this);
@@ -35,6 +38,18 @@ export default class Profile extends Component {
     }
 
     componentDidMount() {
+        this.loadProfile();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        debugger;
+        if (this.state.query !== window.location.search) {
+            this.setState({ query: window.location.search });
+            this.loadProfile();
+        }
+    }
+    
+    loadProfile() {
         const parsed = queryString.parse(window.location.search);
         if (parsed) {
             this.loadData(parsed['id']);
@@ -84,7 +99,7 @@ export default class Profile extends Component {
             return(
                 <div style={buttonPanelStyle}>
                     <Button color="primary" tag={Link} to={`/blocking?id=${this.state.id}`}>Управление блокировкой</Button>{' '}
-                    <Button color="primary" tag={Link} to={`/roles?id=${this.state.id}`}>Управление ролью</Button>
+                    <Button color="primary" tag={Link} to={`/changeRole?id=${this.state.id}`}>Управление ролью</Button>
                 </div>
             )
         }
@@ -166,18 +181,17 @@ export default class Profile extends Component {
 
     render()
     {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderProfile();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегестрирован"}
+                </Alert>
+                : this.renderProfile()
+            );
 
         return(
             <>
-                {errorBaner}
                 {content}
             </>
         )
@@ -186,13 +200,14 @@ export default class Profile extends Component {
     async loadData(userId) {
         fetch('api/Users/' + userId)
         .then((response) => {
-            this.setState({error: !response.ok});
+            this.setState({
+                error: !response.ok,
+                noContent: response.status === 204
+            });
             return response.json();
         }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
-                });
+            if (this.state.error) {
+                console.log(data);
             }
             else {
                 this.setState({ 
@@ -211,8 +226,10 @@ export default class Profile extends Component {
                 });
             }
         }).catch((ex) => {
+            console.log(ex.toString());
+        }).finally(() => {
             this.setState({
-                errorMessage: ex.toString()
+                loading: false
             });
         });
     }

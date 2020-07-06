@@ -279,16 +279,16 @@ export default class NewEvent extends Component {
         )
     }
 
-    loadCategories() {
+    async loadCategories() {
         fetch('api/Categories')
             .then((response) => {
-                this.setState({error: !response.ok});
+                this.setState({
+                    error: !response.ok
+                });
                 return response.json();
             }).then((data) => {
-                if (this.state.error){
-                    this.setState({
-                        errorMessage: data
-                    });
+                if (this.state.error) {
+                    console.log(data);
                 }
                 else {
                     data.unshift({
@@ -300,9 +300,7 @@ export default class NewEvent extends Component {
                     });
                 }
             }).catch((ex) => {
-                this.setState({
-                    errorMessage: ex.toString()
-                });
+                console.log(ex.toString)
             });
     }
 
@@ -350,13 +348,11 @@ export default class NewEvent extends Component {
                 return response.json();
             }
         }).then((data) => {
-            this.setState({
-                errorMessage: data
-            });
+            if(this.state.error) {
+                console.log(data);
+            }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

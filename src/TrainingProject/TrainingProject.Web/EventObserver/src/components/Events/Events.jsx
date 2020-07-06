@@ -3,20 +3,20 @@ import queryString from 'query-string';
 import EventMedia from './EventMedia';
 import EventsPaginator from './EventsPaginator';
 import EventsSideBar from './EventsSideBar';
-import { Alert } from 'reactstrap';
 
 export default class Events extends Component {
     constructor(props) {
         super(props);
         this.state = { 
             loading: true,
+
+            error: false, 
+
             query: window.location.search, 
             events: [], 
             currentPage: 0, 
             pageSize: 8, 
             totalRecords: 0,  
-            error: false, 
-            errorMessage: '' 
         };
     }
 
@@ -31,7 +31,7 @@ export default class Events extends Component {
         }
     }
 
-    renderEventsList(events){
+    renderEventsList(events) {
         return(
             <div>
                 <p>{`Найдено событий: ${this.state.totalRecords}`}</p>
@@ -44,11 +44,6 @@ export default class Events extends Component {
     }
 
     render() {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderEventsList(this.state.events);
@@ -66,8 +61,6 @@ export default class Events extends Component {
         }
     
         return (
-            <>
-            {errorBaner}
             <div style={pageStyle}>
                 <div style={contentStyle}>
                     <h2 id="tabelLabel">События в Минске</h2>
@@ -77,7 +70,6 @@ export default class Events extends Component {
                     <EventsSideBar />
                 </div>
             </div>
-            </>
         );
     }
 
@@ -124,23 +116,28 @@ export default class Events extends Component {
 
         fetch(`api/Events${queryTrailer}`)
             .then((response) => {
-                this.setState({error: !response.ok});
+                this.setState({
+                    error: !response.ok
+                });
                 return response.json();
             }).then((data) => {
                 if (this.state.error){
-                    this.setState({errorMessage: data});
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
                         events: data.records, 
                         currentPage: data.currentPage, 
                         pageSize: data.pageSize, 
-                        totalRecords: data.totalRecords, 
-                        loading: false 
+                        totalRecords: data.totalRecords
                     });
                 }
             }).catch((ex) => {
-                this.setState({errorMessage: ex.toString()});
+                console.log(ex.toString());
+            }).finally(() => {
+                this.setState({
+                    loading: false
+                });
             });
     }
 }

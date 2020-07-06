@@ -37,7 +37,7 @@ export default class NavMenu extends Component {
         });
     }
 
-    toggleLogoutModal(){
+    toggleLogoutModal() {
         this.setState({
             logoutModal: !this.state.logoutModal
         });
@@ -128,6 +128,8 @@ export default class NavMenu extends Component {
             headers: {
                 'Content-Type': 'application/json'
             }
+        }).catch((ex) => {
+            console.log(ex.toString());
         });
     }
 }

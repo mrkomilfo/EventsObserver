@@ -11,6 +11,7 @@ export default class EditEvent extends Component{
 
             error: false,
             errorMessage: '',
+            noContent: false,
 
             id: null,
             name: '', 
@@ -26,6 +27,7 @@ export default class EditEvent extends Component{
             imageFile: null,
             fileName: '',
             hasImage: false,
+
             formErrors: { 
                 name: '', 
                 category: '', 
@@ -89,7 +91,7 @@ export default class EditEvent extends Component{
         }   
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let nameValid = this.state.nameValid;
@@ -177,8 +179,7 @@ export default class EditEvent extends Component{
         });
     }
 
-    removeImage()
-    {
+    removeImage() {
         this.setState({
             imageFile: null,
             hasImage: false,
@@ -188,13 +189,11 @@ export default class EditEvent extends Component{
         }, this.validateForm)
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/event?id=${this.state.id}`);
     }
 
-    renderEvent()
-    {
+    renderEvent() {
         const imageStyle = {
             maxWidth: '420px',
             maxHeight: '420px',
@@ -219,8 +218,6 @@ export default class EditEvent extends Component{
         else imageBlock = null
 
         return(
-            <>
-            <h2>Редактирование информации о мероприятии</h2>
             <Form>
                 <FormGroup>
                     <Label for="name">Название мероприятия</Label>
@@ -292,11 +289,10 @@ export default class EditEvent extends Component{
                     <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
                 </div>
             </Form>
-            </>
         )
     }
 
-    render(){
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -304,11 +300,17 @@ export default class EditEvent extends Component{
 
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderEvent();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Мероприятие удалено или ещё не создано"}
+                  </Alert> 
+                : this.renderEvent()
+            );
 
         return(
             <>
                 {errorBaner}
+                <h2>Редактирование информации о мероприятии</h2>
                 {content}
             </>
         )
@@ -317,13 +319,13 @@ export default class EditEvent extends Component{
     loadCategories() {
         fetch('api/Categories')
             .then((response) => {
-                this.setState({error: !response.ok});
+                this.setState({
+                    error: !response.ok
+                });
                 return response.json();
             }).then((data) => {
-                if (this.state.error){
-                    this.setState({
-                        errorMessage: data
-                    });
+                if (this.state.error) {
+                    console.log(data);
                 }
                 else {
                     data.unshift({
@@ -335,9 +337,7 @@ export default class EditEvent extends Component{
                     });
                 }
             }).catch((ex) => {
-                this.setState({
-                    errorMessage: ex.toString()
-                });
+                console.log(ex.toString)
             });
     }
 
@@ -348,14 +348,15 @@ export default class EditEvent extends Component{
                     this.props.history.push("/signIn");
                 }
                 else {
-                    this.setState({ error: !response.ok });
+                    this.setState({
+                        error: !response.ok,
+                        noContent: response.status === 204
+                    });
                     return response.json();
                 }
             }).then((data) => {
-                if (this.state.error){
-                    this.setState({ 
-                        errorMessage: data 
-                    });
+                if (this.state.error) {
+                    console.log(data);
                 }
                 else {
                     this.setState({ 
@@ -371,12 +372,13 @@ export default class EditEvent extends Component{
                         tags: data.tags,
                         imagePath: data.image,
                         hasImage: !!data.image,
-                        loading: false
                     });
                 }
             }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
                 this.setState({
-                    errorMessage: ex.toString()
+                    loading: false
                 });
             });
     }
@@ -408,6 +410,7 @@ export default class EditEvent extends Component{
         if (this.state.imageFile) {
             formdata.append('image', this.state.imageFile);
         }
+
         AuthHelper.fetchWithCredentials('api/Events', {
             method: 'PUT',
             body: formdata
@@ -419,20 +422,17 @@ export default class EditEvent extends Component{
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

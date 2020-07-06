@@ -4,7 +4,7 @@ import './404.css';
 
 export default class Page404 extends Component
 {
-    render(){
+    render() {
         return(
             <div className="overlay404">
                 <div className="body404">

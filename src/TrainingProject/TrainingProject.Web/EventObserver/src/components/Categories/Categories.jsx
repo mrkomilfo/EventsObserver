@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Alert, Table, Button } from 'reactstrap';
+import { Table, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 
 export default class Categories extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            categories: [], loading: true, 
-            error: false, errorMessage: '' 
+            loading: true, 
+            error: false,
+            categories: []
         };
     }
 
@@ -15,7 +16,7 @@ export default class Categories extends Component {
         this.loadCategories();
     }
 
-    renderCategoriesList(categories){
+    renderCategoriesList() {
         return(
             <>
             <Button color="primary" style={{marginBottom: '10px'}} tag={Link} to={"/newCategory"}>
@@ -36,21 +37,15 @@ export default class Categories extends Component {
         )
     }
 
-    render(){
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
+    render() {
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderCategoriesList(this.state.categories);
 
         return (
             <>
-            {errorBaner}
-            <h2>Категории</h2>
-            {content}
+                <h2>Категории</h2>
+                {content}
             </>
         );
     }
@@ -60,20 +55,25 @@ export default class Categories extends Component {
             method: 'GET',
         })
         .then((response) => {
-            this.setState({error: !response.ok});
+            this.setState({
+                error: !response.ok
+            });
             return response.json();
         }).then((data) => {
             if (this.state.error){
-                this.setState({errorMessage: data});
+                console.log(data);
             }
             else {
                 this.setState({ 
-                    categories: data, 
-                    loading: false 
+                    categories: data
                 });
             }
         }).catch((ex) => {
-            this.setState({errorMessage: ex.toString()});
-        });
+            console.log(ex.toString());
+        }).finally(() => {
+            this.setState({ 
+                loading: false 
+            });
+        })
     }
 }

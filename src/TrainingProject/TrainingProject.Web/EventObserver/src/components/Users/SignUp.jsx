@@ -42,11 +42,13 @@ export default class SignUp extends Component {
 
         this.setState({
           [name]: value}, 
-          () => { this.validateField(name, value) }
+          () => { 
+              this.validateField(name, value) 
+            }
         );
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let nameValid = this.state.nameValid;
@@ -56,7 +58,7 @@ export default class SignUp extends Component {
         let passwordValid = this.state.passwordValid;
         let passwordConfirmValid = this.state.passwordConfirmValid;
 
-        switch(fieldName){
+        switch(fieldName) {
             case 'name':
                 nameValid = value.length >= 4;
                 fieldValidationErrors.name = nameValid ? '' : 'Минимальная длина - 4';
@@ -86,12 +88,12 @@ export default class SignUp extends Component {
         }
         this.setState({
             formErrors: fieldValidationErrors,
-            nameValid: nameValid,
-            emailValid: emailValid,
-            phoneValid: phoneValid,
-            loginValid: loginValid,
-            passwordValid: passwordValid,
-            passwordConfirmValid: passwordConfirmValid
+            nameValid,
+            emailValid,
+            phoneValid,
+            loginValid,
+            passwordValid,
+            passwordConfirmValid
           }, this.validateForm);
     }
 
@@ -190,7 +192,7 @@ export default class SignUp extends Component {
             },
             body: JSON.stringify(data)
         }).then((response) => {
-            if (response.ok){
+            if (response.ok) {
                 this.props.history.push("/signIn");
             }
             else {
@@ -198,16 +200,11 @@ export default class SignUp extends Component {
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

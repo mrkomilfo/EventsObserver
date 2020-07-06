@@ -37,7 +37,7 @@ export default class NewCategory extends Component {
         });   
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value) {
         let fieldValidationErrors = this.state.formErrors;
 
         let nameValid = this.state.nameValid;
@@ -57,9 +57,9 @@ export default class NewCategory extends Component {
         }
         this.setState({
             formErrors: fieldValidationErrors,
-            nameValid: nameValid,
-            descriptionValid: descriptionValid,
-          }, this.validateForm);
+            nameValid,
+            descriptionValid,
+        }, this.validateForm);
     }
 
     validateForm() {
@@ -70,13 +70,11 @@ export default class NewCategory extends Component {
         });
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/categories`);
     }
 
-    render()
-    {
+    render() {
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
@@ -106,7 +104,7 @@ export default class NewCategory extends Component {
         )
     }
 
-    async createCategory(){
+    async createCategory() {
         if (!this.state.formValid)
         {
             this.setState({
@@ -132,20 +130,17 @@ export default class NewCategory extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                });
+            if(this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
     }
 }

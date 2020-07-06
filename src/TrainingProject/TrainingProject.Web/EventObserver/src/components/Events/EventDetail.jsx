@@ -11,8 +11,10 @@ export default class EventDetail extends Component {
         super(props);
         this.state = {
             loading: true,
+
             error: false,
-            errorMessage: '',
+            noContent: false,
+
             id: null,
             name: '',
             categoryId: null,
@@ -29,7 +31,9 @@ export default class EventDetail extends Component {
             tags: [],
             publicationTime: '',
             image: '',
+
             deleteModal: false,
+            
             userRole: AuthHelper.getRole(),
             userId: AuthHelper.getId(),
         }
@@ -181,18 +185,17 @@ export default class EventDetail extends Component {
 
     render()
     {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
         const content = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderEvent();
+            : (this.state.noContent
+                ? <Alert color="info">
+                    {"Мероприятие удалено или ещё не создано"}
+                  </Alert> 
+                : this.renderEvent()
+            );
 
-        return(
+        return (
             <>
-                {errorBaner}
                 {content}
             </>
         )
@@ -200,41 +203,43 @@ export default class EventDetail extends Component {
 
     async loadData(eventId) {
         fetch('api/Events/' + eventId)
-        .then((response) => {
-            this.setState({error: !response.ok});
-            return response.json();
-        }).then((data) => {
-            if (this.state.error){
-                this.setState({ 
-                    errorMessage: data 
+            .then((response) => {
+                this.setState({
+                    error: !response.ok,
+                    noContent: response.status === 204
                 });
-            }
-            else {
-                this.setState({ 
-                    id: data.id,
-                    name: data.name,
-                    categoryId: data.categoryId,
-                    category: data.category,
-                    description: data.description,
-                    start: data.start,
-                    startParsable: data.startParsable,
-                    place: data.place,
-                    fee: data.fee,
-                    participantsLimit: data.participantsLimit,
-                    organizerId: data.organizerId,
-                    organizer: data.organizer,
-                    participants: data.participants,
-                    tags: data.tags,
-                    publicationTime: data.publicationTime,
-                    image: data.image,
+                return response.json();
+            }).then((data) => {
+                if (this.state.error) {
+                    console.log(data);
+                }
+                else {
+                    this.setState({ 
+                        id: data.id,
+                        name: data.name,
+                        categoryId: data.categoryId,
+                        category: data.category,
+                        description: data.description,
+                        start: data.start,
+                        startParsable: data.startParsable,
+                        place: data.place,
+                        fee: data.fee,
+                        participantsLimit: data.participantsLimit,
+                        organizerId: data.organizerId,
+                        organizer: data.organizer,
+                        participants: data.participants,
+                        tags: data.tags,
+                        publicationTime: data.publicationTime,
+                        image: data.image,
+                    });
+                }
+            }).catch((ex) => {
+                console.log(ex.toString());
+            }).finally(() => {
+                this.setState({
                     loading: false
                 });
-            }
-        }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
             });
-        });
     }
 
     async deleteEvent() {
@@ -251,20 +256,10 @@ export default class EventDetail extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true})
-                return response.json()
-            }
-        }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                })
+                console.log(response.json());
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            })
+            console.log(ex.toString());
         });
     }
 
@@ -282,20 +277,10 @@ export default class EventDetail extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true})
-                return response.json()
-            }
-        }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                })
+                console.log(response.json());
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            })
+            console.log(ex.toString());
         });
     }
 
@@ -313,20 +298,10 @@ export default class EventDetail extends Component {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true})
-                return response.json()
-            }
-        }).then((data) => {
-            if (this.state.error)
-            {
-                this.setState({
-                    errorMessage: data
-                })
+                console.log(response.json());
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            })
+            console.log(ex.toString());
         });
     }
 }
