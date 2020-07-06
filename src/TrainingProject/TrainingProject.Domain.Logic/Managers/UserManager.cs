@@ -95,11 +95,11 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
             }
-            _mapper.Map(user, updatedUser);
             if (!string.Equals(user.ContactEmail, updatedUser.ContactEmail))
             {
                 updatedUser.EmailConfirmed = false;
             }
+            _mapper.Map(user, updatedUser);
             if (user.Photo != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\users\\{updatedUser.Id}.jpg";

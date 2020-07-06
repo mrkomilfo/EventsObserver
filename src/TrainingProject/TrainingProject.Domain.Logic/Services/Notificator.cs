@@ -26,6 +26,7 @@ namespace TrainingProject.DomainLogic.Services
             m.Body = body;
             m.IsBodyHtml = true;
             SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+            smtp.UseDefaultCredentials = false;
             smtp.Credentials = new NetworkCredential("events.observer.notificator@gmail.com", "EventsObserver17");
             smtp.EnableSsl = true;
             smtp.Send(m);

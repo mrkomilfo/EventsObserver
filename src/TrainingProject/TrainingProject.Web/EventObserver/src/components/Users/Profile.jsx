@@ -35,6 +35,7 @@ export default class Profile extends Component {
         this.toggleEmailConfirmModal = this.toggleEmailConfirmModal.bind(this);
         this.requestEmailConfirm = this.requestEmailConfirm.bind(this);
         this.confirmEmail = this.confirmEmail.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     componentDidMount() {
@@ -146,7 +147,8 @@ export default class Profile extends Component {
             <Modal isOpen={this.state.emailConfirmModal} toggle={this.toggleEmailConfirmModal}>
                 <ModalHeader toggle={this.toggleEmailConfirmModal}>Подтверждение email</ModalHeader>
                 <ModalBody>
-                    На почту {this.state.contactEmail} выслан код подтверждения. Введите его в поле ниже, чтобы подтвердить email
+                    На почту <b>{this.state.contactEmail}</b> выслан код подтверждения. Введите его в поле ниже, чтобы подтвердить email
+                    <br/>
                     <Input type="text" name="confirmCode" id="confirmCode" value={this.state.confirmCode} placeholder="8-значный код" onChange={this.handleInputChange} />
                     {this.state.emailConfirmFail ? <p style={{color: "red"}}>Не верный код подтверждения</p> : null}
                 </ModalBody>
@@ -234,32 +236,61 @@ export default class Profile extends Component {
         });
     }
 
-    requestEmailConfirm(){
+    requestEmailConfirm() {
         AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail`)
         .then((response) => {
             if (response.ok){
                 this.setState({
                     emailConfirmFail: false,
+                    emailConfirmModal: true
                 })
             }
             else if (response.status === 401) {
                 this.props.history.push("/signIn");
             }
             else {
-                this.setState({error: true});
+                this.setState({
+                    error: true
+                });
                 return response.json();
             }
         }).then((data) => {
-            if(this.state.error)
-            {
-                this.setState({
-                    errorMessage: data,
-                });
+            if (this.state.error) {
+                console.log(data);
             }
         }).catch((ex) => {
-            this.setState({
-                errorMessage: ex.toString()
-            });
+            console.log(ex.toString());
         });
+    }
+
+    confirmEmail() {
+        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail?confirmCode=${this.state.confirmCode}`, {
+            method: 'PUT'
+        }).then((response) => {
+            if (response.ok) {
+                this.setState({
+                    emailConfirmFail: false,
+                    emailConfirmModal: false,
+                    emailConfirmed: true
+                })
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
+            else {
+                this.setState({
+                    error: true,
+                    emailConfirmFail: true,
+                });
+                return response.json();
+            }
+        }).then((data) => {
+            if (this.state.error) {
+                console.log(data);
+            }
+        }).catch((ex) => {
+            console.log(ex.toString());
+        });
+            
     }
 }

@@ -245,7 +245,7 @@ namespace TrainingProject.Web.Controllers
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (!Equals(Guid.Parse(userId), currentUserId))
+            if (!Equals(userId, currentUserId))
             {
                 return Forbid("Access denied");
             }
@@ -260,7 +260,7 @@ namespace TrainingProject.Web.Controllers
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (!Equals(Guid.Parse(userId), currentUserId))
+            if (!Equals(userId, currentUserId))
             {
                 return Forbid("Access denied");
             }
