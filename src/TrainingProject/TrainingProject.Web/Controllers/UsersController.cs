@@ -43,6 +43,24 @@ namespace TrainingProject.Web.Controllers
             return Ok(await _userManager.GetUsersAsync(index, pageSize, search));
         }
 
+        [HttpGet]
+        [Route("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string login)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            await _userManager.RequestPasswordResetAsync(login);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string login, string confirmCode)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            await _userManager.ResetPasswordAsync(login, confirmCode);
+            return Ok();
+        }
+
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserFullDto>> DetailsAsync(string userId)
         {
@@ -265,24 +283,6 @@ namespace TrainingProject.Web.Controllers
                 return Forbid("Access denied");
             }
             await _userManager.ConfirmEmailAsync(userId, confirmCode);
-            return Ok();
-        }
-
-        [HttpGet]
-        [Route("/resetPassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery]string login)
-        {
-            _logger.LogMethodCallingWithObject(new { login });
-            await _userManager.RequestPasswordResetAsync(login);
-            return Ok();
-        }
-
-        [HttpPut]
-        [Route("/resetPassword")]
-        public async Task<IActionResult> ResetPassword(string login, string confirmCode)
-        {
-            _logger.LogMethodCallingWithObject(new { login });
-            await _userManager.ResetPasswordAsync(login, confirmCode);
             return Ok();
         }
     }

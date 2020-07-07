@@ -26,7 +26,7 @@ export default class Profile extends Component {
             photo: '',
             emailConfirmed: false,
             emailConfirmModal: false,
-            emailConfirmFail: false,
+            emailConfirmErrorMessage: '',
             confirmCode: '',
             myRole: AuthHelper.getRole(),
             myId: AuthHelper.getId(),
@@ -52,12 +52,15 @@ export default class Profile extends Component {
     
     loadProfile() {
         const parsed = queryString.parse(window.location.search);
-        if (parsed) {
+        if (parsed && parsed['id']) {
             this.loadData(parsed['id']);
+        }
+        else {
+            this.props.history.push("/404")
         }
     }
 
-    toggleEmailConfirmModal(){
+    toggleEmailConfirmModal() {
         this.setState({
             emailConfirmModal: !this.state.emailConfirmModal
         });
@@ -147,10 +150,9 @@ export default class Profile extends Component {
             <Modal isOpen={this.state.emailConfirmModal} toggle={this.toggleEmailConfirmModal}>
                 <ModalHeader toggle={this.toggleEmailConfirmModal}>Подтверждение email</ModalHeader>
                 <ModalBody>
-                    На почту <b>{this.state.contactEmail}</b> выслан код подтверждения. Введите его в поле ниже, чтобы подтвердить email
-                    <br/>
+                    <p>На почту <b>{this.state.contactEmail}</b> выслан код подтверждения. Введите его в поле ниже, чтобы подтвердить email. Код действителен 5 минут.</p>
                     <Input type="text" name="confirmCode" id="confirmCode" value={this.state.confirmCode} placeholder="8-значный код" onChange={this.handleInputChange} />
-                    {this.state.emailConfirmFail ? <p style={{color: "red"}}>Не верный код подтверждения</p> : null}
+                    <span style={{color: "red"}}>{this.state.emailConfirmErrorMessage}</span>
                 </ModalBody>
                 <ModalFooter>
                     <Button color="primary" onClick={this.confirmEmail}>Подтвердить</Button>{' '}
@@ -160,25 +162,26 @@ export default class Profile extends Component {
             </Modal>
 
         return(
-        <>
-        <div style={mainStyle}>
-            <img style={photoStyle} src={this.state.photo} alt="user photo"/>
-            <div>
-                <h3>{this.state.userName}{badge}{status}</h3>
-                <table cellPadding='8px'>
-                    <tbody>
-                        <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
-                        <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
-                        <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
-                        <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
-                        <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
-                    </tbody>
-                </table>
-                {confirmEmailModal}
-            </div>
-        </div>
-        {buttonPanel}
-        </>)
+            <>
+                <div style={mainStyle}>
+                    <img style={photoStyle} src={this.state.photo} alt="user photo"/>
+                    <div>
+                        <h3>{this.state.userName}{badge}{status}</h3>
+                        <table cellPadding='8px'>
+                            <tbody>
+                                <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
+                                <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
+                                <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
+                                <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
+                                <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
+                            </tbody>
+                        </table>
+                        {confirmEmailModal}
+                    </div>
+                </div>
+                {buttonPanel}
+            </>
+        )
     }
 
     render()
@@ -239,9 +242,9 @@ export default class Profile extends Component {
     requestEmailConfirm() {
         AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail`)
         .then((response) => {
-            if (response.ok){
+            if (response.ok) {
                 this.setState({
-                    emailConfirmFail: false,
+                    emailConfirmErrorMessage: '',
                     emailConfirmModal: true
                 })
             }
@@ -264,12 +267,19 @@ export default class Profile extends Component {
     }
 
     confirmEmail() {
+        if (!this.state.confirmCode.trim() || this.state.confirmCode.trim().length != 8)
+        {
+            this.setState({
+                emailConfirmErrorMessage: 'Не верный код подтверждения'
+            });
+            return;
+        }
         AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail?confirmCode=${this.state.confirmCode}`, {
             method: 'PUT'
         }).then((response) => {
             if (response.ok) {
                 this.setState({
-                    emailConfirmFail: false,
+                    emailConfirmErrorMessage: '',
                     emailConfirmModal: false,
                     emailConfirmed: true
                 })
@@ -277,10 +287,14 @@ export default class Profile extends Component {
             else if (response.status === 401) {
                 this.props.history.push("/signIn");
             }
+            else if (response.status === 400) {
+                this.setState({
+                    emailConfirmErrorMessage: 'Не верный код подтверждения'
+                });
+            }
             else {
                 this.setState({
-                    error: true,
-                    emailConfirmFail: true,
+                    error: true
                 });
                 return response.json();
             }
@@ -291,6 +305,5 @@ export default class Profile extends Component {
         }).catch((ex) => {
             console.log(ex.toString());
         });
-            
     }
 }

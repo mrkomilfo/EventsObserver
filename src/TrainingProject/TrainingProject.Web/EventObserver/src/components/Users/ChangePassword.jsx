@@ -146,7 +146,7 @@ export default class ChangePassword extends Component {
         }).then((response) => {
             if (response.ok){
                 AuthHelper.clearAuth();
-                this.props.history.push("/signIn");
+                this.props.history.push("/signIn?goBack=false");
             }
             else if (response.status === 401) {
                 this.props.history.push("/signIn");

@@ -45,8 +45,11 @@ export default class EventDetail extends Component {
 
     componentDidMount() {
         const parsed = queryString.parse(window.location.search);
-        if (parsed) {
+        if (parsed && parsed['id']) {
             this.loadData(parsed['id']);
+        }
+        else {
+            this.props.history.push("/404")
         }
     }
 

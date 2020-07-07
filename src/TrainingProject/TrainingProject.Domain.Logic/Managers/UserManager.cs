@@ -461,10 +461,14 @@ namespace TrainingProject.DomainLogic.Managers
             _logger.LogMethodCallingWithObject(new { login });
 
             User user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Login, login));
-            string email = user?.ContactEmail;
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User '{login}' not found");
+            }
+            string email = user.ContactEmail;
             if (string.IsNullOrEmpty(email) || !user.EmailConfirmed)
             {
-                throw new KeyNotFoundException($"User '{login}' not exist or user doesn't have confirmed email");
+                throw new UnauthorizedAccessException($"User doesn't have confirmed email");
             }
 
             string confirmCode = GenerateRandomString(KEY_LENGTH);

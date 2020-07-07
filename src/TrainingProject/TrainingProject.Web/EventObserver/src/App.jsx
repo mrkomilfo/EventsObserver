@@ -33,7 +33,7 @@ export default class App extends Component {
                 {AuthHelper.getRole() !== 'Guest' ? <Route path='/editEvent' component={EditEvent} /> : <Route path='/editEvent' render={() => (<Redirect to='/signIn' push/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'User' ? <Route path='/users' component={Error403} /> : <Route path='/users' component={Users} />) : <Route path='/users' render={() => (<Redirect to='/signIn' push/>)} />}
                 <Route path='/user' component={Profile} />
-                <Route path='/signUp' component={SignUp} />
+                {AuthHelper.getRole() === 'Guest' ? <Route path='/signUp' component={SignUp} /> : <Route path='/signUp' render={() => (<Redirect to='/events'/>)} />}
                 {AuthHelper.getRole() === 'Guest' ? <Route path='/signIn' component={SignIn} /> : <Route path='/signIn' render={() => (<Redirect to='/events'/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? <Route path='/editProfile' component={EditProfile} /> : <Route path='/editProfile' render={() => (<Redirect to='/signIn' />)} />}
                 {AuthHelper.getRole() !== 'Guest' ? <Route path='/changePassword' component={ChangePassword} /> : <Route path='/changePassword' render={() => (<Redirect to='/signIn' />)} /> }
