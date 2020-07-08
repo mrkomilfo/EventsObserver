@@ -324,7 +324,7 @@ export default class EditEvent extends Component{
         return(
             <>
                 {errorBaner}
-                {content}
+                {this.state.loading ? null : content}
             </>
         )
     }

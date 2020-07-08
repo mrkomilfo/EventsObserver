@@ -211,7 +211,7 @@ export default class EventDetail extends Component {
 
         return (
             <>
-                {content}
+                {this.state.loading ? null : content}
             </>
         )
     }
