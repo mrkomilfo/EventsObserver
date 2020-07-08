@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 import queryString from 'query-string';
-import AuthHelper from '../../Utils/authHelper'
+import AuthHelper from '../../Utils/authHelper';
+import ErrorPage from '../Common/ErrorPage';
 
 export default class EditEvent extends Component{
     constructor(props) {
@@ -11,7 +12,7 @@ export default class EditEvent extends Component{
 
             error: false,
             errorMessage: '',
-            noContent: false,
+            statusCode: 200,
 
             id: null,
             name: '', 
@@ -61,10 +62,14 @@ export default class EditEvent extends Component{
 
     componentDidMount() {
         const parsed = queryString.parse(window.location.search);
-        if (parsed) {
+        if (parsed && parsed['id']) {
             this.loadEvent(parsed['id']);
         }
-        this.loadCategories();
+        else {
+            this.setState({
+                statusCode: 404
+            });
+        }
     }
 
     handleInputChange(event) {
@@ -219,6 +224,7 @@ export default class EditEvent extends Component{
 
         return(
             <Form>
+                <h2>Редактирование информации о мероприятии</h2>
                 <FormGroup>
                     <Label for="name">Название мероприятия</Label>
                     <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
@@ -293,24 +299,31 @@ export default class EditEvent extends Component{
     }
 
     render() {
+        let content;
+        switch (this.state.statusCode) {
+            case 204:
+                content = 
+                    <Alert color="info">
+                        {"Мероприятие удалено или ещё не создано"}
+                    </Alert>
+                break;
+            case 403:
+            case 404:
+            case 500:
+                content = <ErrorPage code={this.state.statusCode}/>
+                break;
+            default:
+                content = this.renderEvent()
+        }
+
         const errorBaner = this.state.errorMessage ? 
         <Alert color="danger">
             {this.state.errorMessage}
         </Alert> : null;
 
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : (this.state.noContent
-                ? <Alert color="info">
-                    {"Мероприятие удалено или ещё не создано"}
-                  </Alert> 
-                : this.renderEvent()
-            );
-
         return(
             <>
                 {errorBaner}
-                <h2>Редактирование информации о мероприятии</h2>
                 {content}
             </>
         )
@@ -350,7 +363,7 @@ export default class EditEvent extends Component{
                 else {
                     this.setState({
                         error: !response.ok,
-                        noContent: response.status === 204
+                        statusCode: response.status
                     });
                     return response.json();
                 }
@@ -419,11 +432,12 @@ export default class EditEvent extends Component{
                 this.props.history.push(`/event?id=${this.state.id}`);
             }
             else if (response.status === 401) {
-                this.props.history.push("/signIn");
+                this.props.history.push('/signIn');
             }
             else {
                 this.setState({
-                    error: true
+                    error: true,
+                    statusCode: this.response.status
                 });
                 return response.json();
             }

@@ -100,8 +100,9 @@ export default class Chat extends Component {
 
     async getAccessToken() {
         const response = await AuthHelper.fetchWithCredentials(`api/Events/${this.props.eventId}/checkInvolvement`);
-        if (response.status === 401) {
-            window.location.reload();
+        if (response.status === 403) {
+            AuthHelper.clearAuth();
+            this.props.history.push('/signIn');
         }
         return AuthHelper.getAccessToken();
     }

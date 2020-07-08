@@ -74,7 +74,7 @@ export default class Events extends Component {
     }
 
     async loadEvents() {
-        let page; let search; let categoryId; let tag; let upComing; let onlyFree; let vacancies; let organizer; let participant;
+        let page; let search; let categoryId; let tag; let upComing; let onlyFree; let vacancies; let organizerId; let participantId;
         const parsed = queryString.parse(window.location.search);
         if (parsed) {
             page = parsed['page'] || 0;
@@ -84,8 +84,8 @@ export default class Events extends Component {
             upComing = parsed['upComing'];
             onlyFree = parsed['onlyFree'];
             vacancies = parsed['vacancies'];
-            organizer = parsed['organizer'];
-            participant = parsed['participant'];
+            organizerId = parsed['organizerId'];
+            participantId = parsed['participantId'];
         }
 
         let queryTrailer = '?page=' + page;
@@ -107,11 +107,11 @@ export default class Events extends Component {
         if (vacancies) {
             queryTrailer += `&vacancies=${vacancies}`
         }
-        if (organizer) {
-            queryTrailer += `&organizer=${organizer}`
+        if (organizerId) {
+            queryTrailer += `&organizerId=${organizerId}`
         }
-        if (participant) {
-            queryTrailer += `&participant=${participant}`
+        if (participantId) {
+            queryTrailer += `&participantId=${participantId}`
         }
 
         fetch(`api/Events${queryTrailer}`)

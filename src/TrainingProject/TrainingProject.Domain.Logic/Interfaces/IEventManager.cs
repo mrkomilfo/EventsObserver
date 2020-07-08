@@ -13,7 +13,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<EventToUpdateDto> GetEventToUpdateAsync(int eventId);
         Task DeleteEventAsync(int eventId, bool force, string hostRoot);
         Task<EventFullDto> GetEventAsync(int eventId);
-        Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, Guid organizerId, Guid participantId);
+        Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, string organizerId, string participantId);
         Task SubscribeAsync(Guid userId, int eventId);
         Task UnsubscribeAsync(Guid userId, int eventId);
         Task<Guid?> GetEventOrganizerIdAsync(int eventId);

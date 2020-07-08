@@ -51,7 +51,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
             var user = _mapper.Map<UserFullDto>(DBUser);
-            user.VisitedEvents = await _appContext.EventsUsers.Where(eu => eu.ParticipantId == userId).CountAsync();
+            user.VisitedEvents = await _appContext.EventsUsers.Where(eu => Equals(eu.ParticipantId, userId)).CountAsync();
 
             string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
             string path = $"img\\users\\{imageName}.jpg";
@@ -74,12 +74,12 @@ namespace TrainingProject.DomainLogic.Managers
             return result;
         }
 
-        public async Task RegisterUserAsync(RegisterDto user)
+        public async Task RegisterUserAsync(RegisterDto user) 
         {
             _logger.LogMethodCallingWithObject(user, "Password, PasswordConfirm");
             if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
             {
-                throw new ArgumentException($"User with login \"{user.Login}\" already exist");
+                throw new ArgumentOutOfRangeException($"User with login \"{user.Login}\" already exist");
             }
             User newUser = _mapper.Map<User>(user);
             newUser.RoleId = (await _appContext.Roles.FirstOrDefaultAsync(r => r.Name == "User"))?.Id;
@@ -235,9 +235,19 @@ namespace TrainingProject.DomainLogic.Managers
             _logger.LogMethodCallingWithObject(new { userId });
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
-                throw new KeyNotFoundException($"Event with id={userId} not found");
+                throw new KeyNotFoundException($"User with id={userId} not found");
             }
             return await _appContext.Users.Where(u => Equals(u.Id, userId)).Select(u => u.UserName).FirstOrDefaultAsync();
+        }
+
+        public async Task<string> GetBlockingExpirationAsync(string login)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Login, login)))
+            {
+                throw new KeyNotFoundException($"User '{login}' not found");
+            }
+            return await _appContext.Users.Where(u => Equals(u.Login, login)).Select(u => u.UnlockTime.ToString().Substring(0,19)).FirstOrDefaultAsync();
         }
 
         public async Task<Role> GetUserRoleAsync(Guid userId)
@@ -258,10 +268,10 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"User with id={changePasswordDto.Id} not found");
             }
-            if (!String.Equals(HashGenerator.Encrypt(changePasswordDto.OldPassword), user.Password))
+            if (!Equals(HashGenerator.Encrypt(changePasswordDto.OldPassword), user.Password))
             {
-                throw new ArgumentException("Wrong old password");
-            }
+                throw new ArgumentOutOfRangeException("Wrong old password");
+            } 
             user.Password = HashGenerator.Encrypt(changePasswordDto.NewPassword);
             await _appContext.SaveChangesAsync(default);
             await DeleteRefreshTokenAsync(changePasswordDto.Id);
@@ -335,7 +345,7 @@ namespace TrainingProject.DomainLogic.Managers
             var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
             if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
             {
-                throw new UnauthorizedAccessException($"Banned until {unlockTime?.ToString("f")}");
+                throw new AccessViolationException($"Banned until {unlockTime?.ToString("f")}");
             }
 
             var accessToken = GenerateToken(identity.Claims);
@@ -355,7 +365,7 @@ namespace TrainingProject.DomainLogic.Managers
         {
             _logger.LogMethodCallingWithObject(new
             {
-                claims = String.Join(", ", claims.ToList().ConvertAll(
+                claims = string.Join(", ", claims.ToList().ConvertAll(
                     delegate (Claim c) 
                     { 
                         return c.ToString(); 
@@ -448,7 +458,7 @@ namespace TrainingProject.DomainLogic.Managers
                 || DateTime.ParseExact(storedConfirmCode.Substring(0, FMT.Length), FMT, CultureInfo.InvariantCulture).AddMinutes(5) < DateTime.Now
                 || !Equals(storedConfirmCode.Substring(FMT.Length), HashGenerator.Encrypt(confirmCode)))
             {
-                throw new ArgumentOutOfRangeException($"Wrong email confirm code");
+                throw new ArgumentException($"Wrong email confirm code");
             }
 
             user.EmailConfirmCodeHash = null;
@@ -468,7 +478,7 @@ namespace TrainingProject.DomainLogic.Managers
             string email = user.ContactEmail;
             if (string.IsNullOrEmpty(email) || !user.EmailConfirmed)
             {
-                throw new UnauthorizedAccessException($"User doesn't have confirmed email");
+                throw new AccessViolationException($"User doesn't have confirmed email");
             }
 
             string confirmCode = GenerateRandomString(KEY_LENGTH);
@@ -496,7 +506,7 @@ namespace TrainingProject.DomainLogic.Managers
                 || DateTime.ParseExact(storedConfirmCode.Substring(0, FMT.Length), FMT, CultureInfo.InvariantCulture).AddMinutes(5) < DateTime.Now
                 || !Equals(storedConfirmCode.Substring(FMT.Length), HashGenerator.Encrypt(confirmCode)))
             {
-                throw new ArgumentOutOfRangeException($"Wrong password reset code");
+                throw new UnauthorizedAccessException($"Wrong password reset code");
             }
 
             string newPassword = GenerateRandomString(KEY_LENGTH);

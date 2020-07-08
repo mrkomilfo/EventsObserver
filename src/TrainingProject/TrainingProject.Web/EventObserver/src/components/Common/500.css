@@ -1,0 +1,43 @@
+.number500{
+    text-align: center;
+    font-size: 10em;
+    margin: auto;
+    text-shadow: 0 0 10px white;
+}
+
+.inscription500 {
+    text-align: center;
+    font-size: 5em;
+    width: fit-content;
+    margin: auto;
+    text-shadow: 0 0 5px white;
+}
+
+.overlay500::before {
+    content: "";
+    background: url('/kek/broken.jpg') no-repeat;
+    background-size: cover;
+    background-position: top;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.overlay500 {
+    background: #FFF;
+    z-index: -1;
+}
+
+.body500 {
+    margin: 0;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: fit-content;
+    font-weight: 500;
+}

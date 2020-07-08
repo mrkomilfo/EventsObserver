@@ -159,6 +159,17 @@ export default class SignUp extends Component {
                     errorMessage: 'Неверный логин или пароль'
                 })
             }
+            else if (response.status === 403)
+            {
+                fetch(`api/Users/blockingExpiration?login=${this.state.login}`)
+                .then(response=>response.text())
+                .then(data => {
+                    debugger;
+                    this.setState({
+                        errorMessage: `Заблокировкан до ${data}`
+                    })
+                });
+            }
             return response.json();
         }).then((data) => {
             if(this.state.error) {
@@ -200,7 +211,7 @@ export default class SignUp extends Component {
                     requestResetCodeErrorMessage: 'Пользователь с таким логином не существует'
                 });
             }
-            else if (response.status === 401) {
+            else if (response.status === 403) {
                 this.setState({
                     requestResetCodeErrorMessage: 'Отсутствует подтверждённая почта'
                 });
@@ -221,7 +232,7 @@ export default class SignUp extends Component {
     }
 
     resetPassword() {
-        if (!this.state.confirmCode.trim() || this.state.confirmCode.trim().length != 8)
+        if (!this.state.confirmCode.trim() || this.state.confirmCode.trim().length !== 8)
         {
             this.setState({
                 resetPasswordErrorMessage: 'Не верный код подтверждения'
@@ -244,7 +255,7 @@ export default class SignUp extends Component {
                     resetPasswordErrorMessage: 'Пользователь с таким логином не существует'
                 });
             }
-            else if (response.status === 400) {
+            else if (response.status === 401) {
                 this.setState({
                     resetPasswordErrorMessage: 'Не верный код подтверждения'
                 });

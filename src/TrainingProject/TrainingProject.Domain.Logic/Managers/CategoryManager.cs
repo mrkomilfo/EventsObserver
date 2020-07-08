@@ -30,7 +30,7 @@ namespace TrainingProject.DomainLogic.Managers
             _logger.LogMethodCallingWithObject(category);
             if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name.ToLower(), category.Name.ToLower())))
             {
-                throw new ArgumentException("Category with this name already exist");
+                throw new ArgumentOutOfRangeException("Category with this name already exist");
             }
             await _appContext.Categories.AddAsync(_mapper.Map<Category>(category));
             await _appContext.SaveChangesAsync(default);

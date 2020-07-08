@@ -27,6 +27,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Role> GetUserRoleAsync(Guid userId);
         Task ChangePasswordAsync(ChangePasswordDto changePasswordDto);
         Task<string> GetUserNameAsync(Guid guid);
+        Task<string> GetBlockingExpirationAsync(string login);
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
         Task<string> GetRefreshTokenAsync(string userId);
         string GenerateToken(IEnumerable<Claim> claims);

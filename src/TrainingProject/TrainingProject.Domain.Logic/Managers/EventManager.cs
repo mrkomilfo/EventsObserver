@@ -76,7 +76,7 @@ namespace TrainingProject.DomainLogic.Managers
             int subscribesCount = await _appContext.EventsUsers.Where(eu => eu.EventId == @event.Id).CountAsync();
             if (@event.ParticipantsLimit < subscribesCount && @event.ParticipantsLimit != 0)
             {
-                throw new ArgumentException($"Сurrent number of participants({subscribesCount}) is greater than the new limit({@event.ParticipantsLimit})");
+                throw new ArgumentOutOfRangeException($"Сurrent number of participants({subscribesCount}) is greater than the new limit({@event.ParticipantsLimit})");
             }
             _mapper.Map(@event, update);
             await _appContext.SaveChangesAsync(default);
@@ -181,9 +181,11 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public async Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag,
-            bool? upComing, bool onlyFree, bool vacancies, Guid organizerId = new Guid(), Guid participantId = new Guid())
+            bool? upComing, bool onlyFree, bool vacancies, string organizerId, string participantId)
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
+            Guid organizerGuid = string.IsNullOrEmpty(organizerId) ? new Guid() : Guid.Parse(organizerId);
+            Guid participantGuid = string.IsNullOrEmpty(participantId) ? new Guid() : Guid.Parse(participantId);
             var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
             if (search != null)
@@ -196,7 +198,9 @@ namespace TrainingProject.DomainLogic.Managers
             }
             if (tag != null)
             {
-                query = query.Where(e => _appContext.EventsTags.Include(et => et.Tag).Where(et => String.Equals(et.EventId, e.Id)).Any(et => String.Equals(et.Tag.Name, tag)));
+                query = query.Where(e => _appContext.EventsTags.Include(et => et.Tag)
+                    .Where(et => et.EventId == e.Id)
+                    .Any(et => Equals(et.Tag.Name, tag)));
             }
             if (upComing != null)
             {
@@ -210,13 +214,15 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Count(eu => eu.EventId == e.Id) < e.ParticipantsLimit);
             }
-            if (organizerId != Guid.Empty)
+            if (organizerGuid != Guid.Empty)
             {
-                query = query.Where(e => Equals(e.OrganizerId, organizerId));
+                query = query.Where(e => Equals(e.OrganizerId, organizerGuid));
             }
-            if (participantId != Guid.Empty)
+            if (participantGuid != Guid.Empty)
             {
-                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => Equals(eu.EventId, e.Id)).Any(eu => String.Equals(eu.ParticipantId, participantId)));
+                query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant)
+                    .Where(eu => eu.EventId == e.Id)
+                    .Any(eu => Equals(eu.ParticipantId, participantGuid)));
             }
             result.TotalRecords = await query.CountAsync();
             if (upComing != null && (bool)upComing)
@@ -251,18 +257,18 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
-            if (await _appContext.EventsUsers.AnyAsync(eu => eu.ParticipantId == userId && eu.EventId == eventId))
+            if (await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
-                throw new ArgumentException($"User(id={userId}) is already signed up on event(id={eventId})");
+                throw new ArgumentOutOfRangeException($"User(id={userId}) is already signed up on event(id={eventId})");
             }
             int participantsLimit = (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit;
             if (await _appContext.EventsUsers.CountAsync(eu => eu.EventId == eventId) >= participantsLimit && participantsLimit != 0)
             {
-                throw new ArgumentException($"No vacancies on event(id={eventId})");
+                throw new ArgumentOutOfRangeException($"No vacancies on event(id={eventId})");
             }
             if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
             {
-                throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
+                throw new AccessViolationException($"Event(id={eventId}) has already started");
             }
             var eu = new EventsUsers { ParticipantId = userId, EventId = eventId };
             await _appContext.EventsUsers.AddAsync(eu);
@@ -272,21 +278,13 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task UnsubscribeAsync(Guid userId, int eventId)
         {
             _logger.LogMethodCallingWithObject(new { userId, eventId });
-            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
-            {
-                throw new KeyNotFoundException($"User with id={userId} not found");
-            }
-            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
-            {
-                throw new KeyNotFoundException($"Event with id={eventId} not found");
-            }
             if (!await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
                 throw new KeyNotFoundException($"User(id={userId}) is not signed up on event(id={eventId})");
             }
             if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
             {
-                throw new ArgumentOutOfRangeException($"Event(id={eventId}) has already started");
+                throw new AccessViolationException($"Event(id={eventId}) has already started");
             }
 
             var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu => eu.EventId == eventId && Equals(eu.ParticipantId, userId));
@@ -341,7 +339,7 @@ namespace TrainingProject.DomainLogic.Managers
             IList<string> involvedUsers = await GetEventInvolvedUsersIdAsync(eventId);
             if (!involvedUsers.Contains(userId))
             {
-                throw new UnauthorizedAccessException($"User(id={userId}) does not have access to event(id={eventId}) chat");
+                throw new AccessViolationException($"User(id={userId}) does not have access to event(id={eventId}) chat");
             }
         }
     }

@@ -31,11 +31,15 @@ namespace TrainingProject.Web.Filters
             {
                 status = HttpStatusCode.NoContent;
             }
-            else if (exceptionType == typeof(ArgumentOutOfRangeException))
+            else if (exceptionType == typeof(ArgumentException) || exceptionType == typeof(FormatException))
             {
                 status = HttpStatusCode.BadRequest;
             }
-            else if (exceptionType == typeof(ArgumentException))
+            else if (exceptionType == typeof(AccessViolationException))
+            {
+                status = HttpStatusCode.Forbidden;
+            }
+            else if (exceptionType == typeof(ArgumentOutOfRangeException))
             {
                 status = HttpStatusCode.Conflict;
             }

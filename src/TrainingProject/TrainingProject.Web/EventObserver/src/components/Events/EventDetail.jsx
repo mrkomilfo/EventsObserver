@@ -4,6 +4,7 @@ import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from
 import { Link } from 'react-router-dom';
 import Chat from './Chat';
 import AuthHelper from '../../Utils/authHelper.js';
+import ErrorPage from '../Common/ErrorPage';
 
 export default class EventDetail extends Component {
     constructor(props)
@@ -13,7 +14,7 @@ export default class EventDetail extends Component {
             loading: true,
 
             error: false,
-            noContent: false,
+            statusCode: 200,
 
             id: null,
             name: '',
@@ -43,13 +44,15 @@ export default class EventDetail extends Component {
         this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const parsed = queryString.parse(window.location.search);
         if (parsed && parsed['id']) {
-            this.loadData(parsed['id']);
+            await this.loadData(parsed['id']);
         }
         else {
-            this.props.history.push("/404")
+            this.setState({
+                statusCode: 404
+            });
         }
     }
 
@@ -73,7 +76,7 @@ export default class EventDetail extends Component {
                 </ModalFooter>
             </Modal>
 
-        if (this.state.userId === this.state.organizerId || this.state.userRole == 'Admin')
+        if (this.state.userId === this.state.organizerId || this.state.userRole === 'Admin')
         {
             return(
                 <div>
@@ -101,15 +104,18 @@ export default class EventDetail extends Component {
     {
         const start = new Date(this.state.startParsable);
         const currentDate = new Date();
-        if (this.state.userRole === 'Guest' || this.state.userId === this.state.organizerId || start <= currentDate)
-        {
-            return null
-        } 
-        else if (Object.keys(this.state.participants).includes(this.state.userId)){
+        if (Object.keys(this.state.participants).includes(this.state.userId)) {
             return(
                 <Button color="secondary" onClick={this.unsubscribe}>Отписаться</Button>
             )
         }
+        else if (this.state.userRole === 'Guest' 
+            || this.state.userId === this.state.organizerId 
+            || start <= currentDate
+            || Object.keys(this.state.participants).length >= this.state.participantsLimit)
+        {
+            return null
+        } 
         else{
             return(
                 <Button color="primary" onClick={this.subscribe}>Записаться</Button>
@@ -124,7 +130,7 @@ export default class EventDetail extends Component {
         const inlineSecond = {marginLeft: '12px'};
         const imageStyle = {width: '100%'};
         const tagBlockStyle = {display: 'inline'};
-        const subscribeButtonStyle = {margin: '0px 0px 12px 8px', position: 'relative', top: '-2px'}
+        const subscribeButtonStyle = {marginLeft: '8px'}
 
         const image = this.state.image 
             ? <img style={imageStyle} src={this.state.image} alt="event image"/> 
@@ -169,7 +175,7 @@ export default class EventDetail extends Component {
                     </tbody>
                 </table>
                 <br/>
-                <div style={inlineStyle}>
+                <div style={{...inlineStyle, marginBottom: '4px'}}>
                     <h4 style={inlineFirst}>Записались - {this.state.participantsLimit
                     ? `(${Object.keys(this.state.participants).length}/${this.state.participantsLimit})`
                     : Object.keys(this.state.participants).length}</h4>
@@ -186,16 +192,22 @@ export default class EventDetail extends Component {
         ) 
     }
 
-    render()
-    {
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : (this.state.noContent
-                ? <Alert color="info">
-                    {"Мероприятие удалено или ещё не создано"}
-                  </Alert> 
-                : this.renderEvent()
-            );
+    render() {
+        let content;
+        switch (this.state.statusCode) {
+            case 204:
+                content = 
+                    <Alert color="info">
+                        {"Мероприятие удалено или ещё не создано"}
+                    </Alert>
+                break;
+            case 404:
+            case 500:
+                content = <ErrorPage code={this.state.statusCode}/>
+                break;
+            default:
+                content = this.renderEvent()
+        }
 
         return (
             <>
@@ -205,11 +217,11 @@ export default class EventDetail extends Component {
     }
 
     async loadData(eventId) {
-        fetch('api/Events/' + eventId)
+        await fetch('api/Events/' + eventId)
             .then((response) => {
                 this.setState({
                     error: !response.ok,
-                    noContent: response.status === 204
+                    statusCode: response.status
                 });
                 return response.json();
             }).then((data) => {

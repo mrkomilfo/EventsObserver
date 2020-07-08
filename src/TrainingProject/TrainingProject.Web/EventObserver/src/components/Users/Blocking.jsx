@@ -124,7 +124,7 @@ export default class Blocking extends Component {
             ? <p><em>Loading...</em></p>
             : (this.state.noContent
                 ? <Alert color="info">
-                    {"Пользователь удалён или ещё не зарегестрирован"}
+                    {"Пользователь удалён или ещё не зарегистрирован"}
                 </Alert>
                 : this.renderContent()
             );

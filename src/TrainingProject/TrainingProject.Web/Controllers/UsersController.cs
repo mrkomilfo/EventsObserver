@@ -84,7 +84,7 @@ namespace TrainingProject.Web.Controllers
             _logger.LogMethodCallingWithObject(new { userId });
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (role != "Admin" && currentUserId != userId)
+            if (Equals(role, "Admin") && !Equals(currentUserId, userId))
             {
                 return Forbid("Access denied");
             }
@@ -100,7 +100,7 @@ namespace TrainingProject.Web.Controllers
             _logger.LogMethodCallingWithObject(userUpdateDto);
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (role != "Admin" && userId != userUpdateDto.Id)
+            if (!Equals(role, "Admin") && !Equals(userId, userUpdateDto.Id))
             {
                 return Forbid("Access denied");
             }
@@ -126,7 +126,7 @@ namespace TrainingProject.Web.Controllers
             _logger.LogMethodCallingWithObject(new { userId });
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userRole = (await _userManager.GetUserRoleAsync(Guid.Parse(userId))).ToString();
-            if (userRole == "Account manager" || userRole == currentRole)
+            if (Equals(userRole, "Account manager") || Equals(userRole, currentRole))
             {
                 return Forbid("Lack of rights");
             }
@@ -142,7 +142,7 @@ namespace TrainingProject.Web.Controllers
             _logger.LogMethodCallingWithObject(banDto);
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userRole = (await _userManager.GetUserRoleAsync(Guid.Parse(banDto.Id))).ToString();
-            if (userRole == "Account manager" || userRole == currentRole)
+            if (Equals(userRole, "Account manager") || Equals(userRole, currentRole))
             {
                 return Forbid("Lack of rights");
             }
@@ -155,18 +155,22 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> UnbanAsync(string userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
-            if (!Guid.TryParse(userId, out Guid userGuid))
-            {
-                return BadRequest("Invalid user id");
-            }
             var currentRole = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-            var userRole = (await _userManager.GetUserRoleAsync(userGuid)).ToString();
-            if (userRole == "Account manager" || userRole == currentRole)
+            var userRole = (await _userManager.GetUserRoleAsync(Guid.Parse(userId))).ToString();
+            if (Equals(userRole, "Account manager") || Equals(userRole, currentRole))
             {
                 return Forbid("Lack of rights");
             }
-            await _userManager.UnbanUserAsync(userGuid);
+            await _userManager.UnbanUserAsync(Guid.Parse(userId));
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("blockingExpiration")]
+        public async Task<ActionResult<string>> BlockingExpirationAsync([FromQuery] string login)
+        {
+            _logger.LogMethodCallingWithObject(new { login });
+            return Ok(await _userManager.GetBlockingExpirationAsync(login));
         }
 
         [HttpGet]
@@ -220,7 +224,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         [Route("refresh")]
         [ModelStateValidation]
-        public async Task<IActionResult> RefreshAsync([FromBody] RefreshDto refreshDto)
+        public async Task<ActionResult> RefreshAsync([FromBody] RefreshDto refreshDto)
         {
             _logger.LogMethodCallingWithObject(refreshDto);
             var principal = _userManager.GetPrincipalFromExpiredToken(refreshDto.Token);
@@ -243,7 +247,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPut]
         [Route("{userId}/logout")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> LogOut(string userId)
+        public async Task<ActionResult> LogOut(string userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
@@ -259,7 +263,7 @@ namespace TrainingProject.Web.Controllers
         [HttpGet]
         [Route("{userId}/confirmEmail")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> ConfirmEmail(string userId)
+        public async Task<ActionResult> ConfirmEmail(string userId)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
@@ -274,7 +278,7 @@ namespace TrainingProject.Web.Controllers
         [HttpPut]
         [Route("{userId}/confirmEmail")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> ConfirmEmail(string userId, [FromQuery] string confirmCode)
+        public async Task<ActionResult> ConfirmEmail(string userId, [FromQuery] string confirmCode)
         {
             _logger.LogMethodCallingWithObject(new { userId });
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;

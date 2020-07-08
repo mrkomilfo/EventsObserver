@@ -23,7 +23,7 @@ export default class Profile extends Component {
             registrationDate: '',
             organizedEvents: 0,
             visitedEvents: 0,
-            photo: '',
+            photo: 'img/users/default.jpg',
             emailConfirmed: false,
             emailConfirmModal: false,
             emailConfirmErrorMessage: '',
@@ -78,7 +78,8 @@ export default class Profile extends Component {
 
     renderButtonPanel() {
         const buttonPanelStyle = {
-            margin: '16px 0px 0px 35%',
+            margin: '16px auto 0px',
+            width: 'fit-content'
         }
 
         if (this.state.myId === this.state.id)
@@ -172,8 +173,8 @@ export default class Profile extends Component {
                                 <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
                                 <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
                                 <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
-                                <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizer=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
-                                <tr><td><b>Посетил:</b></td><td><Link to={`/events?participant=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
+                                <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizerId=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
+                                <tr><td><b>Посетил:</b></td><td><Link to={`/events?participantId=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
                             </tbody>
                         </table>
                         {confirmEmailModal}
@@ -190,7 +191,7 @@ export default class Profile extends Component {
             ? <p><em>Loading...</em></p>
             : (this.state.noContent
                 ? <Alert color="info">
-                    {"Пользователь удалён или ещё не зарегестрирован"}
+                    {"Пользователь удалён или ещё не зарегистрирован"}
                 </Alert>
                 : this.renderProfile()
             );

@@ -35,10 +35,7 @@ namespace TrainingProject.Web.Controllers
             bool vacancies = false, string organizerId = null, string participantId = null)
         {
             _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            Guid.TryParse(organizerId, out var organizerGuid);
-            Guid.TryParse(participantId, out var participantGuid);
-            return Ok(await _eventManager.GetEventsAsync(page, pageSize, search, categoryId, tag, upComing,
-                onlyFree, vacancies, organizerGuid, participantGuid));
+            return Ok(await _eventManager.GetEventsAsync(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId));
         }
 
         [HttpGet("{eventId}")]
@@ -67,7 +64,7 @@ namespace TrainingProject.Web.Controllers
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventId);
-            if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
+            if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }
@@ -83,7 +80,7 @@ namespace TrainingProject.Web.Controllers
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventUpdateDto.Id);
-            if (role != "Admin" && Guid.Parse(userId) != organizerId)
+            if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }
@@ -100,7 +97,7 @@ namespace TrainingProject.Web.Controllers
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventId);
-            if (role != "Admin" && !Equals(Guid.Parse(userId), organizerId))
+            if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }

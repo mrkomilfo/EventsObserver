@@ -89,7 +89,7 @@ export default class NavMenu extends Component {
                     Вы действительно хотите выйти из аккаунта?
                 </ModalBody>
                 <ModalFooter>
-                <Button tag={Link} to="/signIn" color="primary" onClick={this.logout}>Подтвердить</Button>{' '}
+                <Button tag={Link} to="/signIn?goBack=false" color="primary" onClick={this.logout}>Подтвердить</Button>{' '}
                 <Button color="secondary" onClick={this.toggleLogoutModal}>Отмена</Button>
                 </ModalFooter>
             </Modal>

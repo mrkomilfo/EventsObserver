@@ -55,7 +55,7 @@ export default class EventsSideBar extends Component {
             queryTrailer += `search=${this.state.name}`;
             isFirst = false;
         }
-        if (this.state.category != 0) {
+        if (this.state.category !== 0) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `categoryId=${this.state.category}`;
             isFirst = false;
