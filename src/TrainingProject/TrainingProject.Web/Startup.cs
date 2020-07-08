@@ -6,12 +6,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 using Serilog;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TrainingProject.Common;
 using TrainingProject.Data;
@@ -41,14 +45,27 @@ namespace TrainingProject.Web
         public IWebHostEnvironment Environment { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllersWithViews();
 
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "EventObserver/build";
             });
 
-            services.AddSwaggerDocument();
+            services.AddSwaggerDocument(config =>
+            {
+                config.DocumentName = "OpenAPI 2";
+                config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT Token"));
+                config.AddSecurity("JWT Token", Enumerable.Empty<string>(),
+                    new OpenApiSecurityScheme
+                    {
+                        Type = OpenApiSecuritySchemeType.ApiKey,
+                        Name = "Authorization",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Description = "Copy this into the value field: Bearer {token}"
+                    }
+                );
+            });
 
             services.AddAuthentication(x =>
             {
