@@ -112,11 +112,10 @@ export default class EventDetail extends Component {
         else if (this.state.userRole === 'Guest' 
             || this.state.userId === this.state.organizerId 
             || start <= currentDate
-            || Object.keys(this.state.participants).length >= this.state.participantsLimit)
-        {
+            || Object.keys(this.state.participants).length >= this.state.participantsLimit && this.state.participantsLimit !== 0) {
             return null
         } 
-        else{
+        else {
             return(
                 <Button color="primary" onClick={this.subscribe}>Записаться</Button>
             )
