@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import queryString from 'query-string';
-import EventMedia from './EventMedia';
+import EventRow from './EventRow';
 import EventsPaginator from './EventsPaginator';
 import EventsSideBar from './EventsSideBar';
 
@@ -31,43 +31,30 @@ export default class Events extends Component {
         }
     }
 
-    renderEventsList(events) {
-        return(
-            <div>
-                <p>{`Найдено событий: ${this.state.totalRecords}`}</p>
-                <ul>
-                    {this.state.events.map(e => <li style={{listStyleType: 'none'}} key={e.id}><EventMedia event={e}/><hr/></li>)}
-                </ul>
-                <EventsPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>
-            </div>             
-        )
-    }
-
     render() {
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : this.renderEventsList(this.state.events);
-
-        const pageStyle = {
-            display: 'flex'
-        }
-        const contentStyle = {
-            width: '100%'
-        }
-        const filterStyle = {
-            float: 'right',
-            width: '240px',
-            margin: '0px 0px 0px 32px'
-        }
-    
         return (
-            <div style={pageStyle}>
-                <div style={contentStyle}>
-                    <h2 id="tabelLabel">События в Минске</h2>
-                    {content}
+            this.state.loading ? <p><em>Loading...</em></p> :
+            <div style={{display: 'flex'}}>
+                <div className="list-group mr-3">
+                    <div className="list-group-item bg-light">
+                        <h3 id="tabelLabel">События в Минске</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <table className="table m-0">
+                            {this.state.events.map(e => <EventRow event={e}/>)}
+                        </table>
+                    </div>
+                    <div className="list-group-item pb-0">
+                        <EventsPaginator 
+                            currentPage={this.state.currentPage} 
+                            totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}
+                        />
+                    </div>
                 </div>
-                <div style={filterStyle}>
-                    <EventsSideBar />
+                <div className="list-group">
+                    <div className="list-group-item">
+                        <EventsSideBar />
+                    </div>
                 </div>
             </div>
         );

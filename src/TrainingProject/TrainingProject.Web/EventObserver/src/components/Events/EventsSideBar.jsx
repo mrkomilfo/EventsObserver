@@ -144,7 +144,7 @@ export default class EventsSideBar extends Component {
                 </FormGroup>
                 </Label> 
             </FormGroup>
-            <Button color="primary" tag={Link} to={`/events${this.getQuerryTrailer()}`}>Поиск</Button>
+            <Button className="w-100" color="primary" tag={Link} to={`/events${this.getQuerryTrailer()}`}>Поиск</Button>
         </Form>
     )}
 

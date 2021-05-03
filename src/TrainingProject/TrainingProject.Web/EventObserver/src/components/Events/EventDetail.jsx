@@ -2,6 +2,7 @@
 import queryString from 'query-string';
 import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import Parser from 'html-react-parser';
 import Chat from './Chat';
 import AuthHelper from '../../Utils/authHelper.js';
 import ErrorPage from '../Common/ErrorPage';
@@ -164,7 +165,9 @@ export default class EventDetail extends Component {
                 <h4>Категория: <Link to={`/events?categoryId=${this.state.categoryId}`}>{this.state.category}</Link></h4>
                 <div style={tagBlockStyle}>{tags}</div>
                 {image}
-                <p>{this.state.description}</p>
+                <p>
+                    { Parser(this.state.description) }
+                </p>
                 <table cellPadding='8px'>
                     <tbody>
                     <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>

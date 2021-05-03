@@ -9,7 +9,7 @@ export default class Layout extends Component {
     return ( 
       <div>
         <NavMenu />
-        <Container style={{marginBottom: '12px'}}>
+        <Container style={{marginBottom: '12px', width: 'fit-content'}}>
           {this.props.children}
         </Container>
       </div>
