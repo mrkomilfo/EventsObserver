@@ -131,10 +131,6 @@ export default class EditProfile extends Component {
     }
 
     renderProfile() {
-        const formStyle = {
-            maxWidth: '420px'
-        }
-
         const imageStyle = {
             maxWidth: '420px',
             maxHeight: '420px',
@@ -158,7 +154,7 @@ export default class EditProfile extends Component {
         }
 
         return(
-            <Form style={formStyle}>
+            <Form>
                 <FormGroup>
                     <Label for="userName">Имя пользователя</Label>
                     <Input invalid={!this.state.userNameValid} required type="text" name="userName" id="userName" value={this.state.userName} onChange={this.handleInputChange}/>
@@ -195,26 +191,29 @@ export default class EditProfile extends Component {
     }
 
     render() {
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
-
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : (this.state.noContent
-                ? <Alert color="info">
-                    {"Пользователь удалён или ещё не зарегистрирован"}
-                </Alert>
-                : this.renderProfile()
-            );
+        const errorBaner = !this.state.errorMessage ? null :
+            <Alert color="danger">
+                {this.state.errorMessage}
+            </Alert>;
 
         return(
-            <>
-                {errorBaner}
-                <h2>Редактирование профиля</h2>
-                {content}
-            </>
+            this.state.loading ? <p><em>Loading...</em></p> :
+            (this.state.noContent ? 
+                <Alert color="info">
+                    {"Пользователь удалён или ещё не зарегистрирован"}
+                </Alert> : 
+                <div className="mx-auto" style={{maxWidth: '720px'}}>
+                    {errorBaner}
+                    <div className="list-group">
+                        <div className="list-group-item bg-light">
+                            <h3 id="tabelLabel">Редактирование профиля</h3>
+                        </div>
+                        <div className="list-group-item">
+                            {this.renderProfile()}
+                        </div>
+                    </div>
+                </div>
+            )
         )
     }
 

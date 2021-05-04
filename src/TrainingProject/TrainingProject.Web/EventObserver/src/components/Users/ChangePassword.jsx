@@ -94,31 +94,37 @@ export default class ChangePassword extends Component {
         }
         
         return(
-            <>
+            <div className="mx-auto" style={{maxWidth: '300px'}}>
                 {errorBaner}
-                <h2>Изменение пароля</h2>
-                <Form style={formStyle}>
-                    <FormGroup>
-                        <Label for="oldPassword">Старый пароль</Label>
-                        <Input invalid={!this.state.oldPasswordValid} required type="password" name="oldPassword" id="oldPassword" value={this.state.oldPassword} onChange={this.handleInputChange}/>
-                        <FormFeedback>{this.state.formErrors.oldPassword}</FormFeedback>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="newPassword">Новый пароль</Label>
-                        <Input invalid={!this.state.newPasswordValid} required type="password" name="newPassword" id="newPassword" value={this.state.newPassword} onChange={this.handleInputChange}/>
-                        <FormFeedback>{this.state.formErrors.newPassword}</FormFeedback>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="newPasswordConfirm">Повторите новый пароль</Label>
-                        <Input invalid={!this.state.newPasswordConfirmValid} required type="password" name="newPasswordConfirm" id="newPasswordConfirm" value={this.state.newPasswordConfirm} onChange={this.handleInputChange}/>
-                        <FormFeedback>{this.state.formErrors.newPasswordConfirm}</FormFeedback>
-                    </FormGroup>
-                    <div>
-                        <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.changePassword()}>Сохранить</Button>{' '}
-                        <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 id="tabelLabel">Изменение пароля</h3>
                     </div>
-                </Form>
-            </>
+                    <div className="list-group-item">
+                        <Form style={formStyle}>
+                            <FormGroup>
+                                <Label for="oldPassword">Старый пароль</Label>
+                                <Input invalid={!this.state.oldPasswordValid} required type="password" name="oldPassword" id="oldPassword" value={this.state.oldPassword} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.oldPassword}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="newPassword">Новый пароль</Label>
+                                <Input invalid={!this.state.newPasswordValid} required type="password" name="newPassword" id="newPassword" value={this.state.newPassword} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.newPassword}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="newPasswordConfirm">Повторите новый пароль</Label>
+                                <Input invalid={!this.state.newPasswordConfirmValid} required type="password" name="newPasswordConfirm" id="newPasswordConfirm" value={this.state.newPasswordConfirm} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.newPasswordConfirm}</FormFeedback>
+                            </FormGroup>
+                            <div>
+                                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.changePassword()}>Сохранить</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
+                </div>
+            </div>
         )
     }
 

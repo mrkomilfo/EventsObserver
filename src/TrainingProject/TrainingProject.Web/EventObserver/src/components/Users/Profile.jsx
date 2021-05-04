@@ -163,25 +163,30 @@ export default class Profile extends Component {
             </Modal>
 
         return(
-            <>
-                <div style={mainStyle}>
-                    <img style={photoStyle} src={this.state.photo} alt="user photo"/>
-                    <div>
-                        <h3>{this.state.userName}{badge}{status}</h3>
-                        <table cellPadding='8px'>
-                            <tbody>
-                                <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
-                                <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
-                                <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
-                                <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizerId=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
-                                <tr><td><b>Посетил:</b></td><td><Link to={`/events?participantId=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
-                            </tbody>
-                        </table>
-                        {confirmEmailModal}
+            <div className="mx-auto list-group" style={{maxWidth: '720px'}}>
+                <div className="list-group-item bg-light">
+                    <h3 className="m-0">Профиль пользователя</h3>
+                </div>
+                <div className="list-group-item">
+                    <div style={mainStyle}>
+                        <img style={photoStyle} src={this.state.photo} alt="user photo"/>
+                        <div>
+                            <h3>{this.state.userName}{badge}{status}</h3>
+                            <table cellPadding='8px'>
+                                <tbody>
+                                    <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>
+                                    <tr><td><b>Email:</b></td><td>{this.state.contactEmail || 'Не указан'}</td><td>{emailConfirmedButton}</td></tr>
+                                    <tr><td><b>Телефон:</b></td><td>{this.state.contactPhone || 'Не указан'}</td></tr>
+                                    <tr><td><b>Организовал:</b></td><td><Link to={`/events?organizerId=${this.state.id}`}>{this.state.organizedEvents} мероприятий</Link></td></tr>
+                                    <tr><td><b>Посетил:</b></td><td><Link to={`/events?participantId=${this.state.id}`}>{this.state.visitedEvents} мероприятий</Link></td></tr>
+                                </tbody>
+                            </table>
+                            {buttonPanel}
+                            {confirmEmailModal}
+                        </div>
                     </div>
                 </div>
-                {buttonPanel}
-            </>
+            </div>
         )
     }
 

@@ -34,26 +34,28 @@ export default class Events extends Component {
     render() {
         return (
             this.state.loading ? <p><em>Loading...</em></p> :
-            <div style={{display: 'flex'}}>
-                <div className="list-group mr-3">
-                    <div className="list-group-item bg-light">
-                        <h3 id="tabelLabel">События в Минске</h3>
+            <div className="mx-auto" style={{width: 'fit-content'}}>
+                <div style={{display: 'flex'}}>
+                    <div className="list-group mr-3">
+                        <div className="list-group-item bg-light">
+                            <h3 className="m-0">События в Минске</h3>
+                        </div>
+                        <div className="list-group-item">
+                            <table className="table m-0">
+                                {this.state.events.map(e => <EventRow event={e}/>)}
+                            </table>
+                        </div>
+                        <div className="list-group-item pb-0">
+                            <EventsPaginator 
+                                currentPage={this.state.currentPage} 
+                                totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}
+                            />
+                        </div>
                     </div>
-                    <div className="list-group-item">
-                        <table className="table m-0">
-                            {this.state.events.map(e => <EventRow event={e}/>)}
-                        </table>
-                    </div>
-                    <div className="list-group-item pb-0">
-                        <EventsPaginator 
-                            currentPage={this.state.currentPage} 
-                            totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}
-                        />
-                    </div>
-                </div>
-                <div className="list-group">
-                    <div className="list-group-item">
-                        <EventsSideBar />
+                    <div className="list-group">
+                        <div className="list-group-item">
+                            <EventsSideBar />
+                        </div>
                     </div>
                 </div>
             </div>

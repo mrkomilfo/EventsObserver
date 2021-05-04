@@ -109,32 +109,34 @@ export default class SignUp extends Component {
                 </ModalFooter>
             </Modal>
 
-        const signInStyle = {
-            maxWidth: '256px'
-        }
-
         return( 
-            <>
+            <div className="mx-auto" style={{maxWidth: '300px'}}>
                 {errorBaner}
-                <h2>Вход</h2>  
-                <Form style={signInStyle}>    
-                    <FormGroup>
-                        <Label for="login">Логин</Label>
-                        <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="password">Пароль</Label>
-                        <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
-                    </FormGroup>
-                    <div>
-                        <Button color="primary" onClick={this.logIn}>Войти</Button>{' '}
-                        <Button color="warning" onClick={this.toggleRequestResetCodeModal}>Я забыл пароль</Button>
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Вход</h3>
                     </div>
-                    {requestResetCodeModal}
-                    {resetPasswordModal}
-                    {resetPasswordConfirmModal}
-                </Form>
-            </>
+                    <div className="list-group-item">
+                        <Form>    
+                            <FormGroup>
+                                <Label for="login">Логин</Label>
+                                <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="password">Пароль</Label>
+                                <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
+                            </FormGroup>
+                            <div>
+                                <Button color="primary" onClick={this.logIn}>Войти</Button>{' '}
+                                <Button color="warning" onClick={this.toggleRequestResetCodeModal}>Я забыл пароль</Button>
+                            </div>
+                            {requestResetCodeModal}
+                            {resetPasswordModal}
+                            {resetPasswordConfirmModal}
+                        </Form>
+                    </div>
+                </div>
+            </div>
         )
     }
 

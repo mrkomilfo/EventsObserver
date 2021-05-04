@@ -201,81 +201,87 @@ export default class NewEvent extends Component {
         const imageBlock = this.state.imageFile ? <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" onClick={(e) => this.removeImage()}/> : null;
 
         return(
-            <>
-            {errorBaner}
-            <h2>Новое мероприятие</h2>
-            <Form>
-                <FormGroup>
-                    <Label for="name">Название мероприятия</Label>
-                    <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.name}</FormFeedback>
-                </FormGroup>
-                <FormGroup> 
-                    <Label for="category">Категория</Label>
-                    <Input invalid={!this.state.categoryValid} type="select" name="category" id="category" value={this.state.category} onChange={this.handleInputChange}>
-                        {categoriesSelect}
-                    </Input>
-                    <FormFeedback>{this.state.formErrors.category}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="description">Описание</Label>
-                    <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.description}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="place">Место</Label>
-                    <Input invalid={!this.state.placeValid} required type="text" name="place" id="place" value={this.state.place} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.place}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="date">Дата</Label>
-                    <Input invalid={!this.state.dateValid} required type="date" name="date" id="date" onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.date}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="time">Время</Label>
-                    <Input invalid={!this.state.timeValid} required type="time" name="time" id="time" onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.time}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="fee">Взнос</Label>{'  '}<span style={tipStyle} id="feeTip">?</span>
-                    <UncontrolledTooltip placement="right" target="feeTip">
-                        0 - бесплатно
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.feeValid} required type="text" name="fee" id="fee" value={this.state.fee} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.fee}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="participantsLimit">Количество участников</Label>{'  '}<span style={tipStyle} id="limitTip">?</span>
-                    <UncontrolledTooltip placement="right" target="limitTip">
-                        0 - без ограничений
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.participantsLimitValid} required type="number" name="participantsLimit" id="participantsLimit" value={this.state.participantsLimit} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.participantsLimit}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="tags">Теги</Label>{'  '}<span style={tipStyle} id="tagsTip">?</span>
-                    <UncontrolledTooltip placement="right" target="tagsTip">
-                        Теги могут содержать буквы, цифры, пробелы, знаки нижнего подчёркивания и разделяются запятыми
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.tagsValid} type="text" name="tags" id="tags" value={this.state.tags} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.tags}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="imageFile">Картинка</Label>{'  '}<span style={tipStyle} id="imageTip">?</span>
-                    <UncontrolledTooltip placement="right" target="imageTip">
-                        Чтобы удалить картинку - просто кликните по ней
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.imageFileValid} type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.imageFile}</FormFeedback>
-                    {imageBlock}
-                </FormGroup>
-                <div>
-                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+            <div className="mx-auto" style={{maxWidth: '720px'}}>
+                {errorBaner}
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Новое мероприятие</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <Form>
+                            <FormGroup>
+                                <Label for="name">Название мероприятия</Label>
+                                <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.name}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup> 
+                                <Label for="category">Категория</Label>
+                                <Input invalid={!this.state.categoryValid} type="select" name="category" id="category" value={this.state.category} onChange={this.handleInputChange}>
+                                    {categoriesSelect}
+                                </Input>
+                                <FormFeedback>{this.state.formErrors.category}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="description">Описание</Label>
+                                <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.description}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="place">Место</Label>
+                                <Input invalid={!this.state.placeValid} required type="text" name="place" id="place" value={this.state.place} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.place}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="date">Дата</Label>
+                                <Input invalid={!this.state.dateValid} required type="date" name="date" id="date" onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.date}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="time">Время</Label>
+                                <Input invalid={!this.state.timeValid} required type="time" name="time" id="time" onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.time}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="fee">Взнос</Label>{'  '}<span style={tipStyle} id="feeTip">?</span>
+                                <UncontrolledTooltip placement="right" target="feeTip">
+                                    0 - бесплатно
+                                </UncontrolledTooltip>
+                                <Input invalid={!this.state.feeValid} required type="text" name="fee" id="fee" value={this.state.fee} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.fee}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="participantsLimit">Количество участников</Label>{'  '}<span style={tipStyle} id="limitTip">?</span>
+                                <UncontrolledTooltip placement="right" target="limitTip">
+                                    0 - без ограничений
+                                </UncontrolledTooltip>
+                                <Input invalid={!this.state.participantsLimitValid} required type="number" name="participantsLimit" id="participantsLimit" value={this.state.participantsLimit} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.participantsLimit}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="tags">Теги</Label>{'  '}<span style={tipStyle} id="tagsTip">?</span>
+                                <UncontrolledTooltip placement="right" target="tagsTip">
+                                    Теги могут содержать буквы, цифры, пробелы, знаки нижнего подчёркивания и разделяются запятыми
+                                </UncontrolledTooltip>
+                                <Input invalid={!this.state.tagsValid} type="text" name="tags" id="tags" value={this.state.tags} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.tags}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="imageFile">Картинка</Label>{'  '}<span style={tipStyle} id="imageTip">?</span>
+                                <UncontrolledTooltip placement="right" target="imageTip">
+                                    Чтобы удалить картинку - просто кликните по ней
+                                </UncontrolledTooltip>
+                                <Input invalid={!this.state.imageFileValid} type="file" name="imageFile" id="imageFile" accept=".jpg,.png,.jpeg" value={this.state.fileName} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.imageFile}</FormFeedback>
+                                {imageBlock}
+                            </FormGroup>
+                            <div>
+                                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createEvent()}>Опубликовать</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
                 </div>
-            </Form>
-            </>
+            </div>
         )
     }
 

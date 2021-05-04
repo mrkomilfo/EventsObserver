@@ -56,49 +56,12 @@ export default class Users extends Component {
         return queryTrailer;
     }
 
-    renderUsersList(users) {
-        return(
-            <>
-                <p>{`Найдено пользователей: ${this.state.totalRecords}`}</p>
-                <Table striped>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Имя пользователя</th>
-                            <th>Роль</th>
-                            <th>Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.users.map((u, index) => 
-                        <tr key={u.id}>
-                            <th scope="row">{this.state.currentPage*this.state.pageSize+index+1}</th>
-                            <td><Link to={`user?id=${u.id}`}>{u.userName}</Link></td>
-                            <td>{u.role}</td>
-                            <td>{u.status || 'без ограничений'}</td>
-                        </tr>)}
-                    </tbody>
-                </Table>  
-                <UsersPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>        
-            </> 
-        )
-    }
-
     render() {
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : this.renderUsersList(this.state.users);
-
-        const headerStyle = {
-            marginBottom: '8px',
-            display: 'flex',
-            justifyContent: 'space-between'
-        }
-
         return(
-            <>
-                <div style={headerStyle}>
-                    <h2>Пользователи</h2>
+            this.state.loading ? <p><em>Loading...</em></p> :
+            <div className="list-group mx-auto" style={{maxWidth: '720px'}}>
+                <div class="list-group-item bg-light d-flex justify-content-between">
+                    <h3 className="m-0">Пользователи</h3>
                     <div>
                         <InputGroup>
                             <Input type="text" name="userName" id="userName" value={this.state.userName} placeholder="Имя пользователя" onChange={this.handleInputChange} />
@@ -106,8 +69,31 @@ export default class Users extends Component {
                         </InputGroup>
                     </div>
                 </div>
-                {content}
-            </>
+                <div className="list-group-item">
+                    <Table striped>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Имя пользователя</th>
+                                <th>Роль</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.users.map((u, index) => 
+                            <tr key={u.id}>
+                                <th scope="row">{this.state.currentPage*this.state.pageSize+index+1}</th>
+                                <td><Link to={`user?id=${u.id}`}>{u.userName}</Link></td>
+                                <td>{u.role}</td>
+                                <td>{u.status || 'без ограничений'}</td>
+                            </tr>)}
+                        </tbody>
+                    </Table>  
+                </div>
+                <div className="list-group-item pb-0">
+                    <UsersPaginator currentPage={this.state.currentPage} totalPages={Math.ceil(this.state.totalRecords / this.state.pageSize)}/>        
+                </div>
+            </div>
         );
     }
 

@@ -125,46 +125,52 @@ export default class SignUp extends Component {
         }
         
         return(
-            <>
+            <div className="mx-auto" style={{maxWidth: '300px'}}>
             {errorBaner}
-            <h2>Регистрация</h2>
-            <Form style={formStyle}>
-                <FormGroup>
-                    <Label for="name">Имя пользователя</Label>
-                    <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.name}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="email">Email</Label>{'  '}<span style={tipStyle} id="emailTip">?</span>
-                    <UncontrolledTooltip placement="right" target="emailTip">
-                        Почта необходима для восстановления пароля и получения напоминаний о предстоящих мероприятиях
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.emailValid} type="email" name="email" id="email" value={this.state.email} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.email}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="phone">Телефон</Label>
-                    <Input invalid={!this.state.phoneValid} type="tel" name="phone" id="phone" value={this.state.phone} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.phone}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="login">Логин</Label>
-                    <Input invalid={!this.state.loginValid} required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.login}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="password">Пароль</Label>
-                    <Input invalid={!this.state.passwordValid} required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.password}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="passwordConfirm">Повторите пароль</Label>
-                    <Input invalid={!this.state.passwordConfirmValid} required type="password" name="passwordConfirm" id="passwordConfirm" value={this.state.passwordConfirm} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.passwordConfirm}</FormFeedback>
-                </FormGroup>
-                <Button color="primary" disabled = {!this.state.formValid} onClick={() => this.register()}>Зарегистрироваться</Button>
-            </Form>
-            </>
+            <div className="list-group">
+                <div className="list-group-item bg-light">
+                    <h3 className="m-0">Регистрация</h3>
+                </div>
+                <div className="list-group-item">
+                        <Form style={formStyle}>
+                            <FormGroup>
+                                <Label for="name">Имя пользователя</Label>
+                                <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.name}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="email">Email</Label>{'  '}<span style={tipStyle} id="emailTip">?</span>
+                                <UncontrolledTooltip placement="right" target="emailTip">
+                                    Почта необходима для восстановления пароля и получения напоминаний о предстоящих мероприятиях
+                                </UncontrolledTooltip>
+                                <Input invalid={!this.state.emailValid} type="email" name="email" id="email" value={this.state.email} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.email}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="phone">Телефон</Label>
+                                <Input invalid={!this.state.phoneValid} type="tel" name="phone" id="phone" value={this.state.phone} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.phone}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="login">Логин</Label>
+                                <Input invalid={!this.state.loginValid} required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.login}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="password">Пароль</Label>
+                                <Input invalid={!this.state.passwordValid} required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.password}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="passwordConfirm">Повторите пароль</Label>
+                                <Input invalid={!this.state.passwordConfirmValid} required type="password" name="passwordConfirm" id="passwordConfirm" value={this.state.passwordConfirm} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.passwordConfirm}</FormFeedback>
+                            </FormGroup>
+                            <Button color="primary" disabled = {!this.state.formValid} onClick={() => this.register()}>Зарегистрироваться</Button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
         )
     }
 
