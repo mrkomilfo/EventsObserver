@@ -286,7 +286,7 @@ export default class NewEvent extends Component {
     }
 
     async loadCategories() {
-        fetch('api/Categories')
+        fetch('api/categories/names')
             .then((response) => {
                 this.setState({
                     error: !response.ok

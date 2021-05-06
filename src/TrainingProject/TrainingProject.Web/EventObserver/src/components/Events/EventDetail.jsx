@@ -170,10 +170,10 @@ export default class EventDetail extends Component {
                 </p>
                 <table cellPadding='8px'>
                     <tbody>
-                    <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>
-                    <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
-                    <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
-                    <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +' BYN' : 'Бесплатно'}</td></tr>
+                        <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>
+                        <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
+                        <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
+                        <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +' BYN' : 'Бесплатно'}</td></tr>
                     </tbody>
                 </table>
                 <br/>

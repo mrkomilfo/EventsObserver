@@ -14,7 +14,6 @@ import Blocking from './components/Users/Blocking';
 import ChangePassword from './components/Users/ChangePassword';
 import ChangeRole from './components/Users/ChangeRole';
 import Categories from './components/Categories/Categories';
-import CategoryDetail from './components/Categories/CategoryDetail';
 import NewCategory from './components/Categories/NewCategory';
 import EditCategory from './components/Categories/EditCategory';
 import AuthHelper from './Utils/authHelper';
@@ -42,7 +41,6 @@ export default class App extends Component {
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'User' ? <Route path='/blocking' component={Page403} /> : <Route path='/blocking' component={Blocking} />) : <Route path='/blocking' render={() => (<Redirect to='/signIn' push/>)} />}
 
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Admin' ? <Route path='/categories' component={Categories} /> : <Route path='/categories' component={Page403} />) : <Route path='/categories' render={() => (<Redirect to='/signIn' push/>)} />}
-                {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Admin' ? <Route path='/category' component={CategoryDetail} /> : <Route path='/category' component={Page403} />) : <Route path='/category' render={() => (<Redirect to='/signIn' push/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Admin' ? <Route path='/newCategory' component={NewCategory} /> : <Route path='/newCategory' component={Page403} />) : <Route path='/newCategory' render={() => (<Redirect to='/signIn' push/>)} />}
                 {AuthHelper.getRole() !== 'Guest' ? (AuthHelper.getRole() === 'Admin' ? <Route path='/editCategory' component={EditCategory} /> : <Route path='/categories' component={Page403} />) : <Route path='/editCategory' render={() => (<Redirect to='/signIn' push/>)} />}
                 

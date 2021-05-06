@@ -42,7 +42,9 @@ export default class Events extends Component {
                         </div>
                         <div className="list-group-item">
                             <table className="table m-0">
-                                {this.state.events.map(e => <EventRow event={e}/>)}
+                                <tbody>
+                                    {this.state.events.map(e => <EventRow event={e}/>)}
+                                </tbody>
                             </table>
                         </div>
                         <div className="list-group-item pb-0">

@@ -23,31 +23,33 @@ export default class EventRow extends Component {
                 </td>
                 <td className="pt-0">
                     <table className="table table-sm table-borderless m-0">
-                        <tr>
-                            <td colSpan="2">
-                                <h4 className="m-0">
-                                    <Link style={{ wordBreak: "break-all" }} to={`/event?id=${this.props.event.id}`}>
-                                        {this.props.event.name}
-                                    </Link>
-                                </h4>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Категория:</td>
-                            <td><Link to={`/events?categoryId=${this.props.event.categoryId}`}>{this.props.event.category}</Link></td>
-                        </tr>
-                        <tr>
-                            <td>Место:</td>
-                            <td>{this.props.event.place}</td>
-                        </tr>
-                        <tr>
-                            <td>Начало:</td>
-                            <td>{this.props.event.start}</td>
-                        </tr>
-                        <tr>
-                            <td>Взнос:</td>
-                            <td>{this.props.event.fee ? this.props.event.fee +'BYN' : 'Бесплатно'}</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td colSpan="2">
+                                    <h4 className="m-0">
+                                        <Link style={{ wordBreak: "break-all" }} to={`/event?id=${this.props.event.id}`}>
+                                            {this.props.event.name}
+                                        </Link>
+                                    </h4>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Категория:</td>
+                                <td><Link to={`/events?categoryId=${this.props.event.categoryId}`}>{this.props.event.category}</Link></td>
+                            </tr>
+                            <tr>
+                                <td>Место:</td>
+                                <td>{this.props.event.place}</td>
+                            </tr>
+                            <tr>
+                                <td>Начало:</td>
+                                <td>{this.props.event.start}</td>
+                            </tr>
+                            <tr>
+                                <td>Взнос:</td>
+                                <td>{this.props.event.fee ? this.props.event.fee +'BYN' : 'Бесплатно'}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </td>
             </tr>

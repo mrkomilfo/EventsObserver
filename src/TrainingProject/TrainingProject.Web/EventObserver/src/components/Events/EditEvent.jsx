@@ -62,6 +62,9 @@ export default class EditEvent extends Component{
 
     componentDidMount() {
         const parsed = queryString.parse(window.location.search);
+
+        this.loadCategories();
+
         if (parsed && parsed['id']) {
             this.loadEvent(parsed['id']);
         }
@@ -222,8 +225,14 @@ export default class EditEvent extends Component{
         }
         else imageBlock = null
 
+        const errorBaner = this.state.errorMessage ? 
+            <Alert color="danger">
+                {this.state.errorMessage}
+            </Alert> : null;
+
         return(
             <div className="mx-auto" style={{maxWidth: '720px'}}>
+                {errorBaner}
                 <div className="list-group">
                     <div className="list-group-item bg-light">
                         <h3 className="m-0">Редактирование информации о мероприятии</h3>
@@ -322,23 +331,17 @@ export default class EditEvent extends Component{
                 break;
             default:
                 content = this.renderEvent()
-        }
-
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
+        }        
 
         return(
             <>
-                {errorBaner}
                 {this.state.loading ? null : content}
             </>
         )
     }
 
-    loadCategories() {
-        fetch('api/Categories')
+    async loadCategories() {
+        fetch('api/categories/names')
             .then((response) => {
                 this.setState({
                     error: !response.ok
@@ -363,7 +366,7 @@ export default class EditEvent extends Component{
     }
 
     async loadEvent(eventId) {
-        AuthHelper.fetchWithCredentials('api/Events/' + eventId + '/update')
+        AuthHelper.fetchWithCredentials('api/events/' + eventId + '/update')
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");

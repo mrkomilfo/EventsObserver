@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Net.Mail;
+
 using TrainingProject.Common;
 using TrainingProject.Domain;
-
 
 namespace TrainingProject.DomainLogic.Services
 {

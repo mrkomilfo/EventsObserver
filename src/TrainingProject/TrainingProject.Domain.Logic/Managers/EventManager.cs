@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
@@ -34,30 +37,38 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task AddEventAsync(EventCreateDto @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
+
             var newEvent = _mapper.Map<EventCreateDto, Event>(@event);
+
             await _appContext.Events.AddAsync(newEvent);
             await _appContext.SaveChangesAsync(default);
 
             if (@event.Image != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{newEvent.Id}.jpg";
+
                 _logger.LogInfo($"Saving image to {path}");
+
                 await using var fileStream = new FileStream(path, FileMode.Create);
+
                 await @event.Image.CopyToAsync(fileStream);
             }
 
             if (@event.Tags != null)
             {
                 var tags = @event.Tags.ParseSubstrings(",");
+
                 foreach (var tagName in tags)
                 {
                     var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName.ToLower()));
+
                     if (tag == null)
                     {
                         tag = _mapper.Map<string, Tag>(tagName);
                         await _appContext.Tags.AddAsync(tag);
                         await _appContext.SaveChangesAsync(default);
                     }
+
                     await _appContext.EventsTags.AddAsync(new EventsTags { EventId = newEvent.Id, TagId = tag.Id });
                 }
             }
@@ -68,32 +79,42 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task UpdateEventAsync(EventUpdateDto @event, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(@event);
+
             var update = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == @event.Id);
+
             if (update == null)
             {
                 throw new KeyNotFoundException($"Event with id={@event.Id} not found");
             }
+
             int subscribesCount = await _appContext.EventsUsers.Where(eu => eu.EventId == @event.Id).CountAsync();
+
             if (@event.ParticipantsLimit < subscribesCount && @event.ParticipantsLimit != 0)
             {
                 throw new ArgumentOutOfRangeException($"Сurrent number of participants({subscribesCount}) is greater than the new limit({@event.ParticipantsLimit})");
             }
             _mapper.Map(@event, update);
+
             await _appContext.SaveChangesAsync(default);
 
             _appContext.EventsTags.RemoveRange(_appContext.EventsTags.Where(et => et.EventId == @event.Id));
+
             if (@event.Tags != null)
             {
                 var tags = @event.Tags.ParseSubstrings(",");
+
                 foreach (var tagName in tags)
                 {
                     var tag = await _appContext.Tags.FirstOrDefaultAsync(t => string.Equals(t.Name.ToLower(), tagName));
+
                     if (tag == null)
                     {
                         tag = _mapper.Map<string, Tag>(tagName);
+
                         await _appContext.Tags.AddAsync(tag);
                         await _appContext.SaveChangesAsync(default);
                     }
+
                     await _appContext.EventsTags.AddAsync(new EventsTags { EventId = update.Id, TagId = tag.Id });
                 }
             }
@@ -101,8 +122,11 @@ namespace TrainingProject.DomainLogic.Managers
             if (@event.Image != null)
             {
                 string path = $"{hostRoot}\\wwwroot\\img\\events\\{update.Id}.jpg";
+
                 _logger.LogInfo($"Saving image to {path}");
+
                 await using var fileStream = new FileStream(path, FileMode.Create);
+
                 await @event.Image.CopyToAsync(fileStream);
             }
 
@@ -112,31 +136,40 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<EventToUpdateDto> GetEventToUpdateAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var @event = await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+
             if (@event == null)
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
+
             EventToUpdateDto eventToUpdate = _mapper.Map<EventToUpdateDto>(@event);
 
             if (@event.HasImage)
             {
                 eventToUpdate.Image = $"img\\events\\{eventId}.jpg";
             }
+
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag.Name).ToHashSet();
-            eventToUpdate.Tags = String.Join(", ", tags);
+            
+            eventToUpdate.Tags = string.Join(", ", tags);
+
             return eventToUpdate;
         }
 
         public async Task DeleteEventAsync(int eventId, bool force, string hostRoot)
         {
             _logger.LogMethodCallingWithObject(new { eventId, force, hostRoot });
+
             var @event = await _appContext.Events.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(c => c.Id == eventId);
+
             if (@event == null)
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
+
             if (force)
             {
                 _appContext.Events.Remove(@event);
@@ -148,25 +181,31 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 @event.IsDeleted = true;
             }
+
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task<EventFullDto> GetEventAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var DBEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
+
             if (DBEvent == null)
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
-            var eventFullDto = _mapper.Map<EventFullDto>(DBEvent);
 
+            var eventFullDto = _mapper.Map<EventFullDto>(DBEvent);
             var participants = await _appContext.EventsUsers.Include(eu => eu.Participant).Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).ToListAsync();
+
             foreach (var participant in participants)
             {
                 eventFullDto.Participants.Add(participant.Id.ToString(), participant.UserName);
             }
+
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag).ToHashSet();
+
             foreach (var tag in tags)
             {
                 eventFullDto.Tags.Add(tag.Id.ToString(), tag.Name);
@@ -184,47 +223,58 @@ namespace TrainingProject.DomainLogic.Managers
             bool? upComing, bool onlyFree, bool vacancies, string organizerId, string participantId)
         {
             _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            Guid organizerGuid = string.IsNullOrEmpty(organizerId) ? new Guid() : Guid.Parse(organizerId);
-            Guid participantGuid = string.IsNullOrEmpty(participantId) ? new Guid() : Guid.Parse(participantId);
+
+            var organizerGuid = string.IsNullOrEmpty(organizerId) ? new Guid() : Guid.Parse(organizerId);
+            var participantGuid = string.IsNullOrEmpty(participantId) ? new Guid() : Guid.Parse(participantId);
             var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
+
             if (search != null)
             {
                 query = query.Where(e => e.Name.ToLower().Contains(search.ToLower()));
             }
+
             if (categoryId != null)
             {
                 query = query.Where(e => e.CategoryId == categoryId);
             }
+
             if (tag != null)
             {
                 query = query.Where(e => _appContext.EventsTags.Include(et => et.Tag)
                     .Where(et => et.EventId == e.Id)
                     .Any(et => Equals(et.Tag.Name, tag)));
             }
+
             if (upComing != null)
             {
                 query = query.Where(e => (bool)upComing ? e.Start >= DateTime.Now : e.Start < DateTime.Now);
             }
+
             if (onlyFree)
             {
                 query = query.Where(e => e.Fee == 0);
             }
+
             if (vacancies)
             {
                 query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsUsers.Count(eu => eu.EventId == e.Id) < e.ParticipantsLimit);
             }
+
             if (organizerGuid != Guid.Empty)
             {
                 query = query.Where(e => Equals(e.OrganizerId, organizerGuid));
             }
+
             if (participantGuid != Guid.Empty)
             {
                 query = query.Where(e => _appContext.EventsUsers.Include(eu => eu.Participant)
                     .Where(eu => eu.EventId == e.Id)
                     .Any(eu => Equals(eu.ParticipantId, participantGuid)));
             }
+
             result.TotalRecords = await query.CountAsync();
+
             if (upComing != null && (bool)upComing)
             {
                 query = query.OrderBy(e => e.Start).Skip(index * pageSize).Take(pageSize);
@@ -233,6 +283,7 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
             }
+
             result.Records = await _mapper.ProjectTo<EventLiteDto>(query).ToListAsync(default);
 
             for (int i = 0; i < result.Records.Count; i++)
@@ -240,37 +291,47 @@ namespace TrainingProject.DomainLogic.Managers
                 if (result.Records[i].HasImage)
                 {
                     string path = $"img\\events\\{result.Records[i].Id}.jpg";
+
                     result.Records[i].Image = path;
                 }
             }
+
             return result;
         }
 
         public async Task SubscribeAsync(Guid userId, int eventId)
         {
             _logger.LogMethodCallingWithObject(new { userId, eventId });
+
             if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
+
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
+
             if (await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
                 throw new ArgumentOutOfRangeException($"User(id={userId}) is already signed up on event(id={eventId})");
             }
+
             int participantsLimit = (await _appContext.Events.FirstAsync(e => e.Id == eventId)).ParticipantsLimit;
+
             if (await _appContext.EventsUsers.CountAsync(eu => eu.EventId == eventId) >= participantsLimit && participantsLimit != 0)
             {
                 throw new ArgumentOutOfRangeException($"No vacancies on event(id={eventId})");
             }
+
             if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
             {
                 throw new AccessViolationException($"Event(id={eventId}) has already started");
             }
+
             var eu = new EventsUsers { ParticipantId = userId, EventId = eventId };
+
             await _appContext.EventsUsers.AddAsync(eu);
             await _appContext.SaveChangesAsync(default);
         }
@@ -278,37 +339,45 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task UnsubscribeAsync(Guid userId, int eventId)
         {
             _logger.LogMethodCallingWithObject(new { userId, eventId });
+
             if (!await _appContext.EventsUsers.AnyAsync(eu => Equals(eu.ParticipantId, userId) && eu.EventId == eventId))
             {
                 throw new KeyNotFoundException($"User(id={userId}) is not signed up on event(id={eventId})");
             }
+
             if ((await _appContext.Events.FirstAsync(e => e.Id == eventId)).Start < DateTime.Now)
             {
                 throw new AccessViolationException($"Event(id={eventId}) has already started");
             }
 
-            var eu = await _appContext.EventsUsers.FirstOrDefaultAsync(eu => eu.EventId == eventId && Equals(eu.ParticipantId, userId));
+            var eu = await _appContext.EventsUsers
+                .FirstOrDefaultAsync(eu => eu.EventId == eventId && Equals(eu.ParticipantId, userId));
+
             if (eu != null)
             {
                 _appContext.EventsUsers.Remove(eu);
             }
+
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task<Guid?> GetEventOrganizerIdAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
+
             return (await _appContext.Events.FirstOrDefaultAsync(e => e.Id == eventId))?.OrganizerId;
         }
 
         public void Notificate()
         {
             _logger.LogMethodCalling();
-            DateTime now = DateTime.Now;
+
+            var now = DateTime.Now;
             var eventUsers = _appContext.EventsUsers.Include(eu => eu.Event).Include(eu => eu.Participant).ToList();
             var eventUsersList = eventUsers
                 .Where(eu => !string.IsNullOrEmpty(eu.Participant.ContactEmail)
@@ -323,20 +392,25 @@ namespace TrainingProject.DomainLogic.Managers
 
         public async Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId)
         {
-            IList<string> ids = new List<string>();
+            var ids = new List<string>();
             var targetEvent = await GetEventAsync(eventId);
+
             ids.Add(targetEvent.OrganizerId);
+
             var participantsIds = targetEvent.Participants.Keys;
+
             foreach (string participantId in participantsIds)
             {
                 ids.Add(participantId);
             }
+
             return ids;
         }
 
         public async Task CheckUserInvolvementInTheEventAsync(string userId, int eventId)
         {
-            IList<string> involvedUsers = await GetEventInvolvedUsersIdAsync(eventId);
+            var involvedUsers = await GetEventInvolvedUsersIdAsync(eventId);
+
             if (!involvedUsers.Contains(userId))
             {
                 throw new AccessViolationException($"User(id={userId}) does not have access to event(id={eventId}) chat");

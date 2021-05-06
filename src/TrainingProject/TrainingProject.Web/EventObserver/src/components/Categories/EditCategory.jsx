@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
-import AuthHelper from '../../Utils/authHelper'
+
+import AuthHelper from '../../Utils/authHelper';
+import ErrorPage from '../Common/ErrorPage';
 
 export default class EditCategory extends Component {
     constructor(props) {
         super(props);
         this.state = {     
             loading: true,
+            statusCode: 200,
 
             id: null,
             name: '', 
@@ -22,6 +25,7 @@ export default class EditCategory extends Component {
 
             error: false,
             errorMessage: '',
+
             noContent: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -32,8 +36,13 @@ export default class EditCategory extends Component {
     
     componentDidMount() {
         const parsed = queryString.parse(window.location.search);
-        if (parsed) {
+        if (parsed && parsed['id']) {
             this.loadCategory(parsed['id']);
+        }
+        else {
+            this.setState({
+                statusCode: 404
+            });
         }
     }
 
@@ -61,7 +70,7 @@ export default class EditCategory extends Component {
                 fieldValidationErrors.name = nameValid ? '' : 'У мероприятия должно быть название';
                 break;
             case 'description':
-                descriptionValid = value.length <= 127;
+                descriptionValid = value.length <= 256;
                 fieldValidationErrors.description = descriptionValid ? '' : 'Описание слишком длинное';
                 break;
             default:
@@ -86,53 +95,72 @@ export default class EditCategory extends Component {
         this.props.history.push(`/category?id=${this.state.id}`);
     }
 
-    render() {
+    renderCategory() {
         const errorBaner = this.state.errorMessage ? 
             <Alert color="danger">
                 {this.state.errorMessage}
             </Alert> : null;
 
-        const content = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : (this.state.noContent
-                ? <Alert color="info">
-                    {"Категория удалена или ещё не создана"}
-                  </Alert> 
-                : this.renderCategory()
-            );
+        return(
+            <div className="mx-auto" style={{maxWidth: '720px'}}>
+                {errorBaner}
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Редактирование категории</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <Form>
+                            <FormGroup>
+                                <Label for="name">Название</Label>
+                                <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.name}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="description">Описание</Label>
+                                <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.description}</FormFeedback>
+                            </FormGroup>
+                            <div>
+                                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.editCategory()}>Сохранить</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    render() {
+        let content;
+        switch (this.state.statusCode) {
+            case 204:
+                content = 
+                    <Alert color="info">
+                        {"Категория удалена или ещё не создана"}
+                    </Alert>
+                break;
+            case 403:
+            case 404:
+            case 500:
+                content = <ErrorPage code={this.state.statusCode}/>
+                break;
+            default:
+                content = 
+                this.state.loading 
+                    ? <p><em>Loading...</em></p> 
+                    : this.renderCategory()
+        }
 
         return(
             <>
-                {errorBaner}
-                <h2>Редактирование категории</h2>
                 {content}
             </>
         )
     }
 
-    renderCategory() {
-        return(
-            <Form>
-                <FormGroup>
-                    <Label for="name">Название</Label>
-                    <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.name}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="description">Описание</Label>
-                    <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.description}</FormFeedback>
-                </FormGroup>
-                <div>
-                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.editCategory()}>Сохранить</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
-                </div>
-            </Form>
-        )
-    }
-
     async loadCategory(categoryId) {
-        AuthHelper.fetchWithCredentials('api/Categories/' + categoryId)
+        AuthHelper.fetchWithCredentials('api/categories/' + categoryId)
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");
@@ -177,7 +205,7 @@ export default class EditCategory extends Component {
             name: this.state.name,
             description: this.state.description
         }
-        AuthHelper.fetchWithCredentials('api/Categories', {
+        AuthHelper.fetchWithCredentials('api/categories', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+
 using System;
 using System.Globalization;
+
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Models.Categories;
 using TrainingProject.DomainLogic.Models.Events;
@@ -13,8 +15,8 @@ namespace TrainingProject.DomainLogic.Helpers
         public MappingProfile()
         {
             CreateMap<CategoryCreateDto, Category>();
-            CreateMap<Category, CategoryLiteDto>();
             CreateMap<Category, CategoryFullDto>();
+            CreateMap<Category, CategoryLiteDto>();
 
             CreateMap<EventCreateDto, Event>()
                 .ForMember(m => m.Start, opt => opt.MapFrom(m => DateTime.ParseExact(m.Start, "d/M/yyyy H:m", CultureInfo.InvariantCulture)))

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
 using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.Domain;
@@ -28,10 +30,12 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task AddCategoryAsync(CategoryCreateDto category)
         {
             _logger.LogMethodCallingWithObject(category);
+
             if (await _appContext.Categories.AnyAsync(c => string.Equals(c.Name.ToLower(), category.Name.ToLower())))
             {
                 throw new ArgumentOutOfRangeException("Category with this name already exist");
             }
+
             await _appContext.Categories.AddAsync(_mapper.Map<Category>(category));
             await _appContext.SaveChangesAsync(default);
         }
@@ -39,25 +43,32 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task UpdateCategoryAsync(Category category)
         {
             _logger.LogMethodCallingWithObject(category);
+
             var update = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+
             if (update == null)
             {
                 throw new KeyNotFoundException($"Category with id={category.Id} not found");
             }
+
             update.Name = category.Name;
             update.Description = category.Description;
+
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task DeleteCategoryAsync(int categoryId, bool force = false)
         {
             _logger.LogMethodCallingWithObject(new { categoryId, force });
+
             var category = await _appContext.Categories.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(c => c.Id == categoryId);
+
             if (category == null)
             {
                 throw new KeyNotFoundException($"Category with id={categoryId} not found");
             }
+
             if (force)
             {
                 _appContext.Categories.Remove(category);
@@ -66,23 +77,36 @@ namespace TrainingProject.DomainLogic.Managers
             {
                 category.IsDeleted = true;
             }
+
             await _appContext.SaveChangesAsync(default);
         }
 
         public async Task<CategoryFullDto> GetCategoryAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
+
             var category = await _appContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+
             if (category == null)
             {
                 throw new KeyNotFoundException($"Category with id={categoryId} not found");
             }
+
             return _mapper.Map<CategoryFullDto>(category);
         }
-        public async Task<ICollection<CategoryLiteDto>> GetCategoriesAsync()
+
+        public ICollection<CategoryFullDto> GetCategories()
         {
             _logger.LogMethodCalling();
-            return await _appContext.Categories.Select(c => new CategoryLiteDto { Id = c.Id, Name = c.Name }).ToListAsync();
+
+            return _mapper.Map<ICollection<CategoryFullDto>>(_appContext.Categories);
+        }
+
+        public ICollection<CategoryLiteDto> GetCategoryNames()
+        {
+            _logger.LogMethodCalling();
+
+            return _mapper.Map<ICollection<CategoryLiteDto>>(_appContext.Categories);
         }
     }
 }

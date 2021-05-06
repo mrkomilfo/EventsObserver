@@ -81,26 +81,32 @@ export default class NewCategory extends Component {
         </Alert> : null;
 
         return(
-            <>
-            {errorBaner}
-            <h2>Новая категория</h2>
-            <Form>
-                <FormGroup>
-                    <Label for="name">Название</Label>
-                    <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.name}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="description">Описание</Label>
-                    <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.description}</FormFeedback>
-                </FormGroup>
-                <div>
-                    <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createCategory()}>Добавить</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+            <div className="mx-auto" style={{maxWidth: '720px'}}>
+                {errorBaner}
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Новая категория</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <Form>
+                            <FormGroup>
+                                <Label for="name">Название</Label>
+                                <Input invalid={!this.state.nameValid} required type="text" name="name" id="name" value={this.state.name} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.name}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="description">Описание</Label>
+                                <Input invalid={!this.state.descriptionValid} required type="textarea" name="description" id="description" value={this.state.description} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.description}</FormFeedback>
+                            </FormGroup>
+                            <div>
+                                <Button disabled = {!this.state.formValid} color="primary" onClick={() => this.createCategory()}>Добавить</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
                 </div>
-            </Form>
-            </>
+            </div>
         )
     }
 

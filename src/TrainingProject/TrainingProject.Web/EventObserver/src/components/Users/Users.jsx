@@ -59,7 +59,7 @@ export default class Users extends Component {
     render() {
         return(
             this.state.loading ? <p><em>Loading...</em></p> :
-            <div className="list-group mx-auto" style={{maxWidth: '720px'}}>
+            <div className="list-group mx-auto" style={{maxWidth: '900px'}}>
                 <div class="list-group-item bg-light d-flex justify-content-between">
                     <h3 className="m-0">Пользователи</h3>
                     <div>

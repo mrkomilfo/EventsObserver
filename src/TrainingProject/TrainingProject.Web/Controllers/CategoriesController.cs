@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using TrainingProject.Common;
 using TrainingProject.Domain;
 using TrainingProject.DomainLogic.Interfaces;
@@ -24,16 +26,26 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryLiteDto>>> IndexAsync()
+        public ActionResult<IEnumerable<CategoryFullDto>> IndexAsync()
         {
             _logger.LogMethodCalling();
-            return Ok(await _categoryManager.GetCategoriesAsync());
+
+            return Ok(_categoryManager.GetCategories());
+        }
+
+        [HttpGet("names")]
+        public ActionResult<IEnumerable<CategoryLiteDto>> Names()
+        {
+            _logger.LogMethodCalling();
+
+            return Ok(_categoryManager.GetCategoryNames());
         }
 
         [HttpGet("{categoryId}")]
         public async Task<ActionResult<CategoryFullDto>> DetailsAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
+
             return Ok(await _categoryManager.GetCategoryAsync(categoryId));
         }
 
