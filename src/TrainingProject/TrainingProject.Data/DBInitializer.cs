@@ -78,22 +78,22 @@ namespace TrainingProject.Data
                 await context.Events.AddRangeAsync(events);
                 await context.SaveChangesAsync(default);
 
-                IEnumerable<EventsTags> eventTags = new List<EventsTags>()
+                IEnumerable<EventTag> eventTags = new List<EventTag>()
                 {
-                    new EventsTags{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(0)?.Id},
-                    new EventsTags{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(1)?.Id},
-                    new EventsTags{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(2)?.Id},
-                    new EventsTags{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(3)?.Id},
+                    new EventTag{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(0)?.Id},
+                    new EventTag{EventId = (int)events.ElementAtOrDefault(0)?.Id, TagId = (int)tags.ElementAtOrDefault(1)?.Id},
+                    new EventTag{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(2)?.Id},
+                    new EventTag{EventId = (int)events.ElementAtOrDefault(1)?.Id, TagId = (int)tags.ElementAtOrDefault(3)?.Id},
                 };
                 context.EventsTags.AddRange(eventTags);
                 await context.SaveChangesAsync(default);
 
-                IEnumerable<EventsUsers> eventUsers = new List<EventsUsers>()
+                IEnumerable<EventParticipant> eventUsers = new List<EventParticipant>()
                 {
-                    new EventsUsers{EventId = (int)events.ElementAtOrDefault(0)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "admin")).Select(u => u.Id).FirstOrDefault() },
-                    new EventsUsers{EventId = (int)events.ElementAtOrDefault(1)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "user")).Select(u => u.Id).FirstOrDefault() }
+                    new EventParticipant{EventId = (int)events.ElementAtOrDefault(0)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "admin")).Select(u => u.Id).FirstOrDefault() },
+                    new EventParticipant{EventId = (int)events.ElementAtOrDefault(1)?.Id, ParticipantId = context.Users.Where(u => string.Equals(u.Login, "user")).Select(u => u.Id).FirstOrDefault() }
                 };
-                context.EventsUsers.AddRange(eventUsers);
+                context.EventsParticipants.AddRange(eventUsers);
                 await context.SaveChangesAsync(default);
             }
         }

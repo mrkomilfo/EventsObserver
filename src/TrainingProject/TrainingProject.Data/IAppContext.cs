@@ -19,8 +19,12 @@ namespace TrainingProject.Data
 
         public DbSet<Role> Roles { get; set; }
 
-        public DbSet<EventsTags> EventsTags { get; set; }
+        public DbSet<EventTag> EventsTags { get; set; }
 
-        public DbSet<EventsUsers> EventsUsers { get; set; }
+        public DbSet<EventParticipant> EventsParticipants { get; set; }
+
+        public DbSet<EventDayOfWeek> EventDaysOfWeek { get; set; }
+
+        public DbSet<EventDayOfWeekParticipant> RecurrentEventParticipants { get; set; }
     }
 }

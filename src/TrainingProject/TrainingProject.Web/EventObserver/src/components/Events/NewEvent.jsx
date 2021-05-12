@@ -9,32 +9,33 @@ export default class NewEvent extends Component {
             name: '', 
             category: '', 
             description: '', 
-            place: '', 
-            date: null, 
-            time: null, 
+            place: '',
+            dateTime: null,
+            weekDays: {},
             fee: 0, 
             participantsLimit: 0,
             tags: '',
             imageFile: null,
             fileName: '',
+            isRecurrent: false,
             formErrors: { 
                 name: '', 
                 category: '', 
                 description: '', 
-                place: '', 
-                date: '', 
-                time: '', 
+                place: '',
+                dateTime: '',
+                weekDays: '',
                 fee: '',
                 participantsLimit: '',
                 imageFile: ''
             },
             formValid: false,
-            nameValid: false, 
-            categoryValid: false, 
-            descriptionValid: false, 
-            placeValid: false, 
-            dateValid: false, 
-            timeValid: false, 
+            nameValid: false,
+            categoryValid: false,
+            descriptionValid: false,
+            placeValid: false,
+            dateTimeValid: false,
+            weekDaysValid: false,
             feeValid: true,
             participantsLimitValid: true,
             tagsValid: true,
@@ -45,6 +46,8 @@ export default class NewEvent extends Component {
             categories: [],
         };
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleWeekdayTimeChange = this.handleWeekdayTimeChange.bind(this);
+        this.onWeekdayTimeClear = this.onWeekdayTimeClear.bind(this);
         this.validateField = this.validateField.bind(this);
         this.createEvent = this.createEvent.bind(this);
         this.cancel = this.cancel.bind(this);
@@ -78,21 +81,21 @@ export default class NewEvent extends Component {
         }        
     }
 
-    validateField(fieldName, value){
+    validateField(fieldName, value= null) {
         let fieldValidationErrors = this.state.formErrors;
 
         let nameValid = this.state.nameValid;
         let categoryValid = this.state.categoryValid;
         let descriptionValid = this.state.descriptionValid;
         let placeValid = this.state.placeValid;
-        let dateValid = this.state.dateValid;
-        let timeValid = this.state.timeValid;
+        let dateTimeValid = this.state.dateTime;
+        let weekDaysValid = this.state.weekDaysValid;
         let feeValid = this.state.feeValid;
         let participantsLimitValid = this.state.participantsLimitValid;
         let tagsValid = this.state.tagsValid;
         let imageFileValid = this.state.imageFileValid;
 
-        switch(fieldName){
+        switch(fieldName) {
             case 'name':
                 nameValid = !!value;
                 fieldValidationErrors.name = nameValid ? '' : 'У мероприятия должно быть название';
@@ -109,13 +112,13 @@ export default class NewEvent extends Component {
                 placeValid = !!value;
                 fieldValidationErrors.place = placeValid ? '' : 'Место проведение не указано';
                 break;
-            case 'date':
-                dateValid = !!value;
-                fieldValidationErrors.date = dateValid ? '' : 'Дата проведения не указана';
+            case 'dateTime':
+                dateTimeValid = !!value;
+                fieldValidationErrors.dateTime = dateTimeValid ? '' : 'Время и дата проведения не указана';
                 break;
-            case 'time':
-                timeValid = !!value;
-                fieldValidationErrors.time = timeValid ? '' : 'Время проведения не указана';
+            case 'weekDays':
+                weekDaysValid = Object.values(this.state.weekDays).some(x => !!x);
+                fieldValidationErrors.weekDays = weekDaysValid ? '' : 'Нужно выбрать хотя бы один день';
                 break;
             case 'fee':
                 feeValid = value.match(/^((0|([1-9][0-9]*))(\.[0-9]{0,2})?)$/i);
@@ -142,8 +145,8 @@ export default class NewEvent extends Component {
             categoryValid: categoryValid,
             descriptionValid: descriptionValid,
             placeValid: placeValid,
-            dateValid: dateValid,
-            timeValid: timeValid,
+            dateTimeValid: dateTimeValid,
+            weekDaysValid: weekDaysValid,
             feeValid: feeValid,
             participantsLimitValid: participantsLimitValid,
             tagsValid: tagsValid,
@@ -157,8 +160,8 @@ export default class NewEvent extends Component {
                 this.state.nameValid &&
                 this.state.categoryValid &&
                 this.state.placeValid &&
-                this.state.dateValid &&
-                this.state.timeValid &&
+                (!this.state.isRecurrent && this.state.dateTimeValid
+                    || this.state.isRecurrent && this.state.weekDaysValid) &&
                 this.state.feeValid &&
                 this.state.participantsLimitValid &&
                 this.state.tagsValid &&
@@ -166,8 +169,7 @@ export default class NewEvent extends Component {
         });
     }
 
-    removeImage()
-    {
+    removeImage() {
         this.setState({
             imageFile: null,
             fileName: '',
@@ -175,12 +177,27 @@ export default class NewEvent extends Component {
         }, this.validateForm)
     }
 
-    cancel()
-    {
+    cancel() {
         this.props.history.push(`/events`);
     }
 
-    render(){
+    handleWeekdayTimeChange(event) {
+        const target = event.target;
+        const weekday = parseInt(target.dataset.weekday);
+        
+        this.setState({weekDays: {...this.state.weekDays, [weekday]: target.value}}, 
+            () => this.validateField('weekDays'));
+    }
+
+    onWeekdayTimeClear(event) {
+        const target = event.target;
+        const weekday = parseInt(target.dataset.weekday);
+
+        this.setState({weekDays: {...this.state.weekDays, [weekday]: ''}},
+            () => this.validateField('weekDays'));
+    }
+
+    render() {
         const imageStyle = {
             maxWidth: '420px',
             maxHeight: '420px',
@@ -192,17 +209,53 @@ export default class NewEvent extends Component {
             textDecoration: 'underline'
         }
 
-        const errorBaner = this.state.errorMessage ? 
-        <Alert color="danger">
-            {this.state.errorMessage}
-        </Alert> : null;
+        const errorBanner = this.state.errorMessage ? 
+            <Alert color="danger">
+                {this.state.errorMessage}
+            </Alert> : null;
 
         const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()} value={c.id}>{c.name}</option>)
-        const imageBlock = this.state.imageFile ? <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" onClick={(e) => this.removeImage()}/> : null;
+        const imageBlock = this.state.imageFile ? 
+            <img style={imageStyle} src={URL.createObjectURL(this.state.imageFile)} alt="event image" 
+                 onClick={(e) => this.removeImage()}/> : null;
+        const datePicker = this.state.isRecurrent ?
+            <FormGroup>
+                <table className="table table-borderless">
+                    <tbody> {
+                        ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, index) => {
+                                let key = (index+1) % 7;
+                                
+                                return(
+                                    <tr>
+                                        <td style={{width: 'fit-content'}}>{day}</td>
+                                        <td>
+                                            <Input invalid={!this.state.weekDaysValid} type="time" data-weekday={key} 
+                                                   value={this.state.weekDays[key]} onChange={this.handleWeekdayTimeChange}/>
+                                        </td>
+                                        <td style={{width: '72px'}}> {
+                                                this.state.weekDays[key] ?
+                                                    <button className="btn btn-outline-secondary" data-weekday={key} 
+                                                            onClick={this.onWeekdayTimeClear}>➖</button> : null
+                                            }
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+                <div className="text-danger">{this.state.formErrors.weekDays}</div>
+            </FormGroup> :
+            <FormGroup>
+                <Label for="dateTime">Дата и время</Label>
+                <Input invalid={!this.state.dateTimeValid} required type="datetime-local" name="dateTime" id="dateTime"
+                       value={this.state.dateTime} onChange={this.handleInputChange}/>
+                <FormFeedback>{this.state.formErrors.dateTime}</FormFeedback>
+            </FormGroup>
 
         return(
             <div className="mx-auto" style={{maxWidth: '720px'}}>
-                {errorBaner}
+                {errorBanner}
                 <div className="list-group">
                     <div className="list-group-item bg-light">
                         <h3 className="m-0">Новое мероприятие</h3>
@@ -231,16 +284,22 @@ export default class NewEvent extends Component {
                                 <Input invalid={!this.state.placeValid} required type="text" name="place" id="place" value={this.state.place} onChange={this.handleInputChange}/>
                                 <FormFeedback>{this.state.formErrors.place}</FormFeedback>
                             </FormGroup>
-                            <FormGroup>
-                                <Label for="date">Дата</Label>
-                                <Input invalid={!this.state.dateValid} required type="date" name="date" id="date" onChange={this.handleInputChange}/>
-                                <FormFeedback>{this.state.formErrors.date}</FormFeedback>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="time">Время</Label>
-                                <Input invalid={!this.state.timeValid} required type="time" name="time" id="time" onChange={this.handleInputChange}/>
-                                <FormFeedback>{this.state.formErrors.time}</FormFeedback>
-                            </FormGroup>
+                            <ul className="nav nav-tabs">
+                                <li className="nav-item">
+                                    <a type="button" className={`nav-link ${this.state.isRecurrent ? null : 'active'}`}
+                                       onClick={() => this.setState({isRecurrent : false}, () => this.validateForm())}>
+                                        Разовое мероприятие
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a type="button" className={`nav-link ${this.state.isRecurrent ? 'active' : null}`}
+                                       onClick={() => this.setState({isRecurrent : true}, () => this.validateForm())}>
+                                        Рекурентное мероприятие
+                                    </a>
+                                </li>
+                            </ul>
+                            {datePicker}
+                            <hr/>
                             <FormGroup>
                                 <Label for="fee">Взнос</Label>{'  '}<span style={tipStyle} id="feeTip">?</span>
                                 <UncontrolledTooltip placement="right" target="feeTip">
@@ -319,30 +378,44 @@ export default class NewEvent extends Component {
             })
             return;
         }
-        let formdata = new FormData();
-        formdata.append('name', this.state.name);
-        formdata.append('categoryId', this.state.category);
-        formdata.append('description', this.state.description);
 
-        const dateTime = new Date(this.state.date + " " + this.state.time);
-        const start = `${dateTime.getDate()}/${dateTime.getMonth()+1}/${dateTime.getFullYear()} ${dateTime.getHours()}:${dateTime.getMinutes()}`
-        formdata.append('start', start);
+        let formData = new FormData();
 
-        formdata.append('place', this.state.place);
-        formdata.append('fee', parseFloat(this.state.fee));
-        formdata.append('participantsLimit', this.state.participantsLimit);
-        formdata.append('organizerId', AuthHelper.getId());
+        formData.append('name', this.state.name);
+        formData.append('categoryId', this.state.category);
+        formData.append('description', this.state.description);
+        formData.append('place', this.state.place);
+        formData.append('fee', parseFloat(this.state.fee));
+        formData.append('participantsLimit', this.state.participantsLimit);
+        formData.append('organizerId', AuthHelper.getId());
+        formData.append('isRecurrent', this.state.isRecurrent);
+        
         if (this.state.tags) {
-            formdata.append('tags', this.state.tags);
+            formData.append('tags', this.state.tags);
         }
-        if (this.state.imageFile)
-        {
-            formdata.append('image', this.state.imageFile);
+        
+        if (this.state.imageFile) {
+            formData.append('image', this.state.imageFile);
         }
 
-        AuthHelper.fetchWithCredentials('api/Events', {
+        if (this.state.isRecurrent) {
+            const weekDays = Object.keys(this.state.weekDays).map(key => ({
+                dayOfWeek: key,
+                start: this.state.weekDays[key]
+            }));
+
+            formData.append('eventDaysOfWeek', JSON.stringify(weekDays));
+        }
+        else {
+            const dateTime = new Date(this.state.dateTime);
+            const start = `${dateTime.getDate()}/${dateTime.getMonth()+1}/${dateTime.getFullYear()} ${dateTime.getHours()}:${dateTime.getMinutes()}`;
+
+            formData.append('start', start);
+        }
+
+        AuthHelper.fetchWithCredentials('api/events', {
             method: 'POST',
-            body: formdata
+            body: formData
         }).then((response) => {
             if (response.ok){
                 this.props.history.push("/events");

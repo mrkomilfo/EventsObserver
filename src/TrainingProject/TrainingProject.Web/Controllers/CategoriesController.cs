@@ -55,7 +55,9 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> CreateAsync([FromBody] CategoryCreateDto categoryCreateDto)
         {
             _logger.LogMethodCallingWithObject(categoryCreateDto);
+
             await _categoryManager.AddCategoryAsync(categoryCreateDto);
+
             return Ok();
         }
 
@@ -65,16 +67,20 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> UpdateAsync([FromBody] Category category)
         {
             _logger.LogMethodCallingWithObject(category);
+
             await _categoryManager.UpdateCategoryAsync(category);
+
             return Ok();
         }
 
-        [HttpDelete("{categoryId}")]
+        [HttpDelete("{categoryId:int}")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<ActionResult> DeleteAsync(int categoryId)
         {
             _logger.LogMethodCallingWithObject(new { categoryId });
+
             await _categoryManager.DeleteCategoryAsync(categoryId, false);
+
             return Ok();
         }
     }

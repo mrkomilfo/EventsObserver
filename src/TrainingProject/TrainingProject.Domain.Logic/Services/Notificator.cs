@@ -32,7 +32,7 @@ namespace TrainingProject.DomainLogic.Services
             smtp.Send(m);
         }
 
-        public void Notificate(EventsUsers eventUser)
+        public void Notificate(EventParticipant eventUser)
         {
             _logger.LogMethodCallingWithObject(eventUser);
 

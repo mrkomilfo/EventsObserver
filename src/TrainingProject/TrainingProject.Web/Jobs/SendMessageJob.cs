@@ -14,7 +14,7 @@ namespace TrainingProject.Web.Jobs
 
         public void Execute()
         {
-            _eventManager.Notificate();
+            _eventManager.Notify();
         }
     }
 }

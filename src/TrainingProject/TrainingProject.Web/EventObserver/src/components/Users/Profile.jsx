@@ -43,7 +43,6 @@ export default class Profile extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        debugger;
         if (this.state.query !== window.location.search) {
             this.setState({ query: window.location.search });
             this.loadProfile();

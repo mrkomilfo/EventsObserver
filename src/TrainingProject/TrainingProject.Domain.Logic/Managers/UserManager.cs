@@ -51,7 +51,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
             var user = _mapper.Map<UserFullDto>(DBUser);
-            user.VisitedEvents = await _appContext.EventsUsers.Where(eu => Equals(eu.ParticipantId, userId)).CountAsync();
+            user.VisitedEvents = await _appContext.EventsParticipants.Where(eu => Equals(eu.ParticipantId, userId)).CountAsync();
 
             string imageName = DBUser.HasPhoto ? userId.ToString() : "default";
             string path = $"img\\users\\{imageName}.jpg";

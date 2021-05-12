@@ -8,8 +8,8 @@ namespace TrainingProject.DomainLogic.Interfaces
 {
     public interface IEventManager
     {
-        Task AddEventAsync(EventCreateDto @event, string hostRoot);
-        Task UpdateEventAsync(EventUpdateDto @event, string hostRoot);
+        Task AddEventAsync(EventCreateDto eventDto, string hostRoot);
+        Task UpdateEventAsync(EventUpdateDto eventDto, string hostRoot);
         Task<EventToUpdateDto> GetEventToUpdateAsync(int eventId);
         Task DeleteEventAsync(int eventId, bool force, string hostRoot);
         Task<EventFullDto> GetEventAsync(int eventId);
@@ -19,6 +19,6 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Guid?> GetEventOrganizerIdAsync(int eventId);
         Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId);
         Task CheckUserInvolvementInTheEventAsync(string userId, int eventId);
-        void Notificate();
+        void Notify();
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+
 using TrainingProject.Common;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
@@ -42,6 +44,7 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<EventFullDto>> DetailsAsync(int eventId)
         {
             _logger.LogMethodCalling();
+
             return Ok(await _eventManager.GetEventAsync(eventId));
         }
 
@@ -51,8 +54,11 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> CreateAsync([FromForm] EventCreateDto eventCreateDto)
         {
             _logger.LogMethodCallingWithObject(eventCreateDto);
+
             var hostRoot = _hostServices.GetHostPath();
+
             await _eventManager.AddEventAsync(eventCreateDto, hostRoot);
+
             return Ok();
         }
 
@@ -61,14 +67,19 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<EventToUpdateDto>> UpdateAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventId);
+
             if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }
-            return Ok(await _eventManager.GetEventToUpdateAsync(eventId));
+
+            var eventToUpdate = await _eventManager.GetEventToUpdateAsync(eventId);
+
+            return Ok(eventToUpdate);
         }
 
         [HttpPut]
@@ -77,15 +88,20 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> UpdateAsync([FromForm] EventUpdateDto eventUpdateDto)
         {
             _logger.LogMethodCallingWithObject(eventUpdateDto);
+
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventUpdateDto.Id);
+
             if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }
+
             var hostRoot = _hostServices.GetHostPath();
+
             await _eventManager.UpdateEventAsync(eventUpdateDto, hostRoot);
+
             return Ok();
         }
 

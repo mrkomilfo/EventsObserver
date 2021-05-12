@@ -166,7 +166,6 @@ export default class SignUp extends Component {
                 fetch(`api/Users/blockingExpiration?login=${this.state.login}`)
                 .then(response=>response.text())
                 .then(data => {
-                    debugger;
                     this.setState({
                         errorMessage: `Заблокировкан до ${data}`
                     })

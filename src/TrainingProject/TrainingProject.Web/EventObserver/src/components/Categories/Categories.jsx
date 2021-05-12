@@ -134,7 +134,6 @@ export default class Categories extends Component {
             method: 'DELETE',
         }).then((response) => {
             if (response.ok) {
-                debugger
                 this.setState({categories: this.state.categories.filter(c => c.id !== this.state.categoryToDeleteId)},
                     this.toggleDeleteModal)
             } 
