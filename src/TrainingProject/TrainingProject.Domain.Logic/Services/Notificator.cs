@@ -41,7 +41,7 @@ namespace TrainingProject.DomainLogic.Services
                 $"<p>{eventUser.Participant.UserName}, напоминаем, что уже скоро состоится мероприятие {eventUser.Event.Name}, на которое Вы записались.</p>" +
                 $"<p>Время: {eventUser.Event.Start:f}</p>" +
                 $"<p>Место: {eventUser.Event.Place}</p>" +
-                $"<p>Взнос: {eventUser.Event.Fee}BYN</p>";
+                $"<p>Стоимость: {eventUser.Event.Fee}BYN</p>";
             SendMessage(title, body, eventUser.Participant.ContactEmail);
         }
     }

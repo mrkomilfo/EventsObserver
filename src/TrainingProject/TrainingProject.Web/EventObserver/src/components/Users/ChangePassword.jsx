@@ -7,19 +7,19 @@ export default class ChangePassword extends Component {
         super(props);
         this.state = { 
             id: AuthHelper.getId(), 
-            oldPassword: '', 
-            newPassword: '', 
+            oldPassword: '',
+            newPassword: '',
             newPasswordConfirm: '',
-            formErrors: { 
-                oldPassword: '', 
-                newPassword: '', 
+            formErrors: {
+                oldPassword: '',
+                newPassword: '',
                 newPasswordConfirm: ''
             },
-            formValid: false, 
-            oldPasswordValid: false, 
-            newPasswordValid: false, 
+            formValid: false,
+            oldPasswordValid: false,
+            newPasswordValid: false,
             newPasswordConfirmValid: false,
-            error: false, 
+            error: false,
             errorMessage: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -143,7 +143,7 @@ export default class ChangePassword extends Component {
             newPasswordConfirm: this.state.newPasswordConfirm
         };
 
-        AuthHelper.fetchWithCredentials('api/Users/changePassword', {
+        AuthHelper.fetchWithCredentials('api/users/changePassword', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'

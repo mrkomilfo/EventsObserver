@@ -6,6 +6,7 @@ import Parser from 'html-react-parser';
 import Chat from './Chat';
 import AuthHelper from '../../Utils/authHelper.js';
 import ErrorPage from '../Common/ErrorPage';
+import CommentsBlock from "../Comments/CommentsBlock";
 
 export default class EventDetail extends Component {
     constructor(props)
@@ -35,7 +36,7 @@ export default class EventDetail extends Component {
             image: '',
 
             deleteModal: false,
-            
+
             userRole: AuthHelper.getRole(),
             userId: AuthHelper.getId(),
         }
@@ -63,7 +64,7 @@ export default class EventDetail extends Component {
         });
     }
 
-    renderBottomButtonPanel()
+    renderButtonPanel()
     {
         const deleteModal = 
             <Modal isOpen={this.state.deleteModal} toggle={this.toggleDeleteModal}>
@@ -80,9 +81,13 @@ export default class EventDetail extends Component {
         if (this.state.userId === this.state.organizerId || this.state.userRole === 'Admin')
         {
             return(
-                <div>
-                    <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>Редактировать</Button>{' '}
-                    <Button color="danger" onClick={this.toggleDeleteModal}>Удалить</Button>
+                <div style={{minWidth: "fit-content"}}>
+                    <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>
+                        <i className="bi bi-pencil"/>
+                    </Button>{' '}
+                    <Button outline color="danger" onClick={this.toggleDeleteModal}>
+                        <i className="bi bi-trash"/>
+                    </Button>
                     {deleteModal}
                 </div>
             )
@@ -127,18 +132,17 @@ export default class EventDetail extends Component {
     {
         const inlineStyle = {display: 'table'};
         const inlineFirst = {display: 'table-cell'};
-        const inlineSecond = {marginLeft: '12px'};
-        const imageStyle = {width: '100%'};
-        const tagBlockStyle = {display: 'inline'};
         const subscribeButtonStyle = {marginLeft: '8px'}
 
         const image = this.state.image 
-            ? <img style={imageStyle} src={this.state.image} alt="event image"/> 
+            ? <img className="w-100 border" src={this.state.image} alt="event image"/> 
             : null;
 
         const tags = Object.keys(this.state.tags).map((key, index) => {
             return (
-                <Link className="link" to={"/events?tag=" + this.state.tags[key]} key={key}>#{this.state.tags[key]} </Link>
+                <Link type="btn" className="btn btn-sm btn-outline-primary px-1 py-0 mr-2" to={"/events?tag=" + this.state.tags[key]} key={key}>
+                    #{this.state.tags[key]}
+                </Link>
             );
         });
 
@@ -151,45 +155,54 @@ export default class EventDetail extends Component {
             )
         });
 
-        const subscribeButton = this.renderSubscribeButton();
-
-        const bottomButtonPanel = this.renderBottomButtonPanel();
-
-        const chat = this.state.userId === this.state.organizerId || Object.keys(this.state.participants).includes(this.state.userId)
+        /*const chat = this.state.userId === this.state.organizerId || Object.keys(this.state.participants).includes(this.state.userId)
             ? <Chat eventId={this.state.id} />
-            : null;
+            : null;*/
 
         return(
-            <div>
-                <div style={inlineStyle}><h2 style={inlineFirst}>{this.state.name}</h2><p style={inlineSecond}>Опубликовано: {this.state.publicationTime}</p></div>
-                <h4>Категория: <Link to={`/events?categoryId=${this.state.categoryId}`}>{this.state.category}</Link></h4>
-                <div style={tagBlockStyle}>{tags}</div>
-                {image}
-                <p>
-                    { Parser(this.state.description) }
-                </p>
-                <table cellPadding='8px'>
-                    <tbody>
-                        <tr><td><b>Организатор:</b></td><td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td></tr>
-                        <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
-                        <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
-                        <tr><td><b>Взнос:</b></td><td>{this.state.fee ? this.state.fee +' BYN' : 'Бесплатно'}</td></tr>
-                    </tbody>
-                </table>
-                <br/>
-                <div style={{...inlineStyle, marginBottom: '4px'}}>
-                    <h4 style={inlineFirst}>Записались - {this.state.participantsLimit
-                    ? `(${Object.keys(this.state.participants).length}/${this.state.participantsLimit})`
-                    : Object.keys(this.state.participants).length}</h4>
-                    <div style={subscribeButtonStyle}>{subscribeButton}</div>
+            <div className="mx-auto" style={{maxWidth: '720px'}}>
+                <div className="list-group mb-3">
+                    <div className="list-group-item bg-light d-flex justify-content-between">
+                        <h3 className="m-0">{this.state.name}
+                            <Link className="h6 ml-2" to={`/events?categoryId=${this.state.categoryId}`}>{this.state.category}</Link>
+                        </h3>
+                        {this.renderButtonPanel()}
+                    </div>
+                    <div className="list-group-item">
+                        {image}
+                        <table className="mt-2" cellPadding='8px'>
+                            <tbody>
+                                <tr>
+                                    <td><b>Организатор:</b></td>
+                                    <td><Link to={`/user?id=${this.state.organizerId}`}>{this.state.organizer}</Link></td>
+                                </tr>
+                                <tr><td><b>Место проведения:</b></td><td>{this.state.place}</td></tr>
+                                <tr><td><b>Начало:</b></td><td>{this.state.start}</td></tr>
+                                <tr><td><b>Стоимость:</b></td><td>{this.state.fee ? this.state.fee +' BYN' : 'Бесплатно'}</td></tr>
+                            </tbody>
+                        </table>
+                        <div className="p-2">
+                            <b>Описание:</b>
+                            <div>
+                                { Parser(this.state.description) }
+                            </div>
+                        </div>
+                        <div className="p-2">{tags}</div>
+                        <hr/>
+                        <div style={{...inlineStyle, marginBottom: '4px'}}>
+                            <h4 style={inlineFirst}>Записались - {this.state.participantsLimit
+                            ? `(${Object.keys(this.state.participants).length}/${this.state.participantsLimit})`
+                            : Object.keys(this.state.participants).length}</h4>
+                            <div style={subscribeButtonStyle}>{this.renderSubscribeButton()}</div>
+                        </div>
+                        <Table striped>
+                            <tbody>
+                                {participantsTableRows}
+                            </tbody>
+                        </Table>
+                    </div>
                 </div>
-                <Table striped>
-                    <tbody>
-                        {participantsTableRows}
-                    </tbody>
-                </Table>
-                {bottomButtonPanel}
-                {chat}
+                <CommentsBlock eventId={this.state.id}/>
             </div>
         ) 
     }
@@ -219,7 +232,7 @@ export default class EventDetail extends Component {
     }
 
     async loadData(eventId) {
-        await fetch('api/Events/' + eventId)
+        await fetch('api/events/' + eventId)
             .then((response) => {
                 this.setState({
                     error: !response.ok,
@@ -260,7 +273,7 @@ export default class EventDetail extends Component {
     }
 
     async deleteEvent() {
-        AuthHelper.fetchWithCredentials('api/Events/' + this.state.id, {
+        AuthHelper.fetchWithCredentials('api/events/' + this.state.id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -281,7 +294,7 @@ export default class EventDetail extends Component {
     }
 
     async subscribe() {
-        AuthHelper.fetchWithCredentials(`api/Events/${this.state.id}/subscribe`, {
+        AuthHelper.fetchWithCredentials(`api/events/${this.state.id}/subscribe`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -302,7 +315,7 @@ export default class EventDetail extends Component {
     }
 
     async unsubscribe() {
-        AuthHelper.fetchWithCredentials(`api/Events/${this.state.id}/unsubscribe`, {
+        AuthHelper.fetchWithCredentials(`api/events/${this.state.id}/unsubscribe`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

@@ -103,7 +103,7 @@ export default class Categories extends Component {
     }
 
     async loadCategories() {
-        fetch('api/Categories', {
+        fetch('api/categories', {
             method: 'GET',
         })
         .then((response) => {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
-import {Input, Button} from 'reactstrap';
+import { Input, Button } from 'reactstrap';
 import AuthHelper from '../../Utils/authHelper.js';
 import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
@@ -99,7 +99,7 @@ export default class Chat extends Component {
     }
 
     async getAccessToken() {
-        const response = await AuthHelper.fetchWithCredentials(`api/Events/${this.props.eventId}/checkInvolvement`);
+        const response = await AuthHelper.fetchWithCredentials(`api/events/${this.props.eventId}/checkInvolvement`);
         if (response.status === 403) {
             AuthHelper.clearAuth();
             this.props.history.push('/signIn');

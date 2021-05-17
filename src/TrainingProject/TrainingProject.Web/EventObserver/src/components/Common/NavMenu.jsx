@@ -123,7 +123,7 @@ export default class NavMenu extends Component {
             logoutModal: false
         });
 
-        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/logout`, {
+        AuthHelper.fetchWithCredentials(`api/users/${this.state.id}/logout`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

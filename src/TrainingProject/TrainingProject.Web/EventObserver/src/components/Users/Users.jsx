@@ -44,7 +44,7 @@ export default class Users extends Component {
         });
     }
 
-    getQuerryTrailer() {
+    getQueryTrailer() {
         let isFirst = true
         let queryTrailer = '';
         if (this.state.userName)
@@ -60,12 +60,12 @@ export default class Users extends Component {
         return(
             this.state.loading ? <p><em>Loading...</em></p> :
             <div className="list-group mx-auto" style={{maxWidth: '900px'}}>
-                <div class="list-group-item bg-light d-flex justify-content-between">
+                <div className="list-group-item bg-light d-flex justify-content-between">
                     <h3 className="m-0">Пользователи</h3>
                     <div>
                         <InputGroup>
                             <Input type="text" name="userName" id="userName" value={this.state.userName} placeholder="Имя пользователя" onChange={this.handleInputChange} />
-                            <InputGroupAddon addonType="append"><Button color="primary" tag={Link} to={`/users${this.getQuerryTrailer()}`}>Поиск</Button></InputGroupAddon>
+                            <InputGroupAddon addonType="append"><Button color="primary" tag={Link} to={`/users${this.getQueryTrailer()}`}>Поиск</Button></InputGroupAddon>
                         </InputGroup>
                     </div>
                 </div>
@@ -109,7 +109,7 @@ export default class Users extends Component {
         if (search) {
             queryTrailer += `&search=${search}`
         }
-        AuthHelper.fetchWithCredentials(`api/Users${queryTrailer}`)
+        AuthHelper.fetchWithCredentials(`api/users${queryTrailer}`)
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");

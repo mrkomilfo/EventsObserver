@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, UncontrolledTooltip } from 'reactstrap';
 import AuthHelper from '../../Utils/authHelper'
+import DateTimeHelper from "../../Utils/dateTimeHelper";
 
 export default class NewEvent extends Component {
     constructor(props) {
@@ -10,8 +11,9 @@ export default class NewEvent extends Component {
             category: '', 
             description: '', 
             place: '',
-            dateTime: null,
+            dateTime: '',
             weekDays: {},
+            publicationEnd: '',
             fee: 0, 
             participantsLimit: 0,
             tags: '',
@@ -25,6 +27,7 @@ export default class NewEvent extends Component {
                 place: '',
                 dateTime: '',
                 weekDays: '',
+                publicationEnd: '',
                 fee: '',
                 participantsLimit: '',
                 imageFile: ''
@@ -35,6 +38,7 @@ export default class NewEvent extends Component {
             descriptionValid: false,
             placeValid: false,
             dateTimeValid: false,
+            publicationEndValid: false,
             weekDaysValid: false,
             feeValid: true,
             participantsLimitValid: true,
@@ -88,8 +92,9 @@ export default class NewEvent extends Component {
         let categoryValid = this.state.categoryValid;
         let descriptionValid = this.state.descriptionValid;
         let placeValid = this.state.placeValid;
-        let dateTimeValid = this.state.dateTime;
+        let dateTimeValid = this.state.dateTimeValid;
         let weekDaysValid = this.state.weekDaysValid;
+        let publicationEndValid = this.state.publicationEndValid;
         let feeValid = this.state.feeValid;
         let participantsLimitValid = this.state.participantsLimitValid;
         let tagsValid = this.state.tagsValid;
@@ -120,6 +125,10 @@ export default class NewEvent extends Component {
                 weekDaysValid = Object.values(this.state.weekDays).some(x => !!x);
                 fieldValidationErrors.weekDays = weekDaysValid ? '' : 'Нужно выбрать хотя бы один день';
                 break;
+            case 'publicationEnd':
+                publicationEndValid = !!value;
+                fieldValidationErrors.publicationEnd = publicationEndValid ? '' : 'Необходимо указать время завершения размещения афиши';
+                break;
             case 'fee':
                 feeValid = value.match(/^((0|([1-9][0-9]*))(\.[0-9]{0,2})?)$/i);
                 fieldValidationErrors.fee = feeValid ? '' : 'Стоимость не указана или указана неверно';
@@ -147,6 +156,7 @@ export default class NewEvent extends Component {
             placeValid: placeValid,
             dateTimeValid: dateTimeValid,
             weekDaysValid: weekDaysValid,
+            publicationEndValid: publicationEndValid,
             feeValid: feeValid,
             participantsLimitValid: participantsLimitValid,
             tagsValid: tagsValid,
@@ -156,12 +166,13 @@ export default class NewEvent extends Component {
 
     validateForm() {
         this.setState({
-            formValid: 
+            formValid:
                 this.state.nameValid &&
                 this.state.categoryValid &&
                 this.state.placeValid &&
                 (!this.state.isRecurrent && this.state.dateTimeValid
                     || this.state.isRecurrent && this.state.weekDaysValid) &&
+                this.state.publicationEndValid &&
                 this.state.feeValid &&
                 this.state.participantsLimitValid &&
                 this.state.tagsValid &&
@@ -249,7 +260,8 @@ export default class NewEvent extends Component {
             <FormGroup>
                 <Label for="dateTime">Дата и время</Label>
                 <Input invalid={!this.state.dateTimeValid} required type="datetime-local" name="dateTime" id="dateTime"
-                       value={this.state.dateTime} onChange={this.handleInputChange}/>
+                       min={DateTimeHelper.getCurrentDateTime()} value={this.state.dateTime}
+                       onChange={this.handleInputChange}/>
                 <FormFeedback>{this.state.formErrors.dateTime}</FormFeedback>
             </FormGroup>
 
@@ -301,7 +313,14 @@ export default class NewEvent extends Component {
                             {datePicker}
                             <hr/>
                             <FormGroup>
-                                <Label for="fee">Взнос</Label>{'  '}<span style={tipStyle} id="feeTip">?</span>
+                                <Label for="publicationEnd">Разместить афишу до</Label>
+                                <Input invalid={!this.state.publicationEndValid} required type="datetime-local"
+                                       name="publicationEnd" id="publicationEnd" min={DateTimeHelper.getCurrentDateTime()}
+                                       value={this.state.publicationEnd} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.publicationEnd}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="fee">Стоимость</Label>{'  '}<span style={tipStyle} id="feeTip">?</span>
                                 <UncontrolledTooltip placement="right" target="feeTip">
                                     0 - бесплатно
                                 </UncontrolledTooltip>
@@ -412,6 +431,13 @@ export default class NewEvent extends Component {
 
             formData.append('start', start);
         }
+
+        const publicationEndDateTime = new Date(this.state.publicationEnd);
+        const publicationEnd =
+            `${publicationEndDateTime.getDate()}/${publicationEndDateTime.getMonth()+1}/${publicationEndDateTime.getFullYear()} ` +
+            `${publicationEndDateTime.getHours()}:${publicationEndDateTime.getMinutes()}`;
+
+        formData.append('publicationEnd', publicationEnd);
 
         AuthHelper.fetchWithCredentials('api/events', {
             method: 'POST',

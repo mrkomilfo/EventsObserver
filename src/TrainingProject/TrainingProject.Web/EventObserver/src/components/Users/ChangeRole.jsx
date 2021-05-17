@@ -83,7 +83,7 @@ export default class ChangeRole extends Component{
     }
 
     async loadRoles() {
-        AuthHelper.fetchWithCredentials('api/Users/roles')
+        AuthHelper.fetchWithCredentials('api/users/roles')
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");
@@ -109,7 +109,7 @@ export default class ChangeRole extends Component{
     }
 
     async loadUser(userId) {
-        AuthHelper.fetchWithCredentials(`api/Users/${userId}/role`)
+        AuthHelper.fetchWithCredentials(`api/users/${userId}/role`)
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");
@@ -148,7 +148,7 @@ export default class ChangeRole extends Component{
             roleId: parseInt(this.state.roleId, 10),
         }
 
-        AuthHelper.fetchWithCredentials('api/Users/role', {
+        AuthHelper.fetchWithCredentials('api/users/role', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'

@@ -1,0 +1,47 @@
+.authorIcon{
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.authorDateWrapper{
+    position: relative;
+    top: -2px;
+}
+
+.commentAuthorName{
+    margin-bottom: 0px;
+    font-weight: bold;
+}
+
+.commentDate{
+    margin-bottom: 0px;
+}
+
+.authorDate{
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.comment{
+    margin-top: 12px;
+}
+
+.commentHeader{
+    justify-content: space-between;
+    display: flex;
+}
+
+.deleteButton{
+    font-size: 14px;
+    color: grey;
+}
+
+.deleteButton:hover{
+    text-decoration: none;
+    color: grey;
+    text-shadow: grey 0 0 1px;
+    cursor: pointer;
+}

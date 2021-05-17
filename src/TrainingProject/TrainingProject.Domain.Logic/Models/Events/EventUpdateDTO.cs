@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -25,8 +24,8 @@ namespace TrainingProject.DomainLogic.Models.Events
 
         public string Start { get; set; }
 
-        //[Required]
-        //public string PublicationEnd { get; set; }
+        [Required]
+        public string PublicationEnd { get; set; }
 
         [Required]
         public string Place { get; set; }

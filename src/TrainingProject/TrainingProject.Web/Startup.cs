@@ -1,22 +1,27 @@
 using AutoMapper;
+
 using FluentScheduler;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+
 using NSwag;
 using NSwag.Generation.Processors.Security;
+
 using Serilog;
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using TrainingProject.Common;
 using TrainingProject.Data;
 using TrainingProject.DomainLogic.Helpers;
@@ -35,14 +40,16 @@ namespace TrainingProject.Web
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Environment { get; }
+
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
         }
 
-        public IConfiguration Configuration { get; }
-        public IWebHostEnvironment Environment { get; }
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
@@ -114,19 +121,21 @@ namespace TrainingProject.Web
             {
                 mc.AddProfile(new MappingProfile());
             });
-            IMapper mapper = mappingConfig.CreateMapper();
+            var mapper = mappingConfig.CreateMapper();
+
             services.AddSingleton(mapper);
             services.AddDbContext<IAppContext, AppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<ICategoryManager, CategoryManager>();
             services.AddScoped<IEventManager, EventManager>();
+            services.AddScoped<ICommentManager, CommentManager>();
             services.AddScoped<IHostServices, HostServices>();
             services.AddScoped<INotificator, Notificator>();
-            services.AddSingleton<IWebHostEnvironment>(Environment);
+            services.AddSingleton(Environment);
             services.AddTransient<SendMessageJob>();
             services.AddScoped<ExceptionHandlingFilter>();
-            services.AddSingleton<ILogger>(Log.Logger);
+            services.AddSingleton(Log.Logger);
             services.AddScoped<ILogHelper, LogHelper>();
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             services.AddScoped<ISwearingProvider, SwearingProvider>();

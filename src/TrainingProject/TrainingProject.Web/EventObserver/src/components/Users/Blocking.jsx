@@ -138,7 +138,7 @@ export default class Blocking extends Component {
     }
 
     async loadUser(userId) {
-        AuthHelper.fetchWithCredentials(`api/Users/${userId}/ban`)
+        AuthHelper.fetchWithCredentials(`api/users/${userId}/ban`)
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");
@@ -183,7 +183,7 @@ export default class Blocking extends Component {
             days: parseInt(this.state.days, 10),
             hours: parseInt(this.state.hours, 10),
         }
-        AuthHelper.fetchWithCredentials('api/Users/ban', {
+        AuthHelper.fetchWithCredentials('api/users/ban', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -213,7 +213,7 @@ export default class Blocking extends Component {
     }
 
     async unban() {
-        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/unban`, {
+        AuthHelper.fetchWithCredentials(`api/users/${this.state.id}/unban`, {
             method: 'PUT'
         }).then((response) => {
             if (response.ok){

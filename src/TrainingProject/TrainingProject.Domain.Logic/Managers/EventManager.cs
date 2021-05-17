@@ -293,7 +293,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             var organizerGuid = string.IsNullOrEmpty(organizerId) ? new Guid() : Guid.Parse(organizerId);
             var participantGuid = string.IsNullOrEmpty(participantId) ? new Guid() : Guid.Parse(participantId);
-            var result = new Page<EventLiteDto>() { CurrentPage = index, PageSize = pageSize };
+            var result = new Page<EventLiteDto> { CurrentPage = index, PageSize = pageSize };
             var query = _appContext.Events.Include(e => e.Category).AsQueryable();
 
             if (search != null)
@@ -399,7 +399,7 @@ namespace TrainingProject.DomainLogic.Managers
 
             var eu = new EventParticipant { ParticipantId = userId, EventId = eventId };
 
-            await _appContext.EventsParticipants.AddAsync(eu);
+            await _appContext.EventsParticipants.AddAsync(eu); 
             await _appContext.SaveChangesAsync(default);
         }
 

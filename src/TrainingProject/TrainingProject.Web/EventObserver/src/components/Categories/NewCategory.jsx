@@ -122,7 +122,7 @@ export default class NewCategory extends Component {
             name: this.state.name,
             description: this.state.description
         }
-        AuthHelper.fetchWithCredentials('api/Categories', {
+        AuthHelper.fetchWithCredentials('api/categories', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'

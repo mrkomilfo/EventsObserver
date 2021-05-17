@@ -45,11 +45,14 @@ namespace TrainingProject.Domain
 
         public ICollection<EventDayOfWeekParticipant> VisitedRecurrentEvents { get; set; }
 
+        public ICollection<Comment> Comments { get; set; }
+
         public User()
         {
             OrganizedEvents = new HashSet<Event>();
             VisitedOneTimeEvents = new HashSet<Event>();
             VisitedRecurrentEvents = new HashSet<EventDayOfWeekParticipant>();
+            Comments = new HashSet<Comment>();
         }
     }
 }

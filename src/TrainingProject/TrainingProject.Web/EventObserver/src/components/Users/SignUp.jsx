@@ -191,7 +191,7 @@ export default class SignUp extends Component {
             passwordConfirm: this.state.passwordConfirm
         };
 
-        fetch('api/Users', {
+        fetch('api/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'

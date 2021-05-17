@@ -24,6 +24,8 @@ namespace TrainingProject.Data
 
         public DbSet<EventDayOfWeekParticipant> RecurrentEventParticipants { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         private ModelBuilder _builder;
 
         public AppContext(DbContextOptions<AppContext> options) : base(options)
@@ -47,6 +49,7 @@ namespace TrainingProject.Data
             ConfigureCategory();
             ConfigureEventDayOfWeek();
             ConfigureRecurrentEventParticipant();
+            ConfigureComment();
         }
 
         private void ConfigureTag()
@@ -82,6 +85,10 @@ namespace TrainingProject.Data
             _builder.Entity<User>()
                 .HasMany(u => u.OrganizedEvents)
                 .WithOne(e => e.Organizer)
+                .OnDelete(DeleteBehavior.SetNull);
+            _builder.Entity<User>()
+                .HasMany(u => u.Comments)
+                .WithOne(e => e.Author)
                 .OnDelete(DeleteBehavior.SetNull);
             _builder.Entity<User>()
                 .HasMany(u => u.VisitedRecurrentEvents)
@@ -126,6 +133,10 @@ namespace TrainingProject.Data
                 .HasMany(e => e.DaysOfWeek)
                 .WithOne(e => e.Event)
                 .OnDelete(DeleteBehavior.Cascade);
+            _builder.Entity<Event>()
+                .HasMany(e => e.Comments)
+                .WithOne(e => e.Event)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void ConfigureCategory()
@@ -157,6 +168,15 @@ namespace TrainingProject.Data
             _builder.Entity<EventDayOfWeekParticipant>()
                 .HasKey(e => e.Id);
             _builder.Entity<EventDayOfWeekParticipant>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+        }
+
+        private void ConfigureComment()
+        {
+            _builder.Entity<Comment>()
+                .HasKey(e => e.Id);
+            _builder.Entity<Comment>()
                 .Property(e => e.Id)
                 .ValueGeneratedOnAdd();
         }

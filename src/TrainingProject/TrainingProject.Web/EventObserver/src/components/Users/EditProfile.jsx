@@ -218,7 +218,7 @@ export default class EditProfile extends Component {
     }
 
     async loadUser(userId) {
-        AuthHelper.fetchWithCredentials(`api/Users/${userId}/update`)
+        AuthHelper.fetchWithCredentials(`api/users/${userId}/update`)
             .then((response) => {
                 if (response.status === 401) {
                     this.props.history.push("/signIn");
@@ -271,7 +271,7 @@ export default class EditProfile extends Component {
         {
             formdata.append('photo', this.state.imageFile);
         }
-        AuthHelper.fetchWithCredentials('api/Users', {
+        AuthHelper.fetchWithCredentials('api/users', {
             method: 'PUT',
             body: formdata
         }).then((response) => {

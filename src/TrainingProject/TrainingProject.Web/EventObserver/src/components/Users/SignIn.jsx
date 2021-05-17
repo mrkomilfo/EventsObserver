@@ -145,7 +145,7 @@ export default class SignUp extends Component {
             login: this.state.login,
             password: this.state.password
         };
-        fetch('api/Users/signIn', {
+        fetch('api/users/signIn', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -163,13 +163,13 @@ export default class SignUp extends Component {
             }
             else if (response.status === 403)
             {
-                fetch(`api/Users/blockingExpiration?login=${this.state.login}`)
-                .then(response=>response.text())
-                .then(data => {
-                    this.setState({
-                        errorMessage: `Заблокировкан до ${data}`
-                    })
-                });
+                fetch(`api/users/blockingExpiration?login=${this.state.login}`)
+                    .then(response=>response.text())
+                    .then(data => {
+                        this.setState({
+                            errorMessage: `Заблокировкан до ${data}`
+                        })
+                    });
             }
             return response.json();
         }).then((data) => {
@@ -199,7 +199,7 @@ export default class SignUp extends Component {
             });
             return;
         }
-        fetch(`api/Users/resetPassword?login=${this.state.resetLogin}`)
+        fetch(`api/users/resetPassword?login=${this.state.resetLogin}`)
         .then((response) => {
             if (response.ok) {
                 this.setState({
@@ -240,7 +240,7 @@ export default class SignUp extends Component {
             });
             return;
         }
-        fetch(`api/Users/resetPassword?login=${this.state.resetLogin}&confirmCode=${this.state.confirmCode}`, {
+        fetch(`api/users/resetPassword?login=${this.state.resetLogin}&confirmCode=${this.state.confirmCode}`, {
             method: 'PUT'
         }).then((response) => {
             if (response.ok) {

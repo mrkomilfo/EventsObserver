@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using System.Threading;
 using System.Threading.Tasks;
+
 using TrainingProject.Domain;
 
 namespace TrainingProject.Data
@@ -26,5 +28,7 @@ namespace TrainingProject.Data
         public DbSet<EventDayOfWeek> EventDaysOfWeek { get; set; }
 
         public DbSet<EventDayOfWeekParticipant> RecurrentEventParticipants { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
     }
 }

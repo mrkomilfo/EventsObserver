@@ -41,9 +41,22 @@ export default class Events extends Component {
                             <h3 className="m-0">События в Минске</h3>
                         </div>
                         <div className="list-group-item">
-                            <table className="table m-0">
+                            <table className="table table-borderless m-0">
                                 <tbody>
-                                    {this.state.events.map(e => <EventRow event={e}/>)}
+                                    {
+                                        this.state.events.map((event, index) => (
+                                            <>
+                                                {
+                                                    index === 0 ? null : 
+                                                    <tr>
+                                                        <td className="px-0 py-2" colSpan="2">
+                                                            <hr className="m-0"/>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <EventRow event={event}/>
+                                            </>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -105,7 +118,7 @@ export default class Events extends Component {
             queryTrailer += `&participantId=${participantId}`
         }
 
-        fetch(`api/Events${queryTrailer}`)
+        fetch(`api/events${queryTrailer}`)
             .then((response) => {
                 this.setState({
                     error: !response.ok

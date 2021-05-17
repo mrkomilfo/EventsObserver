@@ -208,7 +208,7 @@ export default class Profile extends Component {
     }
 
     async loadData(userId) {
-        fetch('api/Users/' + userId)
+        fetch('api/users/' + userId)
         .then((response) => {
             this.setState({
                 error: !response.ok,
@@ -245,7 +245,7 @@ export default class Profile extends Component {
     }
 
     requestEmailConfirm() {
-        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail`)
+        AuthHelper.fetchWithCredentials(`api/users/${this.state.id}/confirmEmail`)
         .then((response) => {
             if (response.ok) {
                 this.setState({
@@ -279,7 +279,7 @@ export default class Profile extends Component {
             });
             return;
         }
-        AuthHelper.fetchWithCredentials(`api/Users/${this.state.id}/confirmEmail?confirmCode=${this.state.confirmCode}`, {
+        AuthHelper.fetchWithCredentials(`api/users/${this.state.id}/confirmEmail?confirmCode=${this.state.confirmCode}`, {
             method: 'PUT'
         }).then((response) => {
             if (response.ok) {

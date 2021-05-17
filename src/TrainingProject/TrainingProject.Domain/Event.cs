@@ -7,11 +7,11 @@ namespace TrainingProject.Domain
     {
         public int Id { get; set; }
 
-        public int ParticipantsLimit { get; set; } //0 - unlimited
+        public Guid? OrganizerId { get; set; }
 
         public int? CategoryId { get; set; }
 
-        public decimal Fee { get; set; }
+        public int ParticipantsLimit { get; set; } //0 - unlimited
 
         public string Name { get; set; }
 
@@ -19,15 +19,15 @@ namespace TrainingProject.Domain
 
         public string Place { get; set; }
 
+        public decimal Fee { get; set; }
+
         public bool HasImage { get; set; }
 
         public bool IsDeleted { get; set; }
 
         public bool IsApproved { get; set; }
-        
-        public bool IsRecurrent { get; set; }
 
-        public Guid? OrganizerId { get; set; }
+        public bool IsRecurrent { get; set; }
 
         public DateTime Start { get; set; }
 
@@ -41,6 +41,8 @@ namespace TrainingProject.Domain
 
         public ICollection<User> Participants { get; set; }
 
+        public ICollection<Comment> Comments { get; set; }
+
         public ICollection<Tag> Tags { get; set; }
 
         public ICollection<EventDayOfWeek> DaysOfWeek { get; set; }
@@ -50,6 +52,7 @@ namespace TrainingProject.Domain
             Participants = new HashSet<User>();
             Tags = new HashSet<Tag>();
             DaysOfWeek = new HashSet<EventDayOfWeek>();
+            Comments = new HashSet<Comment>();
         }
     }
 }

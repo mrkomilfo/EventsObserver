@@ -7,7 +7,6 @@ export default class EventRow extends Component {
             objectFit: 'cover',
             maxHeight: 150,
             maxWidth: 300,
-            marginRight: '10px'
         }
 
         let image = this.props.event.image 
@@ -46,7 +45,7 @@ export default class EventRow extends Component {
                                 <td>{this.props.event.start}</td>
                             </tr>
                             <tr>
-                                <td>Взнос:</td>
+                                <td>Стоимость:</td>
                                 <td>{this.props.event.fee ? this.props.event.fee +'BYN' : 'Бесплатно'}</td>
                             </tr>
                         </tbody>

@@ -2,33 +2,39 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using Serilog;
 using Serilog.Events;
+
 using System;
 using System.Threading.Tasks;
+
 using TrainingProject.Data;
 using AppContext = TrainingProject.Data.AppContext;
 
 namespace TrainingProject.Web
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .Enrich.FromLogContext()
-            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
-            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
-            .CreateLogger();
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+                .CreateLogger();
 
             try
             {
                 var host = CreateHostBuilder(args).Build();
+
                 await CreateDbIfNotExists(host);
+
                 Log.Information("Starting web host");
-                host.Run();
+
+                await host.RunAsync();
             }
             catch (Exception ex)
             {
@@ -43,14 +49,21 @@ namespace TrainingProject.Web
         private static async Task CreateDbIfNotExists(IHost host)
         {
             using var scope = host.Services.CreateScope();
+
             var services = scope.ServiceProvider;
+
             try
             {
                 var context = (AppContext)services.GetRequiredService<IAppContext>();
-                Log.Information("Migrate database");
-                context.Database.Migrate();
-                await DBInitializer.InitializeUsersAsync(context);
-                await DBInitializer.InitializeEventsAsync(context);
+
+                if (!await context.Database.EnsureCreatedAsync())
+                {
+                    Log.Information("Migrate database");
+
+                    await context.Database.MigrateAsync();
+
+                    await DbInitializer.InitializeDb(context);
+                }
             }
             catch (Exception ex)
             {
@@ -58,9 +71,11 @@ namespace TrainingProject.Web
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+        }
     }
 }

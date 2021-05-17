@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -28,10 +26,9 @@ namespace TrainingProject.DomainLogic.Models.Events
 
         [Required]
         public string Place { get; set; }
-
-        //TODO publication end
-        //[Required]
-        //public string PublicationEnd { get; set; }
+        
+        [Required]
+        public string PublicationEnd { get; set; }
 
         [Required]
         [ValidGuid]

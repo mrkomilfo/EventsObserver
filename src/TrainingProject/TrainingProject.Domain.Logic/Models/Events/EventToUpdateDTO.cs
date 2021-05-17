@@ -7,9 +7,9 @@ namespace TrainingProject.DomainLogic.Models.Events
     {
         public int Id { get; set; }
 
-        public int ParticipantsLimit { get; set; } //0 - unlimited
-
         public int? CategoryId { get; set; }
+
+        public int ParticipantsLimit { get; set; } //0 - unlimited
 
         public decimal Fee { get; set; }
 
@@ -19,7 +19,9 @@ namespace TrainingProject.DomainLogic.Models.Events
 
         public string Description { get; set; }
 
-        public string DateTime { get; set; }
+        public string Start { get; set; }
+
+        public string PublicationEnd { get; set; }
 
         public string Place { get; set; }
 

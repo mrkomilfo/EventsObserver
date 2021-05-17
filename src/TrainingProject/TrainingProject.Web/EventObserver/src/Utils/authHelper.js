@@ -38,24 +38,31 @@
     }
 
     static async fetchWithCredentials(url, options) {
-        var jwtToken = this.getAccessToken();
+        const jwtToken = this.getAccessToken();
+        
         options = options || {};
         options.headers = options.headers || {};
         options.headers['Authorization'] = 'Bearer ' + jwtToken;
-        var response = await fetch(url, options);
+
+        const response = await fetch(url, options);
+        
         if (response.ok) { //all is good, return the response
             return response;
         }
 
         if (response.status === 401 && response.headers.has('Token-Expired')) {
-            var refreshToken = this.getRefreshToken();
-            var refreshResponse = await this.refresh(jwtToken, refreshToken);
+            const refreshToken = this.getRefreshToken();
+            const refreshResponse = await this.refresh(jwtToken, refreshToken);
+            
             if (!refreshResponse.ok) {
                 return response; //failed to refresh so return original 401 response
             }
-            var jsonRefreshResponse = await refreshResponse.json(); //read the json with the new tokens
+            
+            const jsonRefreshResponse = await refreshResponse.json(); //read the json with the new tokens
+            
             this.saveAccessToken(jsonRefreshResponse.accessToken);
             this.saveRefreshToken(jsonRefreshResponse.refreshToken);
+            
             return await this.fetchWithCredentials(url, options); //repeat the original request
         } else { //status is not 401 and/or there's no Token-Expired header
             return response; //return the original 401 response
@@ -67,7 +74,7 @@
             token: jwtToken,
             refreshToken: refreshToken
         }
-        return fetch('api/Users/refresh', {
+        return fetch('api/users/refresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
