@@ -30,7 +30,6 @@ using TrainingProject.DomainLogic.Managers;
 using TrainingProject.DomainLogic.Services;
 using TrainingProject.Web.Filters;
 using TrainingProject.Web.Helpers;
-using TrainingProject.Web.Hubs;
 using TrainingProject.Web.Interfaces;
 using TrainingProject.Web.Jobs;
 using TrainingProject.Web.Services;
@@ -40,9 +39,9 @@ namespace TrainingProject.Web
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
-        public IWebHostEnvironment Environment { get; }
+        private IWebHostEnvironment Environment { get; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -176,7 +175,6 @@ namespace TrainingProject.Web
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-                endpoints.MapHub<ChatHub>("/chat");
             });
 
             app.UseSpa(spa =>

@@ -12,6 +12,10 @@ namespace TrainingProject.Domain
 
         public DateTime RegistrationDateTime { get; set; }
 
+        public string Code { get; set; }
+
+        public bool IsChecked { get; set; }
+
         public EventDayOfWeek EventDayOfWeek { get; set; }
 
         public User Participant { get; set; }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ using TrainingProject.DomainLogic.Helpers;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
+using TrainingProject.DomainLogic.Models.Users;
 using TrainingProject.DomainLogic.Services;
 
 namespace TrainingProject.DomainLogic.Managers
@@ -88,7 +90,7 @@ namespace TrainingProject.DomainLogic.Managers
                 }
                 
                 var deserializedEventDaysOfWeek = 
-                    JsonConvert.DeserializeObject<List<EventDayOfWeekDto>>(eventDto.EventDaysOfWeek);
+                    JsonConvert.DeserializeObject<List<EventDayOfWeekPostDto>>(eventDto.EventDaysOfWeek);
                 var eventDaysOfWeek = deserializedEventDaysOfWeek.Select(x => new EventDayOfWeek
                 {
                     EventId = newEvent.Id,
@@ -174,7 +176,7 @@ namespace TrainingProject.DomainLogic.Managers
                 }
                 
                 var deserializedEventDaysOfWeek = 
-                    JsonConvert.DeserializeObject<List<EventDayOfWeekDto>>(eventDto.EventDaysOfWeek);
+                    JsonConvert.DeserializeObject<List<EventDayOfWeekPostDto>>(eventDto.EventDaysOfWeek);
                 var eventDaysOfWeek = deserializedEventDaysOfWeek.Select(x => new EventDayOfWeek
                 {
                     EventId = eventDto.Id,
@@ -252,11 +254,16 @@ namespace TrainingProject.DomainLogic.Managers
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task<EventFullDto> GetEventAsync(int eventId)
+        public async Task<EventFullDto> GetEventAsync(int eventId, string userId = null)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
 
-            var dbEvent = await _appContext.Events.Include(e => e.Organizer).Include(e => e.Category).FirstOrDefaultAsync(e => e.Id == eventId);
+            var dbEvent = await _appContext.Events
+                .Include(e => e.Organizer)
+                .Include(e => e.Category)
+                .Include(e => e.DaysOfWeek)
+                    .ThenInclude(e => e.RecurrentEventParticipants)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (dbEvent == null)
             {
@@ -264,12 +271,6 @@ namespace TrainingProject.DomainLogic.Managers
             }
 
             var eventFullDto = _mapper.Map<EventFullDto>(dbEvent);
-            var participants = await _appContext.EventsParticipants.Include(eu => eu.Participant).Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).ToListAsync();
-
-            foreach (var participant in participants)
-            {
-                eventFullDto.Participants.Add(participant.Id.ToString(), participant.UserName);
-            }
 
             var tags = _appContext.EventsTags.Include(et => et.Tag).Where(et => et.EventId == eventId).Select(et => et.Tag).ToHashSet();
 
@@ -281,6 +282,29 @@ namespace TrainingProject.DomainLogic.Managers
             if (dbEvent.HasImage)
             {
                 eventFullDto.Image = $"img\\events\\{eventId}.jpg";
+            }
+
+            if (dbEvent.IsRecurrent)
+            {
+                eventFullDto.WeekDays = _mapper.Map<IReadOnlyCollection<EventDayOfWeekDto>>(dbEvent.DaysOfWeek);
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    foreach (var weekDay in eventFullDto.WeekDays)
+                    {
+                        weekDay.AmISubscribed = await IsUserSubscribedOnRecurrentEvent(weekDay.Id, userId);
+                    }
+                }
+            }
+            else
+            {
+                eventFullDto.Participants = _appContext.EventsParticipants.Include(eu => eu.Participant)
+                    .Where(eu => eu.EventId == eventId).Select(eu => eu.Participant).Count();
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    eventFullDto.AmISubscribed = await IsUserSubscribedOnRecurrentEvent(eventFullDto.Id, userId);
+                }
             }
 
             return eventFullDto;
@@ -375,7 +399,7 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new KeyNotFoundException($"User with id={userId} not found");
             }
 
-            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId))
+            if (!await _appContext.Events.AnyAsync(e => e.Id == eventId && e.IsRecurrent == false))
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
@@ -397,7 +421,13 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new AccessViolationException($"Event(id={eventId}) has already started");
             }
 
-            var eu = new EventParticipant { ParticipantId = userId, EventId = eventId };
+            var eu = new EventParticipant
+            {
+                ParticipantId = userId, 
+                EventId = eventId, 
+                IsChecked = false, 
+                Code = CodeGenerator.GenerateCode(4)
+            };
 
             await _appContext.EventsParticipants.AddAsync(eu); 
             await _appContext.SaveChangesAsync(default);
@@ -447,38 +477,170 @@ namespace TrainingProject.DomainLogic.Managers
             var now = DateTime.Now;
             var eventUsers = _appContext.EventsParticipants.Include(eu => eu.Event).Include(eu => eu.Participant).ToList();
             var eventUsersList = eventUsers
-                .Where(eu => !string.IsNullOrEmpty(eu.Participant.ContactEmail)
+                .Where(eu => !string.IsNullOrEmpty(eu.Participant.Email)
                     && eu.Event.Start > now.AddHours(23)
                     && eu.Event.Start <= now.AddHours(24));
 
             foreach (var eu in eventUsersList)
             {
-                _notificator.Notificate(eu);
+                _notificator.NotifyAboutEvent(eu);
             }
         }
 
-        public async Task<IList<string>> GetEventInvolvedUsersIdAsync(int eventId)
+        public async Task SubscribeOnRecurrentEventAsync(Guid userId, int eventDayOfWeekId)
         {
-            var ids = new List<string>();
-            var targetEvent = await GetEventAsync(eventId);
+            _logger.LogMethodCallingWithObject(new { userId, eventDayOfWeekId });
 
-            ids.Add(targetEvent.OrganizerId);
-
-            var participantsIds = targetEvent.Participants.Keys;
-
-            ids.AddRange(participantsIds);
-
-            return ids;
-        }
-
-        public async Task CheckUserInvolvementInTheEventAsync(string userId, int eventId)
-        {
-            var involvedUsers = await GetEventInvolvedUsersIdAsync(eventId);
-
-            if (!involvedUsers.Contains(userId))
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
             {
-                throw new AccessViolationException($"User(id={userId}) does not have access to event(id={eventId}) chat");
+                throw new KeyNotFoundException(nameof(userId));
             }
+
+            if (!await _appContext.EventDaysOfWeek.AnyAsync(e => e.Id == eventDayOfWeekId))
+            {
+                throw new KeyNotFoundException(nameof(eventDayOfWeekId));
+            }
+
+            var eventDayOfWeekParticipant = new EventDayOfWeekParticipant
+            {
+                EventDayOfWeekId = eventDayOfWeekId,
+                ParticipantId = userId,
+                RegistrationDateTime = DateTime.Now,
+                IsChecked = false,
+                Code = CodeGenerator.GenerateCode(4)
+            };
+
+            await _appContext.RecurrentEventParticipants.AddAsync(eventDayOfWeekParticipant);
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task UnsubscribeFromRecurrentEventAsync(Guid userId, int eventDayOfWeekId)
+        {
+            _logger.LogMethodCallingWithObject(new { userId, eventDayOfWeekId });
+
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Id, userId)))
+            {
+                throw new KeyNotFoundException(nameof(userId));
+            }
+
+            if (!await _appContext.EventDaysOfWeek.AnyAsync(e => e.Id == eventDayOfWeekId))
+            {
+                throw new KeyNotFoundException(nameof(eventDayOfWeekId));
+            }
+
+            var eventDayOfWeek = await _appContext.EventDaysOfWeek.FindAsync(eventDayOfWeekId);
+
+            if (eventDayOfWeek == null)
+            {
+                throw new KeyNotFoundException(nameof(eventDayOfWeekId));
+            }
+
+            var recurrentEventParticipant = await _appContext.RecurrentEventParticipants.FirstOrDefaultAsync(x =>
+                x.EventDayOfWeekId == eventDayOfWeekId &&
+                x.ParticipantId == userId &&
+                x.RegistrationDateTime.AddDays(7) > eventDayOfWeek.GetNearestDateTime());
+
+            if (recurrentEventParticipant == null)
+            {
+                throw new ObjectNotFoundException(nameof(recurrentEventParticipant));
+            }
+
+            _appContext.RecurrentEventParticipants.Remove(recurrentEventParticipant);
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task<IEnumerable<ParticipantDto>> GetEventParticipants(int eventId)
+        {
+            _logger.LogMethodCallingWithObject(new {eventId});
+
+            var eventDayOfWeek = await _appContext.Events.FindAsync(eventId);
+
+            if (eventDayOfWeek == null)
+            {
+                throw new KeyNotFoundException(nameof(eventId));
+            }
+
+            var participants = await _appContext.EventsParticipants
+                .Include(eu => eu.Participant)
+                .Where(eu => eu.EventId == eventId).ToListAsync();
+
+            return _mapper.Map<IEnumerable<ParticipantDto>>(participants);
+        }
+
+        public async Task<IEnumerable<ParticipantDto>> GetRecurrentEventParticipants(int eventDayOfWeekId)
+        {
+            _logger.LogMethodCallingWithObject(new {eventDayOfWeekId});
+
+            var eventDayOfWeek = await _appContext.EventDaysOfWeek.FindAsync(eventDayOfWeekId);
+
+            if (eventDayOfWeek == null)
+            {
+                throw new KeyNotFoundException(nameof(eventDayOfWeekId));
+            }
+
+            var recurrentEventParticipants = await _appContext.RecurrentEventParticipants
+                .Include(x => x.Participant)
+                .Where(x => x.RegistrationDateTime.AddDays(7) > eventDayOfWeek.GetNearestDateTime()).ToListAsync();
+
+            return _mapper.Map<IEnumerable<ParticipantDto>>(recurrentEventParticipants);
+        }
+
+        public async Task ToggleEventApprove(int eventId)
+        {
+            _logger.LogMethodCallingWithObject(new { eventId });
+
+            var dbEvent = await _appContext.Events.FindAsync(eventId);
+
+            if (dbEvent == null)
+            {
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
+            }
+
+            dbEvent.IsApproved = !dbEvent.IsApproved;
+
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task ToggleParticipantCheck(int id)
+        {
+            _logger.LogMethodCallingWithObject(new { id });
+
+            var eventParticipant = await _appContext.EventsParticipants.FindAsync(id);
+
+            if (eventParticipant == null)
+            {
+                throw new KeyNotFoundException(nameof(eventParticipant));
+            }
+
+            eventParticipant.IsChecked = !eventParticipant.IsChecked;
+
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        public async Task ToggleRecurrentEventParticipantCheck(int id)
+        {
+            _logger.LogMethodCallingWithObject(new { id });
+
+            var eventParticipant = await _appContext.RecurrentEventParticipants.FindAsync(id);
+
+            if (eventParticipant == null)
+            {
+                throw new KeyNotFoundException(nameof(eventParticipant));
+            }
+
+            eventParticipant.IsChecked = !eventParticipant.IsChecked;
+
+            await _appContext.SaveChangesAsync(default);
+        }
+
+        private async Task<bool> IsUserSubscribedOnEvent(int eventId, string userId)
+        {
+            return (await GetEventParticipants(eventId)).Any(p => p.UserId == userId);
+        }
+
+        private async Task<bool> IsUserSubscribedOnRecurrentEvent(int eventDayOfWeekId, string userId)
+        {
+            return (await GetRecurrentEventParticipants(eventDayOfWeekId)).Any(p => p.UserId == userId);
         }
 
         private static Dictionary<int, string> GetWeekDaysByTime(IEnumerable<EventDayOfWeek> weekDays)
@@ -487,5 +649,7 @@ namespace TrainingProject.DomainLogic.Managers
                 ? new Dictionary<int, string>()
                 : weekDays.ToDictionary(x => (int) x.DayOfWeek, x => x.Start.ToString());
         }
+
+
     }
 }

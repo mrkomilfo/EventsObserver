@@ -40,13 +40,16 @@ export default class EventRow extends Component {
                                 <td>Место:</td>
                                 <td>{this.props.event.place}</td>
                             </tr>
-                            <tr>
-                                <td>Начало:</td>
-                                <td>{this.props.event.start}</td>
-                            </tr>
+                            {
+                                this.props.event.isRecurrent ? null :
+                                    <tr>
+                                        <td>Начало:</td>
+                                        <td>{this.props.event.start}</td>
+                                    </tr>
+                            }
                             <tr>
                                 <td>Стоимость:</td>
-                                <td>{this.props.event.fee ? this.props.event.fee +'BYN' : 'Бесплатно'}</td>
+                                <td>{this.props.event.fee ? this.props.event.fee + ' BYN' : 'Бесплатно'}</td>
                             </tr>
                         </tbody>
                     </table>

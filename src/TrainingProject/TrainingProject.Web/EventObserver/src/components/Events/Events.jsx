@@ -54,7 +54,7 @@ export default class Events extends Component {
                                                         </td>
                                                     </tr>
                                                 }
-                                                <EventRow event={event}/>
+                                                <EventRow key={event.id} event={event}/>
                                             </>
                                     ))}
                                 </tbody>

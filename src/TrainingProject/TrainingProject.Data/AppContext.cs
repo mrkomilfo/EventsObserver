@@ -108,7 +108,7 @@ namespace TrainingProject.Data
                         .WithMany()
                         .HasForeignKey("ParticipantId"))
                 .ToTable("EventsUsers")
-                .HasKey(eu => new { eu.EventId, eu.ParticipantId });
+                .HasKey(eu => eu.Id);
         }
 
         private void ConfigureRole()

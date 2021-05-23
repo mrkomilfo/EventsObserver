@@ -73,7 +73,7 @@ export default class CommentsBlock extends Component {
                         this.state.loading ? null :
                             <div>
                                 {this.state.comments.map(comment =>
-                                    <Comment comment={comment} onDeleteCommentClick={this.onDeleteCommentClick}/>)}
+                                    <Comment key={comment.id} comment={comment} onDeleteCommentClick={this.onDeleteCommentClick}/>)}
                             </div>
                     }
                 </div>

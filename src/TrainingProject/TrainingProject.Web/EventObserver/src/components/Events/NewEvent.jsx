@@ -170,8 +170,8 @@ export default class NewEvent extends Component {
                 this.state.nameValid &&
                 this.state.categoryValid &&
                 this.state.placeValid &&
-                (!this.state.isRecurrent && this.state.dateTimeValid
-                    || this.state.isRecurrent && this.state.weekDaysValid) &&
+                ((!this.state.isRecurrent && this.state.dateTimeValid)
+                    || (this.state.isRecurrent && this.state.weekDaysValid)) &&
                 this.state.publicationEndValid &&
                 this.state.feeValid &&
                 this.state.participantsLimitValid &&
@@ -235,7 +235,7 @@ export default class NewEvent extends Component {
                     <tbody> {
                         ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, index) => {
                                 let key = (index+1) % 7;
-                                
+
                                 return(
                                     <tr>
                                         <td style={{width: 'fit-content'}}>{day}</td>
@@ -313,7 +313,7 @@ export default class NewEvent extends Component {
                             {datePicker}
                             <hr/>
                             <FormGroup>
-                                <Label for="publicationEnd">Разместить афишу до</Label>
+                                <Label for="publicationEnd">Окончание срока размещения</Label>
                                 <Input invalid={!this.state.publicationEndValid} required type="datetime-local"
                                        name="publicationEnd" id="publicationEnd" min={DateTimeHelper.getCurrentDateTime()}
                                        value={this.state.publicationEnd} onChange={this.handleInputChange}/>

@@ -9,12 +9,15 @@ namespace TrainingProject.DomainLogic.Models.Users
         [Required]
         [ValidGuid]
         public string Id { get; set; }
+
         [Required]
         public string UserName { get; set; }
-        public string ContactEmail { get; set; }
+
         public string ContactPhone { get; set; }
+
         [Required]
         public bool HasPhoto { get; set; }
+
         [MaxFileSize(8 * 1024 * 1024)]
         public IFormFile Photo { get; set; }
     }

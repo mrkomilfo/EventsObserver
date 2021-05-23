@@ -18,5 +18,7 @@
         public bool HasImage { get; set; }
 
         public string Image { get; set; }
+
+        public bool IsRecurrent { get; set; }
     }
 }

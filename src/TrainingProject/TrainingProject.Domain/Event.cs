@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TrainingProject.Domain
 {
@@ -53,6 +54,18 @@ namespace TrainingProject.Domain
             Tags = new HashSet<Tag>();
             DaysOfWeek = new HashSet<EventDayOfWeek>();
             Comments = new HashSet<Comment>();
+        }
+
+        public IEnumerable<DateTime> GetNearestStartDateTimes()
+        {
+            return !IsRecurrent
+                ? new List<DateTime> { Start }
+                : DaysOfWeek.Select(eventDayOfWeek => eventDayOfWeek.GetNearestDateTime()).OrderBy(x => x).ToList();
+        }
+
+        public bool IsActive()
+        {
+            return IsApproved && PublicationEnd > DateTime.Now && (IsRecurrent || Start > DateTime.Now);
         }
     }
 }

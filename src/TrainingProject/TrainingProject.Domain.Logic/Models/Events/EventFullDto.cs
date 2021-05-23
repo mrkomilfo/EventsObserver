@@ -6,8 +6,6 @@ namespace TrainingProject.DomainLogic.Models.Events
     {
         public int Id { get; set; }
 
-        public int ParticipantsLimit { get; set; } //0 - unlimited
-
         public int? CategoryId { get; set; }
 
         public long StartParsable { get; set; }
@@ -34,13 +32,24 @@ namespace TrainingProject.DomainLogic.Models.Events
 
         public string Image { get; set; }
 
-        public Dictionary<string, string> Participants { get; set; }
+        public bool IsRecurrent { get; set; }
+
+        public int ParticipantsLimit { get; set; } //0 - unlimited
+
+        public int Participants { get; set; }
+
+        public bool AmISubscribed { get; set; }
+
+        public bool IsActive { get; set; }
 
         public Dictionary<string, string> Tags { get; set; }
+
+        public IEnumerable<EventDayOfWeekDto> WeekDays { get; set; }
 
         public EventFullDto()
         {
             Tags = new Dictionary<string, string>();
+            WeekDays = new List<EventDayOfWeekDto>();
         }
     }
 }

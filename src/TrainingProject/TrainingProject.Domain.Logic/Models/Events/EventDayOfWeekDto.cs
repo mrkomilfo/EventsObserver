@@ -1,11 +1,17 @@
-﻿using System;
-
-namespace TrainingProject.DomainLogic.Models.Events
+﻿namespace TrainingProject.DomainLogic.Models.Events
 {
     public class EventDayOfWeekDto
     {
-        public int DayOfWeek { get; set; }
+        public int Id { get; set; }
 
-        public string Start { get; set; }
+        public int WeekDay { get; set; }
+
+        public string Date { get; set; }
+
+        public string Time { get; set; }
+
+        public int Participants { get; set; }
+
+        public bool AmISubscribed { get; set; }
     }
 }

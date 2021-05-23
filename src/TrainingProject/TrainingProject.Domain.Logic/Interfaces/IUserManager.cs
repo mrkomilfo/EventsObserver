@@ -27,7 +27,7 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task<Role> GetUserRoleAsync(Guid userId);
         Task ChangePasswordAsync(ChangePasswordDto changePasswordDto);
         Task<string> GetUserNameAsync(Guid guid);
-        Task<string> GetBlockingExpirationAsync(string login);
+        Task<string> GetBlockingExpirationAsync(string email);
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
         Task<string> GetRefreshTokenAsync(string userId);
         string GenerateToken(IEnumerable<Claim> claims);
@@ -35,8 +35,8 @@ namespace TrainingProject.DomainLogic.Interfaces
         Task DeleteRefreshTokenAsync(string userId);
         Task SaveRefreshTokenAsync(string userId, string newRefreshToken);
         Task RequestEmailConfirmAsync(string userId);
-        Task ConfirmEmailAsync(string userId, string confirmCode);
-        Task RequestPasswordResetAsync(string login);
-        Task ResetPasswordAsync(string login, string confirmCode);
+        Task ConfirmEmailAsync(string email, string confirmCode);
+        Task RequestPasswordResetAsync(string email);
+        Task ResetPasswordAsync(string email, string confirmCode);
     }
 }

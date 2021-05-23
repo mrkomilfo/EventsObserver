@@ -1,4 +1,14 @@
 ﻿export default class DateTimeHelper {
+    static daysOfWeek = {
+        1: 'Пн',
+        2: 'Вт',
+        3: 'Ср',
+        4: 'Чт',
+        5: 'Пт',
+        6: 'Сб',
+        0: 'Вс'
+    }
+
     static getCurrentDateTime() {
         let today = new Date();
         let dd = today.getDate();

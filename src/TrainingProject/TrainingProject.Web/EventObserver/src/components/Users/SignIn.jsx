@@ -7,11 +7,11 @@ export default class SignUp extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            login: '', 
+            email: '', 
             password: '', 
             errorMessage: '', 
             error: false,
-            resetLogin: '',
+            resetEmail: '',
             confirmCode: '',
             requestResetCodeModal: false,
             resetPasswordModal: false,
@@ -20,7 +20,7 @@ export default class SignUp extends Component {
             resetPasswordErrorMessage: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.logIn = this.logIn.bind(this);
+        this.email = this.email.bind(this);
         this.enterPressed = this.enterPressed.bind(this);
         this.toggleRequestResetCodeModal = this.toggleRequestResetCodeModal.bind(this);
         this.toggleResetPasswordModal = this.toggleResetPasswordModal.bind(this);
@@ -60,7 +60,7 @@ export default class SignUp extends Component {
     enterPressed(event) {
         var code = event.keyCode || event.which;
         if (code === 13) {
-            this.logIn();
+            this.email();
         }
     };
 
@@ -74,8 +74,8 @@ export default class SignUp extends Component {
             <Modal isOpen={this.state.requestResetCodeModal} toggle={this.toggleRequestResetCodeModal}>
                 <ModalHeader toggle={this.toggleRequestResetCodeModal}>Сброс пароля</ModalHeader>
                 <ModalBody>
-                    <p>Введите ваш логин в поле ниже.</p>
-                    <Input type="text" name="resetLogin" id="resetLogin" value={this.state.resetLogin} placeholder="Логин" onChange={this.handleInputChange} />
+                    <p>Введите ваш email в поле ниже.</p>
+                    <Input type="email" name="resetEmail" id="resetEmail" value={this.state.resetEmail} placeholder="Логин" onChange={this.handleInputChange} />
                     <span style={{color: "red"}}>{this.state.requestResetCodeErrorMessage}</span>
                 </ModalBody>
                 <ModalFooter>
@@ -119,15 +119,15 @@ export default class SignUp extends Component {
                     <div className="list-group-item">
                         <Form>    
                             <FormGroup>
-                                <Label for="login">Логин</Label>
-                                <Input required type="text" name="login" id="login" value={this.state.login} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
+                                <Label for="email">Email</Label>
+                                <Input required type="text" name="email" id="email" value={this.state.email} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                             </FormGroup>
                             <FormGroup>
                                 <Label for="password">Пароль</Label>
                                 <Input required type="password" name="password" id="password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.enterPressed}/>
                             </FormGroup>
                             <div>
-                                <Button color="primary" onClick={this.logIn}>Войти</Button>{' '}
+                                <Button color="primary" onClick={this.email}>Войти</Button>{' '}
                                 <Button color="warning" onClick={this.toggleRequestResetCodeModal}>Я забыл пароль</Button>
                             </div>
                             {requestResetCodeModal}
@@ -140,9 +140,9 @@ export default class SignUp extends Component {
         )
     }
 
-    logIn() {
+    email() {
         let auth_data = {
-            login: this.state.login,
+            email: this.state.email,
             password: this.state.password
         };
         fetch('api/users/signIn', {
@@ -158,12 +158,12 @@ export default class SignUp extends Component {
             if (response.status === 401)
             {
                 this.setState({
-                    errorMessage: 'Неверный логин или пароль'
+                    errorMessage: 'Неверный email или пароль'
                 })
             }
             else if (response.status === 403)
             {
-                fetch(`api/users/blockingExpiration?login=${this.state.login}`)
+                fetch(`api/users/blockingExpiration?email=${this.state.email}`)
                     .then(response=>response.text())
                     .then(data => {
                         this.setState({
@@ -192,14 +192,14 @@ export default class SignUp extends Component {
     }
 
     requestResetCode() {
-        if (!this.state.resetLogin.trim())
+        if (!this.state.resetEmail.trim())
         {
             this.setState({
-                requestResetCodeErrorMessage: 'Пользователь с таким логином не существует'
+                requestResetCodeErrorMessage: 'Пользователь с таким email не существует'
             });
             return;
         }
-        fetch(`api/users/resetPassword?login=${this.state.resetLogin}`)
+        fetch(`api/users/resetPassword?email=${this.state.resetEmail}`)
         .then((response) => {
             if (response.ok) {
                 this.setState({
@@ -209,7 +209,7 @@ export default class SignUp extends Component {
             }
             else if (response.status === 204) {
                 this.setState({
-                    requestResetCodeErrorMessage: 'Пользователь с таким логином не существует'
+                    requestResetCodeErrorMessage: 'Пользователь с таким email не существует'
                 });
             }
             else if (response.status === 403) {
@@ -240,7 +240,7 @@ export default class SignUp extends Component {
             });
             return;
         }
-        fetch(`api/users/resetPassword?login=${this.state.resetLogin}&confirmCode=${this.state.confirmCode}`, {
+        fetch(`api/users/resetPassword?email=${this.state.resetEmail}&confirmCode=${this.state.confirmCode}`, {
             method: 'PUT'
         }).then((response) => {
             if (response.ok) {
@@ -253,7 +253,7 @@ export default class SignUp extends Component {
             }
             else if (response.status === 204) {
                 this.setState({
-                    resetPasswordErrorMessage: 'Пользователь с таким логином не существует'
+                    resetPasswordErrorMessage: 'Пользователь с таким email не существует'
                 });
             }
             else if (response.status === 401) {

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
+
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core;
 using System.Net;
+
 using TrainingProject.Common;
 
 namespace TrainingProject.Web.Filters
@@ -19,17 +22,19 @@ namespace TrainingProject.Web.Filters
         public void OnException(ExceptionContext context)
         {
             _logger.LogError(context.Exception);
-            HttpStatusCode status = HttpStatusCode.InternalServerError;
-            string message = context.Exception.Message;
+            
+            var status = HttpStatusCode.InternalServerError;
+            var message = context.Exception.Message;
             var exceptionType = context.Exception.GetType();
+            
             if (exceptionType == typeof(UnauthorizedAccessException) 
                 || exceptionType == typeof(SecurityTokenException))
             {
                 status = HttpStatusCode.Unauthorized;
             }
-            else if (exceptionType == typeof(KeyNotFoundException))
+            else if (exceptionType == typeof(KeyNotFoundException) || exceptionType == typeof(ObjectNotFoundException))
             {
-                status = HttpStatusCode.NoContent;
+                status = HttpStatusCode.NotFound;
             }
             else if (exceptionType == typeof(ArgumentException) || exceptionType == typeof(FormatException))
             {
@@ -43,6 +48,7 @@ namespace TrainingProject.Web.Filters
             {
                 status = HttpStatusCode.Conflict;
             }
+            
             context.Result = new JsonResult(message)
             {
                 StatusCode = (int?)status

@@ -8,10 +8,10 @@ namespace TrainingProject.Domain
     {
         public Guid Id { get; set; }
 
-        public string UserName { get; set; }
-
         [Index("INDEX_LOGIN", IsClustered = true, IsUnique = true)]
-        public string Login { get; set; }
+        public string Email { get; set; }
+
+        public string UserName { get; set; }
 
         public string Password { get; set; }
 
@@ -20,8 +20,6 @@ namespace TrainingProject.Domain
         public Role Role { get; set; }
 
         public DateTime? UnlockTime { get; set; }
-
-        public string ContactEmail { get; set; }
 
         public string ContactPhone { get; set; }
 
@@ -33,7 +31,7 @@ namespace TrainingProject.Domain
 
         public bool IsDeleted { get; set; }
 
-        public bool EmailConfirmed { get; set; }
+        public bool IsEmailConfirmed { get; set; }
 
         public string EmailConfirmCodeHash { get; set; }
 

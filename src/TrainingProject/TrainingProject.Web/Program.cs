@@ -56,14 +56,11 @@ namespace TrainingProject.Web
             {
                 var context = (AppContext)services.GetRequiredService<IAppContext>();
 
-                if (!await context.Database.EnsureCreatedAsync())
-                {
-                    Log.Information("Migrate database");
+                Log.Information("Migrate database");
 
-                    await context.Database.MigrateAsync();
+                await context.Database.MigrateAsync();
 
-                    await DbInitializer.InitializeDb(context);
-                }
+                await DbInitializer.InitializeDb(context);
             }
             catch (Exception ex)
             {

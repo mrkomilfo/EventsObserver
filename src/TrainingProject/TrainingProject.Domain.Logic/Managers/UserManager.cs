@@ -77,12 +77,25 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task RegisterUserAsync(RegisterDto user) 
         {
             _logger.LogMethodCallingWithObject(user, "Password, PasswordConfirm");
-            if (await _appContext.Users.AnyAsync(u => string.Equals(u.Login.ToLower(), user.Login.ToLower())))
+
+            var existingUser = _appContext.Users.FirstOrDefault(u => string.Equals(u.Email.ToLower(), user.Email.ToLower()));
+            if (existingUser != null)
             {
-                throw new ArgumentOutOfRangeException($"User with login \"{user.Login}\" already exist");
+                if (!existingUser.IsEmailConfirmed)
+                {
+                    _appContext.Users.Remove(existingUser);
+                    await _appContext.SaveChangesAsync(default);
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException($"User with Email \"{user.Email}\" already exist");
+                }
             }
-            User newUser = _mapper.Map<User>(user);
+
+            var newUser = _mapper.Map<User>(user);
+
             newUser.RoleId = (await _appContext.Roles.FirstOrDefaultAsync(r => r.Name == "User"))?.Id;
+
             await _appContext.Users.AddAsync(newUser);
             await _appContext.SaveChangesAsync(default);
         }
@@ -94,10 +107,6 @@ namespace TrainingProject.DomainLogic.Managers
             if (updatedUser == null)
             {
                 throw new KeyNotFoundException($"User with id={user.Id} not found");
-            }
-            if (!string.Equals(user.ContactEmail, updatedUser.ContactEmail))
-            {
-                updatedUser.EmailConfirmed = false;
             }
             _mapper.Map(user, updatedUser);
             if (user.Photo != null)
@@ -240,14 +249,14 @@ namespace TrainingProject.DomainLogic.Managers
             return await _appContext.Users.Where(u => Equals(u.Id, userId)).Select(u => u.UserName).FirstOrDefaultAsync();
         }
 
-        public async Task<string> GetBlockingExpirationAsync(string login)
+        public async Task<string> GetBlockingExpirationAsync(string email)
         {
-            _logger.LogMethodCallingWithObject(new { login });
-            if (!await _appContext.Users.AnyAsync(u => Equals(u.Login, login)))
+            _logger.LogMethodCallingWithObject(new {Email = email });
+            if (!await _appContext.Users.AnyAsync(u => Equals(u.Email, email)))
             {
-                throw new KeyNotFoundException($"User '{login}' not found");
+                throw new KeyNotFoundException($"User '{email}' not found");
             }
-            return await _appContext.Users.Where(u => Equals(u.Login, login)).Select(u => u.UnlockTime.ToString().Substring(0,19)).FirstOrDefaultAsync();
+            return await _appContext.Users.Where(u => Equals(u.Email, email)).Select(u => u.UnlockTime.ToString().Substring(0,19)).FirstOrDefaultAsync();
         }
 
         public async Task<Role> GetUserRoleAsync(Guid userId)
@@ -277,15 +286,18 @@ namespace TrainingProject.DomainLogic.Managers
             await DeleteRefreshTokenAsync(changePasswordDto.Id);
         }
 
-        private async Task<ClaimsIdentity> GetIdentity(string login, string password)
+        private async Task<ClaimsIdentity> GetIdentity(string email, string password)
         {
-            _logger.LogMethodCallingWithObject(new { login, password }, "password");
+            _logger.LogMethodCallingWithObject(new {Email = email, password }, "password");
+
             ClaimsIdentity identity = null;
-            var user = await _appContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => string.Equals(u.Login, login));
+            var user = await _appContext.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(u => string.Equals(u.Email, email) && u.IsEmailConfirmed);
             if (user == null)
             {
                 return null;
             }
+
             var passwordHash = HashGenerator.Encrypt(password);
             if (passwordHash == user.Password)
             {
@@ -296,6 +308,7 @@ namespace TrainingProject.DomainLogic.Managers
                 };
                 identity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             }
+
             return identity;
         }
 
@@ -337,10 +350,10 @@ namespace TrainingProject.DomainLogic.Managers
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
             _logger.LogMethodCallingWithObject(loginDto, "Password");
-            var identity = await GetIdentity(loginDto.Login, loginDto.Password);
+            var identity = await GetIdentity(loginDto.Email, loginDto.Password);
             if (identity == null)
             {
-                throw new UnauthorizedAccessException($"Wrong login or password");
+                throw new UnauthorizedAccessException($"Wrong email or password");
             }
             var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
             if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
@@ -356,7 +369,7 @@ namespace TrainingProject.DomainLogic.Managers
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 Name = identity.Name,
-                Role = identity.Claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault().Value,
+                Role = identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
             };
             return response;
         }
@@ -422,21 +435,22 @@ namespace TrainingProject.DomainLogic.Managers
         private string GenerateRandomString(int length)
         {
             _logger.LogMethodCallingWithObject(new { length });
+
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[_random.Next(s.Length)]).ToArray());
         }
 
-        public async Task RequestEmailConfirmAsync(string userId)
+        public async Task RequestEmailConfirmAsync(string email)
         {
-            _logger.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { email });
 
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(userId)));
-            var email = user?.ContactEmail;
-
-            if (string.IsNullOrEmpty(email))
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Email, email));
+            
+            if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={userId} not exist or email not specified");
+                throw new KeyNotFoundException($"User with email={email} does not exist");
             }
 
             var confirmCode = GenerateRandomString(KeyLength);
@@ -448,51 +462,53 @@ namespace TrainingProject.DomainLogic.Managers
             var title = "[EventObserver] Подтверждение Email";
             var body = $"<p>Привет, {user.UserName}</p>" +
                 $"<p>Код подтверждения: {confirmCode}</p>";
+
             _notificator.SendMessage(title, body, email);
         }
 
-        public async Task ConfirmEmailAsync(string userId, string confirmCode)
+        public async Task ConfirmEmailAsync(string email, string confirmCode)
         {
-            _logger.LogMethodCallingWithObject(new { userId });
+            _logger.LogMethodCallingWithObject(new { email });
 
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Id, Guid.Parse(userId)));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Email, email));
 
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with id={userId} not found");
+                throw new KeyNotFoundException($"User with email={email} is not found");
             }
 
             var storedConfirmCode = user.EmailConfirmCodeHash;
 
             if (string.IsNullOrEmpty(storedConfirmCode)
-                || DateTime.ParseExact(storedConfirmCode.Substring(0, Fmt.Length), Fmt, CultureInfo.InvariantCulture).AddMinutes(5) < DateTime.Now
-                || !Equals(storedConfirmCode.Substring(Fmt.Length), HashGenerator.Encrypt(confirmCode)))
+                || DateTime.ParseExact(storedConfirmCode[..Fmt.Length], Fmt, 
+                    CultureInfo.InvariantCulture).AddMinutes(5) < DateTime.Now
+                || !Equals(storedConfirmCode[Fmt.Length..], HashGenerator.Encrypt(confirmCode)))
             {
                 throw new ArgumentException($"Wrong email confirm code");
             }
 
             user.EmailConfirmCodeHash = null;
-            user.EmailConfirmed = true;
+            user.IsEmailConfirmed = true;
 
             await _appContext.SaveChangesAsync(default);
         }
 
-        public async Task RequestPasswordResetAsync(string login)
+        public async Task RequestPasswordResetAsync(string email)
         {
-            _logger.LogMethodCallingWithObject(new { login });
+            _logger.LogMethodCallingWithObject(new {Email = email });
 
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Login, login));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Email, email));
 
             if (user == null)
             {
-                throw new KeyNotFoundException($"User '{login}' not found");
+                throw new KeyNotFoundException($"User '{email}' not found");
             }
 
-            var email = user.ContactEmail;
+            var userEmail = user.Email;
 
-            if (string.IsNullOrEmpty(email) || !user.EmailConfirmed)
+            if (string.IsNullOrEmpty(userEmail) || !user.IsEmailConfirmed)
             {
-                throw new AccessViolationException($"User doesn't have confirmed email");
+                throw new AccessViolationException("User doesn't have confirmed email");
             }
 
             var confirmCode = GenerateRandomString(KeyLength);
@@ -505,18 +521,18 @@ namespace TrainingProject.DomainLogic.Managers
             var body = $"<p>Привет, {user.UserName}</p>" +
                 $"<p>Код подтверждения для сброса пароля: {confirmCode}</p>";
 
-            _notificator.SendMessage(title, body, email);
+            _notificator.SendMessage(title, body, userEmail);
         }
 
-        public async Task ResetPasswordAsync(string login, string confirmCode)
+        public async Task ResetPasswordAsync(string email, string confirmCode)
         {
-            _logger.LogMethodCallingWithObject(new { login });
+            _logger.LogMethodCallingWithObject(new {Email = email});
 
-            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Login, login));
+            var user = await _appContext.Users.FirstOrDefaultAsync(u => Equals(u.Email, email));
 
             if (user == null)
             {
-                throw new KeyNotFoundException($"User '{login}' not found");
+                throw new KeyNotFoundException($"User '{email}' not found");
             }
 
             var storedConfirmCode = user.PasswordResetCodeHash;
@@ -540,7 +556,7 @@ namespace TrainingProject.DomainLogic.Managers
                 $"<p>Ваш новый пароль: {newPassword}</p>" +
                 $"<p>Пожалуйста, измените его при первом входе</p>";
 
-            _notificator.SendMessage(title, body, user.ContactEmail);
+            _notificator.SendMessage(title, body, user.Email);
         }
     }
 }

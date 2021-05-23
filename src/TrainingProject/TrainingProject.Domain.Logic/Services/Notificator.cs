@@ -19,30 +19,37 @@ namespace TrainingProject.DomainLogic.Services
         {
             _logger.LogMethodCallingWithObject(new { title, body, receiver });
 
-            MailAddress from = new MailAddress("events.observer.notificator@gmail.com", "Events Observer");
-            MailAddress to = new MailAddress(receiver);
-            MailMessage m = new MailMessage(from, to);
-            m.Subject = title;
-            m.Body = body;
-            m.IsBodyHtml = true;
-            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("events.observer.notificator@gmail.com", "EventsObserver17");
-            smtp.EnableSsl = true;
-            smtp.Send(m);
+            var from = new MailAddress("events.observer.notificator@gmail.com", "Events Observer");
+            var to = new MailAddress(receiver);
+
+            var message = new MailMessage(from, to)
+            {
+                Subject = title,
+                Body = body,
+                IsBodyHtml = true
+            };
+            var smtp = new SmtpClient("smtp.gmail.com", 587)
+            {
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential("events.observer.notificator@gmail.com", "EventsObserver17"),
+                EnableSsl = true
+            };
+
+            smtp.Send(message);
         }
 
-        public void Notificate(EventParticipant eventUser)
+        public void NotifyAboutEvent(EventParticipant eventUser)
         {
             _logger.LogMethodCallingWithObject(eventUser);
 
-            string title = $"[EventObserver] {eventUser.Event.Name} уже скоро";
-            string body = "<h2>Напоминание о предстоящем событии</h2>" +
+            var title = $"[EventObserver] {eventUser.Event.Name} уже скоро";
+            var body = "<h2>Напоминание о предстоящем событии</h2>" +
                 $"<p>{eventUser.Participant.UserName}, напоминаем, что уже скоро состоится мероприятие {eventUser.Event.Name}, на которое Вы записались.</p>" +
                 $"<p>Время: {eventUser.Event.Start:f}</p>" +
                 $"<p>Место: {eventUser.Event.Place}</p>" +
                 $"<p>Стоимость: {eventUser.Event.Fee}BYN</p>";
-            SendMessage(title, body, eventUser.Participant.ContactEmail);
+    
+            SendMessage(title, body, eventUser.Participant.Email);
         }
     }
 }

@@ -21,15 +21,17 @@ namespace TrainingProject.Web.Controllers
     [ServiceFilter(typeof(ExceptionHandlingFilter))]
     public class UsersController : ControllerBase
     {
-        private IUserManager _userManager;
-        private IHostServices _hostServices;
-        private ILogHelper _logger;
+        private readonly IUserManager _userManager;
+        private readonly IHostServices _hostServices;
+        private readonly ILogHelper _logger;
+
         public UsersController(IUserManager userManager, IHostServices hostServices, ILogHelper logger)
         {
             _userManager = userManager;
             _hostServices = hostServices;
             _logger = logger;
         }
+
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin,Account manager")]
         public async Task<ActionResult<Page<UserLiteDto>>> IndexAsync([FromQuery] int index = 0, int pageSize = 20, string search = null)
@@ -45,19 +47,19 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet]
         [Route("resetPassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string login)
+        public async Task<IActionResult> ResetPassword([FromQuery] string email)
         {
-            _logger.LogMethodCallingWithObject(new { login });
-            await _userManager.RequestPasswordResetAsync(login);
+            _logger.LogMethodCallingWithObject(new { email });
+            await _userManager.RequestPasswordResetAsync(email);
             return Ok();
         }
 
         [HttpPut]
         [Route("resetPassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string login, string confirmCode)
+        public async Task<IActionResult> ResetPassword([FromQuery] string email, string confirmCode)
         {
-            _logger.LogMethodCallingWithObject(new { login });
-            await _userManager.ResetPasswordAsync(login, confirmCode);
+            _logger.LogMethodCallingWithObject(new { email });
+            await _userManager.ResetPasswordAsync(email, confirmCode);
             return Ok();
         }
 
@@ -167,10 +169,10 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet]
         [Route("blockingExpiration")]
-        public async Task<ActionResult<string>> BlockingExpirationAsync([FromQuery] string login)
+        public async Task<ActionResult<string>> BlockingExpirationAsync([FromQuery] string email)
         {
-            _logger.LogMethodCallingWithObject(new { login });
-            return Ok(await _userManager.GetBlockingExpirationAsync(login));
+            _logger.LogMethodCallingWithObject(new { email });
+            return Ok(await _userManager.GetBlockingExpirationAsync(email));
         }
 
         [HttpGet]
@@ -215,10 +217,10 @@ namespace TrainingProject.Web.Controllers
         [HttpPost]
         [Route("signIn")]
         [ModelStateValidation]
-        public async Task<ActionResult> SignInAsync([FromBody] LoginDto loginDto)
+        public async Task<ActionResult> SignInAsync([FromBody] LoginDto emailDto)
         {
-            _logger.LogMethodCallingWithObject(loginDto, "Password");
-            return Ok(await _userManager.LoginAsync(loginDto));
+            _logger.LogMethodCallingWithObject(emailDto, "Password");
+            return Ok(await _userManager.LoginAsync(emailDto));
         }
 
         [HttpPost]
@@ -261,32 +263,24 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{userId}/confirmEmail")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> ConfirmEmail(string userId)
+        [Route("{email}/confirmEmail")]
+        public async Task<ActionResult> ConfirmEmail(string email)
         {
-            _logger.LogMethodCallingWithObject(new { userId });
-            var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (!Equals(userId, currentUserId))
-            {
-                return Forbid("Access denied");
-            }
-            await _userManager.RequestEmailConfirmAsync(userId);
+            _logger.LogMethodCallingWithObject(new { email });
+
+            await _userManager.RequestEmailConfirmAsync(email);
+
             return Ok();
         }
 
         [HttpPut]
-        [Route("{userId}/confirmEmail")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> ConfirmEmail(string userId, [FromQuery] string confirmCode)
+        [Route("{email}/confirmEmail")]
+        public async Task<ActionResult> ConfirmEmail(string email, [FromQuery] string confirmCode)
         {
-            _logger.LogMethodCallingWithObject(new { userId });
-            var currentUserId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            if (!Equals(userId, currentUserId))
-            {
-                return Forbid("Access denied");
-            }
-            await _userManager.ConfirmEmailAsync(userId, confirmCode);
+            _logger.LogMethodCallingWithObject(new {userId = email });
+
+            await _userManager.ConfirmEmailAsync(email, confirmCode);
+
             return Ok();
         }
     }

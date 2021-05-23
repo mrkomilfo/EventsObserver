@@ -33,7 +33,7 @@ namespace TrainingProject.Data
             {
                 new User
                 {
-                    Login = "accountManager",
+                    Email = "accountManager@gmail.com",
                     Password = "YIMMU3jl8cYYVN8TGTunenCKof4NfTmY8D0/quh0WU4=", //accountManager
                     UserName = "AccountManager",
                     RoleId = roles.ElementAt(0).Id,
@@ -41,7 +41,7 @@ namespace TrainingProject.Data
                 },
                 new User
                 {
-                    Login = "admin",
+                    Email = "admin@gmail.com",
                     Password = "jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=", //admin
                     UserName = "Administrator",
                     RoleId = roles.ElementAt(1).Id,
@@ -49,7 +49,7 @@ namespace TrainingProject.Data
                 },
                 new User
                 {
-                    Login = "user",
+                    Email = "user@gmail.com",
                     Password = "BPiZbadjt6lpsQKO4wB1aerzpjVIbdqyEdUSyFud+Ps=", //user
                     UserName = "User",
                     RoleId = roles.ElementAt(2).Id,
@@ -166,14 +166,16 @@ namespace TrainingProject.Data
                 new EventParticipant
                 {
                     EventId = events.ElementAt(0).Id,
-                    ParticipantId = context.Users.Where(u => string.Equals(u.Login, "admin"))
-                        .Select(u => u.Id).FirstOrDefault()
+                    ParticipantId = context.Users.Where(u => string.Equals(u.Email, "admin@gmail.com"))
+                        .Select(u => u.Id).FirstOrDefault(),
+                    Code = "2377"
                 },
                 new EventParticipant
                 {
                     EventId = events.ElementAt(1).Id,
-                    ParticipantId = context.Users.Where(u => string.Equals(u.Login, "user"))
-                        .Select(u => u.Id).FirstOrDefault()
+                    ParticipantId = context.Users.Where(u => string.Equals(u.Email, "user@gmail.com"))
+                        .Select(u => u.Id).FirstOrDefault(),
+                    Code = "7342"
                 }
             };
             context.EventsParticipants.AddRange(eventUsers);

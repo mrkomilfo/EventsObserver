@@ -10,6 +10,7 @@ using TrainingProject.Common;
 using TrainingProject.DomainLogic.Interfaces;
 using TrainingProject.DomainLogic.Models.Common;
 using TrainingProject.DomainLogic.Models.Events;
+using TrainingProject.DomainLogic.Models.Users;
 using TrainingProject.Web.Filters;
 using TrainingProject.Web.Interfaces;
 
@@ -20,9 +21,9 @@ namespace TrainingProject.Web.Controllers
     [ServiceFilter(typeof(ExceptionHandlingFilter))]
     public class EventsController : ControllerBase
     {
-        private IEventManager _eventManager;
-        private IHostServices _hostServices;
-        private ILogHelper _logger;
+        private readonly IEventManager _eventManager;
+        private readonly IHostServices _hostServices;
+        private readonly ILogHelper _logger;
 
         public EventsController(IEventManager eventManager, IHostServices hostServices, ILogHelper logger)
         {
@@ -110,15 +111,20 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> DeleteAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
             var organizerId = await _eventManager.GetEventOrganizerIdAsync(eventId);
+
             if (role != "Admin" && !Equals(userId, organizerId.ToString()))
             {
                 return Forbid("Access denied");
             }
+
             var hostRoot = _hostServices.GetHostPath();
+
             await _eventManager.DeleteEventAsync(eventId, false, hostRoot);
+
             return Ok();
         }
 
@@ -127,8 +133,11 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> SubscribeAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+
             await _eventManager.SubscribeAsync(Guid.Parse(userId), eventId);
+
             return Ok();
         }
 
@@ -137,18 +146,44 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult> UnsubscribeAsync(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
+
             var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+
             await _eventManager.UnsubscribeAsync(Guid.Parse(userId), eventId);
+
             return Ok();
         }
 
-        [HttpGet("{eventId}/checkInvolvement")]
+        [HttpGet("{eventId:int}/participants")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> IsUserInvolved(int eventId)
+        public async Task<ActionResult<ParticipantDto>> GetParticipants(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
-            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-            await _eventManager.CheckUserInvolvementInTheEventAsync(userId, eventId);
+
+            var participants = await _eventManager.GetEventParticipants(eventId);
+
+            return Ok(participants);
+        }
+
+        [HttpPatch("{eventId:int}/approve")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult<ParticipantDto>> ToggleEventApprove(int eventId)
+        {
+            _logger.LogMethodCallingWithObject(new { eventId });
+
+            await _eventManager.ToggleEventApprove(eventId);
+
+            return Ok();
+        }
+
+        [HttpPatch("checkParticipant/{eventParticipantId:int}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult<ParticipantDto>> ToggleParticipantCheck(int eventParticipantId)
+        {
+            _logger.LogMethodCallingWithObject(new { eventParticipantId });
+
+            await _eventManager.ToggleParticipantCheck(eventParticipantId);
+
             return Ok();
         }
     }

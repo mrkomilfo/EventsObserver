@@ -14,22 +14,19 @@ export default class EditProfile extends Component {
             noContent: false,
 
             id: '', 
-            userName: '', 
-            contactEmail: '', 
+            userName: '',
             contactPhone: '', 
             hasImage: false, 
             imagePath: '', 
             imageFile: null, 
             fileName: '',
             formErrors: { 
-                userName: '', 
-                contactEmail: '', 
+                userName: '',
                 contactPhone: '',
                 imageFile: ''
             },
             formValid: true,
-            userNameValid: true, 
-            contactEmailValid: true, 
+            userNameValid: true,
             contactPhoneValid: true,
             imageFileValid: true,
         };
@@ -74,7 +71,6 @@ export default class EditProfile extends Component {
         let fieldValidationErrors = this.state.formErrors;
 
         let userNameValid = this.state.userNameValid;
-        let contactEmailValid = this.state.contactEmailValid;
         let contactPhoneValid = this.state.contactPhoneValid;
         let imageFileValid = this.state.imageFileValid;
 
@@ -82,10 +78,6 @@ export default class EditProfile extends Component {
             case 'userName':
                 userNameValid = value.length >= 4;
                 fieldValidationErrors.userName = userNameValid ? '' : 'Минимальная длина - 4';
-                break;
-            case 'contactEmail':
-                contactEmailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) || value.length === 0;
-                fieldValidationErrors.contactEmail = contactEmailValid ? '' : 'Неверный формат';
                 break;
             case 'contactPhone':
                 contactPhoneValid = value.match(/^\+?[0-9]{6,12}$/i) || value.length === 0;
@@ -101,7 +93,6 @@ export default class EditProfile extends Component {
         this.setState({
             formErrors: fieldValidationErrors,
             userNameValid,
-            contactEmailValid,
             contactPhoneValid,
             imageFileValid,
           }, this.validateForm);
@@ -111,7 +102,6 @@ export default class EditProfile extends Component {
         this.setState({
             formValid: 
                 this.state.userNameValid &&
-                this.state.contactEmailValid &&
                 this.state.contactPhoneValid
         });
     }
@@ -159,14 +149,6 @@ export default class EditProfile extends Component {
                     <Label for="userName">Имя пользователя</Label>
                     <Input invalid={!this.state.userNameValid} required type="text" name="userName" id="userName" value={this.state.userName} onChange={this.handleInputChange}/>
                     <FormFeedback>{this.state.formErrors.userName}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="contactEmail">Email</Label>{'  '}<span style={tipStyle} id="emailTip">?</span>
-                    <UncontrolledTooltip placement="right" target="emailTip">
-                        Почта необходима для восстановления пароля и получения напоминаний о предстоящих мероприятиях
-                    </UncontrolledTooltip>
-                    <Input invalid={!this.state.contactEmailValid} type="email" name="contactEmail" id="contactEmail" value={this.state.contactEmail} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.contactEmail}</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="contactPhone">Телефон</Label>
@@ -238,7 +220,6 @@ export default class EditProfile extends Component {
                     this.setState({ 
                         id: data.id,
                         userName: data.userName,
-                        contactEmail: data.contactEmail || "",
                         contactPhone: data.contactPhone || "",
                         hasImage: data.hasPhoto,
                         imagePath: data.photo
@@ -264,7 +245,6 @@ export default class EditProfile extends Component {
         let formdata = new FormData();
         formdata.append('id', this.state.id);
         formdata.append('userName', this.state.userName);
-        formdata.append('contactEmail', this.state.contactEmail);
         formdata.append('contactPhone', this.state.contactPhone);
         formdata.append('hasPhoto', this.state.hasImage);
         if (this.state.imageFile)

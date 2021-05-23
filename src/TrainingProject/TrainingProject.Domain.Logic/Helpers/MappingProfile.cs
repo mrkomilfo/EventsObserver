@@ -72,12 +72,24 @@ namespace TrainingProject.DomainLogic.Helpers
                     opt.MapFrom(m => m.Start.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds))
                 .ForMember(m => m.PublicationTime, opt =>
                     opt.MapFrom(m => m.PublicationTime.ToString("f")))
-                .ForMember(m => m.Tags, opt => opt.Ignore());
+                .ForMember(m => m.IsActive, opt =>
+                    opt.MapFrom(m => m.IsActive()))
+                .ForMember(m => m.Tags, opt => opt.Ignore())
+                .ForMember(m => m.Participants, opt => opt.Ignore());
             CreateMap<Event, EventLiteDto>()
                 .ForMember(m => m.Category, opt =>
                     opt.MapFrom(m => m.Category.Name))
                 .ForMember(m => m.Start, opt =>
                     opt.MapFrom(m => m.Start.ToString("f")));
+            CreateMap<EventDayOfWeek, EventDayOfWeekDto>()
+                .ForMember(m => m.WeekDay, opt =>
+                    opt.MapFrom(m => (int) m.DayOfWeek))
+                .ForMember(m => m.Date, opt =>
+                    opt.MapFrom(m  => m.GetNearestDateTime().ToString("M")))
+                .ForMember(m => m.Time, opt =>
+                    opt.MapFrom(m => m.Start.ToString(@"hh\:mm")))
+                .ForMember(m => m.Participants, opt =>
+                    opt.MapFrom(m => m.GetParticipantsQuantity()));
         }
 
         private void MapUsers()
@@ -129,6 +141,16 @@ namespace TrainingProject.DomainLogic.Helpers
                     opt.MapFrom(m => m.Id.ToString()))
                 .ForMember(m => m.Photo, opt =>
                     opt.MapFrom(m => $"img\\users\\{(m.HasPhoto ? m.Id.ToString() : "default")}.jpg"));
+            CreateMap<EventParticipant, ParticipantDto>()
+                .ForMember(m => m.UserId, opt =>
+                    opt.MapFrom(m => m.ParticipantId.ToString()))
+                .ForMember(m => m.UserName, opt =>
+                    opt.MapFrom(m => m.Participant.UserName));
+            CreateMap<EventDayOfWeekParticipant, ParticipantDto>()
+                .ForMember(m => m.UserId, opt =>
+                    opt.MapFrom(m => m.ParticipantId.ToString()))
+                .ForMember(m => m.UserName, opt =>
+                    opt.MapFrom(m => m.Participant.UserName));
         }
 
         private void MapComments()
