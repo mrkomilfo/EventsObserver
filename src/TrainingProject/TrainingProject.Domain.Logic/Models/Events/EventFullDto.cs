@@ -42,6 +42,8 @@ namespace TrainingProject.DomainLogic.Models.Events
 
         public bool IsActive { get; set; }
 
+        public bool IsApproved { get; set; }
+
         public Dictionary<string, string> Tags { get; set; }
 
         public IEnumerable<EventDayOfWeekDto> WeekDays { get; set; }

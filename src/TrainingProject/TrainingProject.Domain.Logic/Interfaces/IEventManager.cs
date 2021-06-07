@@ -20,7 +20,8 @@ namespace TrainingProject.DomainLogic.Interfaces
 
         Task<EventFullDto> GetEventAsync(int eventId, string userId=null);
 
-        Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag, bool? upComing, bool onlyFree, bool vacancies, string organizerId, string participantId);
+        Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag,
+            string from, string to, string organizerId, string participantId);
 
         Task SubscribeAsync(Guid userId, int eventId);
 

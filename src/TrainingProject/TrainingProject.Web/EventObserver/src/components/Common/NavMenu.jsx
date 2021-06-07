@@ -46,12 +46,12 @@ export default class NavMenu extends Component {
     render () {
         const events = 
             <NavItem>
-                <NavLink tag={Link} to="/">События</NavLink>
+                <NavLink tag={Link} to="/">Мероприятия</NavLink>
             </NavItem>;
 
         const newEvent = this.state.role !== 'Guest' ?
             <NavItem>
-                <NavLink tag={Link} to="/newEvent">Добавить событие</NavLink>
+                <NavLink tag={Link} to="/newEvent">Добавить мероприятие</NavLink>
             </NavItem> : null;
 
         const users = (this.state.role === 'Admin' || this.state.role === 'Account manager') ?

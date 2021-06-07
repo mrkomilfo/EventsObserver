@@ -98,7 +98,7 @@ export default class ChangePassword extends Component {
                 {errorBaner}
                 <div className="list-group">
                     <div className="list-group-item bg-light">
-                        <h3 id="tabelLabel">Изменение пароля</h3>
+                        <h3 className="m-0">Изменение пароля</h3>
                     </div>
                     <div className="list-group-item">
                         <Form style={formStyle}>

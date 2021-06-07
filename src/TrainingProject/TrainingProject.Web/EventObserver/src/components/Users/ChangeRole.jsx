@@ -42,26 +42,30 @@ export default class ChangeRole extends Component{
     }
 
     renderContent() {
-        const formStyle = {
-            maxWidth: '256px'
-        }
         const rolesSelect = this.state.roles.map(r => <option key={r.id.toString()} value={r.id}>{r.name}</option>)
+
         return(
-            <>
-            <h2>Изменение роли пользователя {this.state.userName}</h2>
-            <Form style={formStyle}>
-                <FormGroup>
-                    <Label for="role">Роль</Label>
-                    <Input type="select" name="role" id="role" value={this.state.roleId} onChange={this.handleChange}>
-                        {rolesSelect}
-                    </Input>
-                </FormGroup>
-                <div>
-                    <Button color="primary" onClick={() => this.changeRole()}>Сохранить</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+            <div className="mx-auto" style={{width: '420px'}}>
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Изменение роли пользователя {this.state.userName}</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <Form>
+                            <FormGroup>
+                                <Label for="role">Роль</Label>
+                                <Input type="select" name="role" id="role" value={this.state.roleId} onChange={this.handleChange}>
+                                    {rolesSelect}
+                                </Input>
+                            </FormGroup>
+                            <div>
+                                <Button color="primary" onClick={() => this.changeRole()}>Сохранить</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
                 </div>
-            </Form>
-            </>
+            </div>
         )
     }
 

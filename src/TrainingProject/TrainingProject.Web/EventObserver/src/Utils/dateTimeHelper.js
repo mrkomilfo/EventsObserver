@@ -35,4 +35,21 @@
 
         return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
     }
+
+    static getCurrentDate() {
+        let today = new Date();
+        let dd = today.getDate();
+        let MM = today.getMonth()+1; //January is 0!
+        let yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (MM < 10){
+            MM = '0' + MM;
+        }
+
+        return `${yyyy}-${MM}-${dd}`;
+    }
 }

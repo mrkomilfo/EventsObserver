@@ -37,7 +37,8 @@ namespace TrainingProject.Data
                     Password = "YIMMU3jl8cYYVN8TGTunenCKof4NfTmY8D0/quh0WU4=", //accountManager
                     UserName = "AccountManager",
                     RoleId = roles.ElementAt(0).Id,
-                    RegistrationDate = DateTime.Now
+                    RegistrationDate = DateTime.Now,
+                    IsEmailConfirmed = true
                 },
                 new User
                 {
@@ -45,7 +46,8 @@ namespace TrainingProject.Data
                     Password = "jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=", //admin
                     UserName = "Administrator",
                     RoleId = roles.ElementAt(1).Id,
-                    RegistrationDate = DateTime.Now
+                    RegistrationDate = DateTime.Now,
+                    IsEmailConfirmed = true
                 },
                 new User
                 {
@@ -53,7 +55,8 @@ namespace TrainingProject.Data
                     Password = "BPiZbadjt6lpsQKO4wB1aerzpjVIbdqyEdUSyFud+Ps=", //user
                     UserName = "User",
                     RoleId = roles.ElementAt(2).Id,
-                    RegistrationDate = DateTime.Now
+                    RegistrationDate = DateTime.Now,
+                    IsEmailConfirmed = true
                 }
             };
             context.Users.AddRange(users);

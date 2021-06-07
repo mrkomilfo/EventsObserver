@@ -356,9 +356,9 @@ namespace TrainingProject.DomainLogic.Managers
                 throw new UnauthorizedAccessException($"Wrong email or password");
             }
             var unlockTime = await GetUnlockTimeAsync(Guid.Parse(identity.Name));
-            if (unlockTime != null && ((unlockTime ?? DateTime.Now) > DateTime.Now))
-            {
-                throw new AccessViolationException($"Banned until {unlockTime?.ToString("f")}");
+            if (unlockTime != null && (DateTime) unlockTime > DateTime.Now)
+            { 
+                throw new AccessViolationException($"Banned until {unlockTime.Value:f}");
             }
 
             var accessToken = GenerateToken(identity.Claims);
@@ -376,18 +376,20 @@ namespace TrainingProject.DomainLogic.Managers
 
         public string GenerateToken(IEnumerable<Claim> claims)
         {
+            var claimsList = claims.ToList();
+
             _logger.LogMethodCallingWithObject(new
             {
-                claims = string.Join(", ", claims.ToList().ConvertAll(
+                claims = string.Join(", ", claimsList.ToList().ConvertAll(
                     c => c.ToString()).ToArray())
             });
-            var now = DateTime.UtcNow;
+            
             var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    AuthOptions.ISSUER,
+                    AuthOptions.AUDIENCE,
+                    notBefore: DateTime.UtcNow,
+                    claims: claimsList,
+                    expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
             return new JwtSecurityTokenHandler().WriteToken(jwt); //the method is called WriteToken but returns a string

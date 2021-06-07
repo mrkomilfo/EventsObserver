@@ -110,7 +110,7 @@ export default class SignUp extends Component {
             </Modal>
 
         return( 
-            <div className="mx-auto" style={{maxWidth: '300px'}}>
+            <div className="mx-auto" style={{maxWidth: '320px'}}>
                 {errorBaner}
                 <div className="list-group">
                     <div className="list-group-item bg-light">
@@ -167,7 +167,7 @@ export default class SignUp extends Component {
                     .then(response=>response.text())
                     .then(data => {
                         this.setState({
-                            errorMessage: `Заблокировкан до ${data}`
+                            errorMessage: `Заблокирован до ${data}`
                         })
                     });
             }

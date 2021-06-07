@@ -39,10 +39,10 @@ namespace TrainingProject.DomainLogic.Helpers
                     opt.MapFrom(m => Guid.Parse(m.OrganizerId)))
                 .ForMember(m => m.HasImage, opt =>
                     opt.MapFrom(m => m.Image != null))
-                .ForMember(m => m.Tags, opt =>
-                    opt.Ignore())
                 .ForMember(m => m.PublicationTime, opt =>
-                    opt.MapFrom(m => DateTime.Now));
+                    opt.MapFrom(m => DateTime.Now))
+                .ForMember(m => m.Tags, opt =>
+                    opt.Ignore());
             CreateMap<string, Tag>()
                 .ForMember(m => m.Name, opt =>
                     opt.MapFrom(m => m.ToLower()));
@@ -138,9 +138,9 @@ namespace TrainingProject.DomainLogic.Helpers
                     opt.MapFrom(m => DateTime.Now));
             CreateMap<User, CommentAuthorDto>()
                 .ForMember(m => m.Id, opt =>
-                    opt.MapFrom(m => m.Id.ToString()))
+                    opt.MapFrom(m => m.Id.ToString().ToLower()))
                 .ForMember(m => m.Photo, opt =>
-                    opt.MapFrom(m => $"img\\users\\{(m.HasPhoto ? m.Id.ToString() : "default")}.jpg"));
+                    opt.MapFrom(m => $"img\\users\\{(m.HasPhoto ? m.Id.ToString().ToLower() : "default")}.jpg"));
             CreateMap<EventParticipant, ParticipantDto>()
                 .ForMember(m => m.UserId, opt =>
                     opt.MapFrom(m => m.ParticipantId.ToString()))

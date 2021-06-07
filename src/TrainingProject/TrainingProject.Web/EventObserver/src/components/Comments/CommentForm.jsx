@@ -51,7 +51,10 @@ export default class CommentForm extends Component {
             },
             body: JSON.stringify(data)
         }).then((response) => {
-            if (response.ok){
+            if (response.ok) {
+                this.setState({
+                    comment: ''
+                })
                 this.props.loadComments();
             }
             else if (response.status === 401) {

@@ -151,11 +151,6 @@ export default class SignUp extends Component {
             maxWidth: '256px'
         }
 
-        const tipStyle = {
-            color: '#70757A',
-            textDecoration: 'underline'
-        }
-
         return(
             <div className="mx-auto" style={{maxWidth: '300px'}}>
                 {errorBanner}

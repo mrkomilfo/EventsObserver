@@ -121,12 +121,12 @@ export default class Profile extends Component {
                 badge = null;
         }
         const status = (this.state.myRole === 'Admin' || this.state.myRole === 'Account manager') && this.state.status
-            ? <span style={statusStyle}>{this.state.status}</span> : null
+            ? <span className="ml-2 text-danger">{this.state.status}</span> : null
 
         const buttonPanel = this.renderButtonPanel();
 
         return(
-            <div className="mx-auto list-group" style={{maxWidth: '720px'}}>
+            <div className="mx-auto list-group" style={{minWidth: '750px', maxWidth: 'fit-content'}}>
                 <div className="list-group-item bg-light">
                     <h3 className="m-0">Профиль пользователя</h3>
                 </div>
@@ -134,7 +134,8 @@ export default class Profile extends Component {
                     <div style={mainStyle}>
                         <img style={photoStyle} src={this.state.photo} alt="user photo"/>
                         <div>
-                            <h3>{this.state.userName}{badge}{status}</h3>
+                            <h3 className="ml-2">{this.state.userName}{badge}</h3>
+                            <div>{status}</div>
                             <table cellPadding='8px'>
                                 <tbody>
                                     <tr><td><b>Зарегистрирован:</b></td><td>{this.state.registrationDate}</td></tr>

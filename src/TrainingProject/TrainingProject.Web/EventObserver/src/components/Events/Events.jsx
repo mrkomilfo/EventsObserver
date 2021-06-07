@@ -42,20 +42,19 @@ export default class Events extends Component {
                         </div>
                         <div className="list-group-item">
                             <table className="table table-borderless m-0">
-                                <tbody>
-                                    {
-                                        this.state.events.map((event, index) => (
-                                            <>
-                                                {
-                                                    index === 0 ? null : 
-                                                    <tr>
-                                                        <td className="px-0 py-2" colSpan="2">
-                                                            <hr className="m-0"/>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                                <EventRow key={event.id} event={event}/>
-                                            </>
+                                <tbody>{
+                                    this.state.events.map((event, index) => (
+                                        <>
+                                            {
+                                                index === 0 ? null : 
+                                                <tr>
+                                                    <td className="px-0 py-2" colSpan="2">
+                                                        <hr className="m-0"/>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <EventRow key={event.id} event={event}/>
+                                        </>
                                     ))}
                                 </tbody>
                             </table>
@@ -78,16 +77,15 @@ export default class Events extends Component {
     }
 
     async loadEvents() {
-        let page; let search; let categoryId; let tag; let upComing; let onlyFree; let vacancies; let organizerId; let participantId;
+        let page; let search; let categoryId; let tag; let from; let to; let organizerId; let participantId;
         const parsed = queryString.parse(window.location.search);
         if (parsed) {
             page = parsed['page'] || 0;
             search = parsed['search'];
             categoryId = parsed['categoryId'];
             tag = parsed['tag'];
-            upComing = parsed['upComing'];
-            onlyFree = parsed['onlyFree'];
-            vacancies = parsed['vacancies'];
+            from = parsed['from'];
+            to = parsed['to'];
             organizerId = parsed['organizerId'];
             participantId = parsed['participantId'];
         }
@@ -102,14 +100,11 @@ export default class Events extends Component {
         if (tag) {
             queryTrailer += `&tag=${tag}`
         }
-        if (upComing) {
-            queryTrailer += `&upComing=${upComing}`
+        if (from) {
+            queryTrailer += `&from=${from}`
         }
-        if (onlyFree) {
-            queryTrailer += `&onlyFree=${onlyFree}`
-        }
-        if (vacancies) {
-            queryTrailer += `&vacancies=${vacancies}`
+        if (to) {
+            queryTrailer += `&to=${to}`
         }
         if (organizerId) {
             queryTrailer += `&organizerId=${organizerId}`

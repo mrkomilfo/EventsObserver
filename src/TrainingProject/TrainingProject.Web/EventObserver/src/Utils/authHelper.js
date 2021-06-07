@@ -6,7 +6,7 @@
         localStorage.setItem('refreshToken', refreshToken);
     }
 
-    static clearAuth () {
+    static clearAuth() {
         localStorage.removeItem('userId');
         localStorage.setItem('role', 'Guest');
         localStorage.removeItem('accessToken');

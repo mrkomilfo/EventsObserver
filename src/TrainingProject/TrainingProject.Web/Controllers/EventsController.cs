@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,12 +34,13 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Page<EventLiteDto>>> Index([FromQuery] int page = 0, int pageSize = 4, string search = null,
-            int? categoryId = null, string tag = null, bool? upComing = null, bool onlyFree = false,
-            bool vacancies = false, string organizerId = null, string participantId = null)
+        public async Task<ActionResult<Page<EventLiteDto>>> Index([FromQuery] int page = 0, [FromQuery] int pageSize = 4,
+            [FromQuery] string search = null, [FromQuery] int? categoryId = null, [FromQuery] string tag = null,
+            [FromQuery] string from = null, [FromQuery] string to = null, [FromQuery] string organizerId = null,
+            [FromQuery] string participantId = null)
         {
-            _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
-            return Ok(await _eventManager.GetEventsAsync(page, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId));
+            _logger.LogMethodCallingWithObject(new { page, pageSize, search, categoryId, tag, from, to, organizerId, participantId });
+            return Ok(await _eventManager.GetEventsAsync(page, pageSize, search, categoryId, tag, from, to, organizerId, participantId));
         }
 
         [HttpGet("{eventId}")]
@@ -46,7 +48,9 @@ namespace TrainingProject.Web.Controllers
         {
             _logger.LogMethodCalling();
 
-            return Ok(await _eventManager.GetEventAsync(eventId));
+            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
+
+            return Ok(await _eventManager.GetEventAsync(eventId, userId));
         }
 
         [HttpPost]
@@ -156,7 +160,7 @@ namespace TrainingProject.Web.Controllers
 
         [HttpGet("{eventId:int}/participants")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<ParticipantDto>> GetParticipants(int eventId)
+        public async Task<ActionResult<IEnumerable<ParticipantDto>>> GetParticipants(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
 
@@ -166,8 +170,8 @@ namespace TrainingProject.Web.Controllers
         }
 
         [HttpPatch("{eventId:int}/approve")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<ParticipantDto>> ToggleEventApprove(int eventId)
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<ParticipantDto>>> ToggleEventApprove(int eventId)
         {
             _logger.LogMethodCallingWithObject(new { eventId });
 

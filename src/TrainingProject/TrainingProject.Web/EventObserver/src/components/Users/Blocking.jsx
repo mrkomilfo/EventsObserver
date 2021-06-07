@@ -91,26 +91,32 @@ export default class Blocking extends Component {
 
     renderContent() {
         return(
-            <>
-            <h2>Блокировка пользователя {this.state.userName}</h2>
-            <Form>
-                <FormGroup>
-                    <Label for="days">Количество дней</Label>
-                    <Input invalid={!this.state.daysValid} required type="number" name="days" id="days" value={this.state.days} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.days}</FormFeedback>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="hours">Количество часов</Label>
-                    <Input invalid={!this.state.hoursValid} required type="number" name="hours" id="hours" value={this.state.hours} onChange={this.handleInputChange}/>
-                    <FormFeedback>{this.state.formErrors.hours}</FormFeedback>
-                </FormGroup>
-                <div>
-                    {this.state.isBanned ? <Button color="warning" onClick={() => this.unban()}>Разблокировать</Button> : null}{' '}
-                    <Button disabled = {!this.state.formValid} color="danger" onClick={() => this.ban()}>Заблокировать</Button>{' '}
-                    <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+            <div className="mx-auto" style={{width: '390px'}}>
+                <div className="list-group">
+                    <div className="list-group-item bg-light">
+                        <h3 className="m-0">Блокировка пользователя {this.state.userName}</h3>
+                    </div>
+                    <div className="list-group-item">
+                        <Form>
+                            <FormGroup>
+                                <Label for="days">Количество дней</Label>
+                                <Input invalid={!this.state.daysValid} required type="number" name="days" id="days" value={this.state.days} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.days}</FormFeedback>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="hours">Количество часов</Label>
+                                <Input invalid={!this.state.hoursValid} required type="number" name="hours" id="hours" value={this.state.hours} onChange={this.handleInputChange}/>
+                                <FormFeedback>{this.state.formErrors.hours}</FormFeedback>
+                            </FormGroup>
+                            <div>
+                                {this.state.isBanned ? <Button color="warning" onClick={() => this.unban()}>Разблокировать</Button> : null}{' '}
+                                <Button disabled = {!this.state.formValid} color="danger" onClick={() => this.ban()}>Заблокировать</Button>{' '}
+                                <Button color="secondary" onClick={() => this.cancel()}>Отменить</Button>
+                            </div>
+                        </Form>
+                    </div>
                 </div>
-            </Form>
-            </>
+            </div>
         )
     }
 

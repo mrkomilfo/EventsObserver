@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 
+import AuthHelper from "../../Utils/authHelper";
+
 import './Comment.css';
 
 export default class Comment extends Component {
     constructor (props) {
         super(props);
+        
+        this.state = {
+            userRole: AuthHelper.getRole(),
+            userId: AuthHelper.getId()
+        };
 
         this.onAuthorDateClick = this.onAuthorDateClick.bind(this);
     }
@@ -13,8 +20,12 @@ export default class Comment extends Component {
         window.location.href = `/user?id=${this.props.comment.author.id}`;
     }
 
+    canIDeleteThisComment() {
+        return this.state.userRole === "Admin" || this.state.userId === this.props.comment.author.id;
+    }
+    
     render() {
-        const deleteButton = this.props.comment.canDelete
+        const deleteButton = this.canIDeleteThisComment()
             ? <div className="deleteButton" onClick={() => this.props.onDeleteCommentClick(this.props.comment.id)}>✖</div> 
             : null;
 

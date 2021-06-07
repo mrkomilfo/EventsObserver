@@ -10,8 +10,6 @@ namespace TrainingProject.DomainLogic.Models.Comments
 
         public string PublicationTime { get; set; }
 
-        public bool CanDelete { get; set; }
-
         public CommentAuthorDto Author { get; set; }
     }
 }

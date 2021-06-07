@@ -115,7 +115,7 @@ export default class NewEvent extends Component {
                 break;
             case 'place':
                 placeValid = !!value;
-                fieldValidationErrors.place = placeValid ? '' : 'Место проведение не указано';
+                fieldValidationErrors.place = placeValid ? '' : 'Место проведения не указано';
                 break;
             case 'dateTime':
                 dateTimeValid = !!value;
@@ -234,25 +234,25 @@ export default class NewEvent extends Component {
                 <table className="table table-borderless">
                     <tbody> {
                         ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, index) => {
-                                let key = (index+1) % 7;
+                            let key = (index+1) % 7;
 
-                                return(
-                                    <tr>
-                                        <td style={{width: 'fit-content'}}>{day}</td>
-                                        <td>
-                                            <Input invalid={!this.state.weekDaysValid} type="time" data-weekday={key} 
-                                                   value={this.state.weekDays[key]} onChange={this.handleWeekdayTimeChange}/>
-                                        </td>
-                                        <td style={{width: '72px'}}> {
-                                                this.state.weekDays[key] ?
-                                                    <button className="btn btn-outline-secondary" data-weekday={key} 
-                                                            onClick={this.onWeekdayTimeClear}>➖</button> : null
-                                            }
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        }
+                            return(
+                                <tr>
+                                    <td style={{width: 'fit-content'}}>{day}</td>
+                                    <td>
+                                        <Input invalid={!this.state.weekDaysValid} type="time" data-weekday={key} 
+                                               value={this.state.weekDays[key]} onChange={this.handleWeekdayTimeChange}/>
+                                    </td>
+                                    <td style={{width: '72px'}}>{
+                                            this.state.weekDays[key] ?
+                                                <button className="btn btn-outline-secondary" data-weekday={key} 
+                                                        onClick={this.onWeekdayTimeClear}>➖</button> : null
+                                        }
+                                    </td>
+                                </tr>
+                            )
+                        })
+                    }
                     </tbody>
                 </table>
                 <div className="text-danger">{this.state.formErrors.weekDays}</div>

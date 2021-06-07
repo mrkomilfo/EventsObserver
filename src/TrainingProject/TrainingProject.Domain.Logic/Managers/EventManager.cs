@@ -26,13 +26,15 @@ namespace TrainingProject.DomainLogic.Managers
     public class EventManager : IEventManager
     {
         private readonly IAppContext _appContext;
+        private readonly IUserManager _userManager;
         private readonly IMapper _mapper;
         private readonly INotificator _notificator;
         private readonly ILogHelper _logger;
 
-        public EventManager(IAppContext appContext, IMapper mapper, INotificator notificator, ILogHelper logger)
+        public EventManager(IAppContext appContext, IUserManager userManager, IMapper mapper, INotificator notificator, ILogHelper logger)
         {
             _appContext = appContext;
+            _userManager = userManager;
             _mapper = mapper;
             _notificator = notificator;
             _logger = logger;
@@ -81,14 +83,14 @@ namespace TrainingProject.DomainLogic.Managers
                     await _appContext.EventsTags.AddAsync(new EventTag { EventId = newEvent.Id, TagId = tag.Id });
                 }
             }
-
+ 
             if (eventDto.IsRecurrent)
             {
                 if (string.IsNullOrEmpty(eventDto.EventDaysOfWeek))
                 {
                     throw new ArgumentNullException(nameof(eventDto.EventDaysOfWeek));
                 }
-                
+
                 var deserializedEventDaysOfWeek = 
                     JsonConvert.DeserializeObject<List<EventDayOfWeekPostDto>>(eventDto.EventDaysOfWeek);
                 var eventDaysOfWeek = deserializedEventDaysOfWeek.Select(x => new EventDayOfWeek
@@ -258,6 +260,8 @@ namespace TrainingProject.DomainLogic.Managers
         {
             _logger.LogMethodCallingWithObject(new { eventId });
 
+            Guid.TryParse(userId, out var userGuid);
+
             var dbEvent = await _appContext.Events
                 .Include(e => e.Organizer)
                 .Include(e => e.Category)
@@ -266,6 +270,12 @@ namespace TrainingProject.DomainLogic.Managers
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (dbEvent == null)
+            {
+                throw new KeyNotFoundException($"Event with id={eventId} not found");
+            }
+
+            if (!dbEvent.IsApproved && dbEvent.OrganizerId != userGuid
+                                    && (await _userManager.GetUserRoleAsync(userGuid)).Name != "Admin")
             {
                 throw new KeyNotFoundException($"Event with id={eventId} not found");
             }
@@ -303,7 +313,7 @@ namespace TrainingProject.DomainLogic.Managers
 
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    eventFullDto.AmISubscribed = await IsUserSubscribedOnRecurrentEvent(eventFullDto.Id, userId);
+                    eventFullDto.AmISubscribed = await IsUserSubscribedOnEvent(eventFullDto.Id, userId);
                 }
             }
 
@@ -311,45 +321,31 @@ namespace TrainingProject.DomainLogic.Managers
         }
 
         public async Task<Page<EventLiteDto>> GetEventsAsync(int index, int pageSize, string search, int? categoryId, string tag,
-            bool? upComing, bool onlyFree, bool vacancies, string organizerId, string participantId)
+            string from, string to, string organizerId, string participantId)
         {
-            _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, upComing, onlyFree, vacancies, organizerId, participantId });
+            _logger.LogMethodCallingWithObject(new { index, pageSize, search, categoryId, tag, organizerId, participantId });
 
-            var organizerGuid = string.IsNullOrEmpty(organizerId) ? new Guid() : Guid.Parse(organizerId);
-            var participantGuid = string.IsNullOrEmpty(participantId) ? new Guid() : Guid.Parse(participantId);
+            Guid.TryParse(organizerId, out var organizerGuid);
+            Guid.TryParse(participantId, out var participantGuid);
+            
             var result = new Page<EventLiteDto> { CurrentPage = index, PageSize = pageSize };
-            var query = _appContext.Events.Include(e => e.Category).AsQueryable();
+            var query = _appContext.Events.Include(e => e.Category).Include(e => e.DaysOfWeek).AsQueryable();
 
-            if (search != null)
+            if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(e => e.Name.ToLower().Contains(search.ToLower()));
             }
 
-            if (categoryId != null)
+            if (categoryId != null && categoryId != 0)
             {
                 query = query.Where(e => e.CategoryId == categoryId);
             }
 
-            if (tag != null)
+            if (!string.IsNullOrEmpty(tag))
             {
                 query = query.Where(e => _appContext.EventsTags.Include(et => et.Tag)
                     .Where(et => et.EventId == e.Id)
                     .Any(et => Equals(et.Tag.Name, tag)));
-            }
-
-            if (upComing != null)
-            {
-                query = query.Where(e => (bool)upComing ? e.Start >= DateTime.Now : e.Start < DateTime.Now);
-            }
-
-            if (onlyFree)
-            {
-                query = query.Where(e => e.Fee == 0);
-            }
-
-            if (vacancies)
-            {
-                query = query.Where(e => e.ParticipantsLimit == 0 || _appContext.EventsParticipants.Count(eu => eu.EventId == e.Id) < e.ParticipantsLimit);
             }
 
             if (organizerGuid != Guid.Empty)
@@ -366,25 +362,27 @@ namespace TrainingProject.DomainLogic.Managers
 
             result.TotalRecords = await query.CountAsync();
 
-            if (upComing != null && (bool)upComing)
+            query = query.OrderBy(e => e.Start).Skip(index * pageSize).Take(pageSize);
+
+            var eventsList = query.ToList();
+            
+            if (!string.IsNullOrEmpty(from) && DateTime.TryParse(from, out var parsedFrom))
             {
-                query = query.OrderBy(e => e.Start).Skip(index * pageSize).Take(pageSize);
+                eventsList = eventsList.Where(e => e.GetNearestStartDateTimes()
+                    .Any(x => x >= parsedFrom)).ToList();
             }
-            else
+
+            if (!string.IsNullOrEmpty(to) && DateTime.TryParse(to, out var parsedTo))
             {
-                query = query.OrderByDescending(e => e.Start).Skip(index * pageSize).Take(pageSize);
+                eventsList = eventsList.Where(e => e.GetNearestStartDateTimes()
+                    .Any(x => x < parsedTo.AddDays(1))).ToList();
             }
 
-            result.Records = await _mapper.ProjectTo<EventLiteDto>(query).ToListAsync();
+            result.Records = _mapper.Map<List<EventLiteDto>>(eventsList);
 
-            foreach (var t in result.Records)
+            foreach (var t in result.Records.Where(t => t.HasImage))
             {
-                if (t.HasImage)
-                {
-                    var path = $"img\\events\\{t.Id}.jpg";
-
-                    t.Image = path;
-                }
+                t.Image = $"img\\events\\{t.Id}.jpg";
             }
 
             return result;
@@ -553,13 +551,6 @@ namespace TrainingProject.DomainLogic.Managers
         {
             _logger.LogMethodCallingWithObject(new {eventId});
 
-            var eventDayOfWeek = await _appContext.Events.FindAsync(eventId);
-
-            if (eventDayOfWeek == null)
-            {
-                throw new KeyNotFoundException(nameof(eventId));
-            }
-
             var participants = await _appContext.EventsParticipants
                 .Include(eu => eu.Participant)
                 .Where(eu => eu.EventId == eventId).ToListAsync();
@@ -580,7 +571,8 @@ namespace TrainingProject.DomainLogic.Managers
 
             var recurrentEventParticipants = await _appContext.RecurrentEventParticipants
                 .Include(x => x.Participant)
-                .Where(x => x.RegistrationDateTime.AddDays(7) > eventDayOfWeek.GetNearestDateTime()).ToListAsync();
+                .Where(x => x.EventDayOfWeekId == eventDayOfWeekId
+                            && x.RegistrationDateTime.AddDays(7) > eventDayOfWeek.GetNearestDateTime()).ToListAsync();
 
             return _mapper.Map<IEnumerable<ParticipantDto>>(recurrentEventParticipants);
         }
@@ -649,7 +641,5 @@ namespace TrainingProject.DomainLogic.Managers
                 ? new Dictionary<int, string>()
                 : weekDays.ToDictionary(x => (int) x.DayOfWeek, x => x.Start.ToString());
         }
-
-
     }
 }

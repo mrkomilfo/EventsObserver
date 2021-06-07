@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using TrainingProject.Domain;
+
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace TrainingProject.Data

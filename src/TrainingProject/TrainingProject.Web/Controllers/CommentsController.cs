@@ -61,15 +61,7 @@ namespace TrainingProject.Web.Controllers
         public async Task<ActionResult<Page<CommentDto>>> Index(
             [FromRoute] int eventId, [FromQuery] int index=0, [FromQuery] int pageSize=8)
         {
-            var role = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultRoleClaimType))?.Value;
-            var userId = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimsIdentity.DefaultNameClaimType))?.Value;
-
             var comments = await _commentManager.GetCommentsAsync(eventId, index, pageSize);
-
-            foreach (var comment in comments.Records)
-            {
-                comment.CanDelete = role == "Admin" || userId == comment.Author.Id;
-            }
 
             return Ok(comments);
         }

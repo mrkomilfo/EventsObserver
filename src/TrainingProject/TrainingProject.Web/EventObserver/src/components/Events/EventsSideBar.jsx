@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
-import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import DateTimeHelper from "../../Utils/dateTimeHelper";
 
 export default class EventsSideBar extends Component {
     constructor(props) {
@@ -10,9 +11,8 @@ export default class EventsSideBar extends Component {
             name: '', 
             category: 0, 
             tag: '', 
-            free: false, 
-            vacancies: false, 
-            upComing: null 
+            from: '',
+            to: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -20,34 +20,14 @@ export default class EventsSideBar extends Component {
     handleInputChange(event) {
         const target = event.target;
         const name = target.name;
-        let value;
-        switch(name) {
-            case 'free': 
-            case 'vacancies':
-                value = target.checked;
-                break;
-            case 'upComing':
-                switch(target.value) {
-                    case 'true':
-                        value = true
-                        break;
-                    case 'false':
-                        value = false
-                        break;
-                    default:
-                        value = null;
-                }
-                break;
-            default:
-                value = target.value
-        }
+        const value = target.value;
         
         this.setState({
           [name]: value
         });
     }
 
-    getQuerryTrailer() {
+    getQueryTrailer() {
         let isFirst = true
         let queryTrailer = '';
         if (this.state.name) {
@@ -55,7 +35,7 @@ export default class EventsSideBar extends Component {
             queryTrailer += `search=${this.state.name}`;
             isFirst = false;
         }
-        if (this.state.category !== 0) {
+        if (this.state.category) {
             queryTrailer += isFirst ? '?' : '&';
             queryTrailer += `categoryId=${this.state.category}`;
             isFirst = false;
@@ -65,21 +45,17 @@ export default class EventsSideBar extends Component {
             queryTrailer += `tag=${this.state.tag}`;
             isFirst = false;
         }
-        if (this.state.free) {
+        if (this.state.from) {
             queryTrailer += isFirst ? '?' : '&';
-            queryTrailer += `onlyFree=${this.state.free}`;
+            queryTrailer += `from=${this.state.from}`;
             isFirst = false;
         }
-        if (this.state.vacancies) {
+        if (this.state.to) {
             queryTrailer += isFirst ? '?' : '&';
-            queryTrailer += `vacancies=${this.state.vacancies}`;
+            queryTrailer += `to=${this.state.to}`;
             isFirst = false;
         }
-        if (this.state.upComing != null) {
-            queryTrailer += isFirst ? '?' : '&';
-            queryTrailer += `upComing=${this.state.upComing}`;
-            isFirst = false;
-        }
+
         return queryTrailer;
     }
 
@@ -88,11 +64,7 @@ export default class EventsSideBar extends Component {
     }
 
     render() {
-        const actualityStyle = {
-            marginTop: '16px'
-        }
-
-    const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()}value={c.id}>{c.name}</option>)
+    const categoriesSelect = this.state.categories.map(c => <option key={c.id.toString()} value={c.id}>{c.name}</option>)
     return (
         <Form>
             <FormGroup>
@@ -109,42 +81,34 @@ export default class EventsSideBar extends Component {
                 <Label for="tag">Тег</Label>
                 <Input type="text" name="tag" id="tag" value={this.state.tag} onChange={this.handleInputChange}/>
             </FormGroup>
-            <FormGroup check>
-                <Label check>
-                <Input type="checkbox" name="free" id="free" checked={this.state.free} onChange={this.handleInputChange}/>{' '}
-                Только бесплатные
-                </Label>
-            </FormGroup>
-            <FormGroup check>
-                <Label check>
-                <Input type="checkbox" name="vacancies" id="vacancies" checked={this.state.vacancies} onChange={this.handleInputChange}/>{' '}
-                Есть свободные места
-                </Label>
-            </FormGroup>
-            <FormGroup tag="fieldset" style={actualityStyle}>
-                <Label>
-                Актуальность
-                <FormGroup check>
-                    <Label check>
-                        <Input type="radio" name="upComing" value={'true'} checked={this.state.upComing === true} onChange={this.handleInputChange}/>{' '}                               
-                        Предстоящие
-                    </Label>
+            <FormGroup>
+                <Label for="dates">Даты</Label>
+                <FormGroup name="dates" id="dates">
+                    <FormGroup row>
+                        <Label for="from" sm={2}>От</Label>
+                        <Col sm={7} className="px-0">
+                            <Input type="date" name="from" id="from" min={DateTimeHelper.getCurrentDate()}
+                                   value={this.state.from} onChange={this.handleInputChange}/>
+                        </Col>
+                        <Col sm={3}>
+                            <button type="button" className="btn btn-outline-secondary" disabled={!this.state.from}
+                                    onClick={() => this.setState({from: ''})}>➖</button>
+                        </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                        <Label for="to" sm={2}>До</Label>
+                        <Col sm={7} className="px-0">
+                            <Input type="date" name="to" id="to" min={DateTimeHelper.getCurrentDate()}
+                                   value={this.state.to} onChange={this.handleInputChange}/>
+                        </Col>
+                        <Col sm={3}>
+                            <button type="button" className="btn btn-outline-secondary" disabled={!this.state.to}
+                                    onClick={() => this.setState({to: ''})}>➖</button>
+                        </Col>
+                    </FormGroup>
                 </FormGroup>
-                <FormGroup check>
-                    <Label check>
-                        <Input type="radio" name="upComing" value={'false'} checked={this.state.upComing === false} onChange={this.handleInputChange}/>{' '}
-                        Прошедшие
-                    </Label>
-                </FormGroup>
-                <FormGroup check>
-                    <Label check>
-                        <Input type="radio" name="upComing" value={'null'} checked={this.state.upComing === null} onChange={this.handleInputChange}/>{' '}
-                        Все
-                    </Label>
-                </FormGroup>
-                </Label> 
             </FormGroup>
-            <Button className="w-100" color="primary" tag={Link} to={`/events${this.getQuerryTrailer()}`}>Поиск</Button>
+            <Button className="w-100" color="primary" tag={Link} to={`/events${this.getQueryTrailer()}`}>Поиск</Button>
         </Form>
     )}
 

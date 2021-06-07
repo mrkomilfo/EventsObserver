@@ -1,12 +1,13 @@
 ﻿import React, { Component } from 'react';
 import queryString from 'query-string';
-import { Alert, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Alert, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Parser from 'html-react-parser';
+
 import AuthHelper from '../../Utils/authHelper.js';
 import ErrorPage from '../Common/ErrorPage';
-import CommentsBlock from "../Comments/CommentsBlock";
-import DateTimeHelper from "../../Utils/dateTimeHelper";
+import CommentsBlock from '../Comments/CommentsBlock';
+import DateTimeHelper from '../../Utils/dateTimeHelper';
 
 export default class EventDetail extends Component {
     constructor(props)
@@ -18,7 +19,7 @@ export default class EventDetail extends Component {
             error: false,
             statusCode: 200,
 
-            id: null,
+            id: 0,
             name: '',
             categoryId: null,
             category: '',
@@ -36,22 +37,25 @@ export default class EventDetail extends Component {
             image: '',
             amISubscribed: null,
             isActive: null,
+            isApproved: null,
             participantsList: [],
             
             isRecurrent: null,
             weekDays: [],
-            activeTabId: null,
+            activeWeekDayId: null,
 
             deleteModal: false,
 
             userRole: AuthHelper.getRole(),
             userId: AuthHelper.getId(),
         }
+        this.loadParticipantsIfNecessary = this.loadParticipantsIfNecessary.bind(this);
         this.deleteEvent = this.deleteEvent.bind(this);
         this.subscribe = this.subscribe.bind(this);
         this.unsubscribe = this.unsubscribe.bind(this);
         this.subscribeRecurrent = this.subscribeRecurrent.bind(this);
         this.unsubscribeRecurrent = this.unsubscribeRecurrent.bind(this);
+        this.toggleApprove = this.toggleApprove.bind(this);
         this.toggleDeleteModal = this.toggleDeleteModal.bind(this);
     }
 
@@ -73,12 +77,46 @@ export default class EventDetail extends Component {
         });
     }
 
-    changeDate(e) {
-        this.setState({activeTabId: parseInt(e.target.dataset.id)});
+    changeWeekDay(e) {
+        this.setState({activeWeekDayId: parseInt(e.target.dataset.id)}, this.loadParticipantsIfNecessary);
+    }
+
+    getFreePlaces(participants) {
+        return this.state.participantsLimit
+            ? `${this.state.participantsLimit - participants}/${this.state.participantsLimit}`
+            : 'Не ограничено';
+    }
+
+    isOrganizerOrAdmin() {
+        return this.state.userRole === "Admin" || this.state.organizerId === this.state.userId;
+    }
+
+    async loadParticipantsIfNecessary() {
+        if (this.isOrganizerOrAdmin()) {
+            await this.loadParticipants();
+        }
     }
 
     renderButtonPanel() {
-        const deleteModal = 
+        const approveButton = this.state.userRole !== 'Admin' ? null :
+            this.state.isApproved ?
+                <Button color="success" onClick={this.toggleApprove}>
+                    Подтверждено
+                </Button> :
+                <Button color="primary" onClick={this.toggleApprove}>
+                    Подтвердить
+                </Button>;
+        const editButton = !this.state.isApproved && this.state.userId === this.state.organizerId || this.state.userRole === 'Admin' ?
+            <Button className="ml-2" outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>
+                <i className="bi bi-pencil"/>
+            </Button> : null
+
+        const deleteButton = this.state.userId === this.state.organizerId || this.state.userRole === 'Admin' ? 
+            <Button className="ml-2" outline color="danger" onClick={this.toggleDeleteModal}>
+                <i className="bi bi-trash"/>
+            </Button> : null;
+
+        const deleteModal = deleteButton ?
             <Modal isOpen={this.state.deleteModal} toggle={this.toggleDeleteModal}>
                 <ModalHeader toggle={this.toggleDeleteModal}>Подтвердите действие</ModalHeader>
                 <ModalBody>
@@ -88,34 +126,16 @@ export default class EventDetail extends Component {
                     <Button color="primary" onClick={this.deleteEvent}>Да</Button>{' '}
                     <Button color="secondary" onClick={this.toggleDeleteModal}>Отмена</Button>
                 </ModalFooter>
-            </Modal>
+            </Modal> : null
 
-        if (this.state.userId === this.state.organizerId || this.state.userRole === 'Admin')
-        {
-            return(
-                <div style={{minWidth: "fit-content"}}>
-                    <Button outline color="primary" tag={Link} to={`/editEvent?id=${this.state.id}`}>
-                        <i className="bi bi-pencil"/>
-                    </Button>{' '}
-                    <Button outline color="danger" onClick={this.toggleDeleteModal}>
-                        <i className="bi bi-trash"/>
-                    </Button>
-                    {deleteModal}
-                </div>
-            )
-        }
-        else if (this.state.userRole === 'Admin')
-        {
-            return(
-                <div>
-                    <Button color="danger" onClick={this.toggleDeleteModal}>Удалить</Button>
-                    {deleteModal}
-                </div>
-            )
-        }
-        else {
-            return null
-        }
+        return(
+            <div style={{minWidth: "fit-content"}}>
+                {approveButton}
+                {editButton}
+                {deleteButton}
+                {deleteModal}
+            </div>
+        )
     }
 
     renderSubscribeButton()
@@ -133,12 +153,6 @@ export default class EventDetail extends Component {
             return <button className="btn btn-sm btn-outline-secondary" onClick={this.unsubscribe}
                            disabled={!this.state.isActive}>Отписаться</button>
         }
-    }
-
-    getFreePlaces(participants) {
-        return this.state.participantsLimit
-            ? `${this.state.participantsLimit - participants}/${this.state.participantsLimit}`
-            : 'Неограниченно';
     }
 
     renderSubscribeButtonForRecurrent(amISubscribed, haveFreePlaces, eventWeekDayId) {
@@ -163,22 +177,58 @@ export default class EventDetail extends Component {
             <ul className="nav nav-tabs">
                 {this.state.weekDays.map(x =>
                     <li key={x.id} className="nav-item">
-                        <a type="button" className={`nav-link ${this.state.activeTabId === x.id ? 'active' : null}`}
-                           data-id={x.id} onClick={e => this.changeDate(e)}>
+                        <a type="button" className={`nav-link ${this.state.activeWeekDayId === x.id ? 'active' : null}`}
+                           data-id={x.id} onClick={e => this.changeWeekDay(e)}>
                             {DateTimeHelper.daysOfWeek[x.weekDay]} ({x.date})
                         </a>
                     </li>
                 )}
             </ul> : null
 
-        return(tabs)
+        const searchBar = null
+
+        const participantsTableRows =
+            this.state.participantsList.map((x, index) => {
+                return (
+                    <tr key={x.id} style={{background: x.isChecked ? 'lightgray' : 'white'}}>
+                        <th scope="row">{index + 1}</th>
+                        <td><Link to={`/user?id=${x.userId}`}>{x.userName}</Link></td>
+                        <td>{x.code}</td>
+                        <td><input className="form-check-input ml-0" type="checkbox" checked={x.isChecked}
+                                   onChange={() => this.toggleCheck(x.id)}/></td>
+                    </tr>
+                )
+            });
+
+        const table = participantsTableRows.length === 0 ? <div className="m-2">Пока ещё никто не записался</div> :
+            <table className="table table-sm m-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Имя пользователя</th>
+                        <th>Код</th>
+                        <th>Присутствует</th>
+                    </tr>
+                </thead>
+                <tbody className="overflow-auto" style={{maxHeight: 400}}>
+                    {participantsTableRows}
+                </tbody>
+            </table>
+
+        return(
+            <div className="mt-2">
+                {tabs}
+                <div className="border">
+                    <h5 className="m-2">Участники мероприятия:</h5>
+                    {searchBar}
+                    {table}
+                </div>
+                
+            </div>
+        )
     }
 
     renderEvent() {
-        const inlineStyle = {display: 'table'};
-        const inlineFirst = {display: 'table-cell'};
-        const subscribeButtonStyle = {marginLeft: '8px'}
-
         const image = this.state.image 
             ? <img className="w-100 border" src={this.state.image} alt="event image"/> 
             : null;
@@ -187,21 +237,13 @@ export default class EventDetail extends Component {
             <div className="p-2">
                 {Object.keys(this.state.tags).map((key, index) => {
                     return (
-                        <Link type="btn" className="btn btn-sm btn-outline-primary px-1 py-0 mr-2" to={"/events?tag=" + this.state.tags[key]} key={key}>
+                        <Link type="btn" className="btn btn-sm btn-outline-primary px-1 py-0 mr-2"
+                              to={"/events?tag=" + this.state.tags[key]} key={key}>
                             #{this.state.tags[key]}
                         </Link>
                     );
                 })}
             </div>
-
-        /*const participantsTableRows = Object.keys(this.state.participants).map((key, index) => {
-            return (
-                <tr key={key}> 
-                    <th scope="row">{index+1}</th>
-                    <td><Link to={`/user?id=${key}`}>{this.state.participants[key]}</Link></td>
-                </tr>
-            )
-        });*/
 
         const start = this.state.isRecurrent ?
             <table className="table table-borderless table-sm m-0 w-auto">
@@ -214,7 +256,7 @@ export default class EventDetail extends Component {
                 </tbody>
             </table> : this.state.start;
 
-        const participants = this.state.isRecurrent ?
+        const weekDaysParticipants = this.state.isRecurrent ?
             <table className="table table-borderless table-sm m-0">
                 <tbody>
                 {this.state.weekDays.map(x =>
@@ -260,7 +302,7 @@ export default class EventDetail extends Component {
                                 </tr>
                                 <tr className="p-2">
                                     <td className="align-top"><b>Свободно мест:</b></td>
-                                    <td>{participants}</td>
+                                    <td>{weekDaysParticipants}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -271,18 +313,7 @@ export default class EventDetail extends Component {
                             </div>
                         </div>
                         {tags}
-                        {this.renderParticipantsBlock()}
-                        {/*<div style={{...inlineStyle, marginBottom: '4px'}}>
-                            <h4 style={inlineFirst}>Записались - {this.state.participantsLimit
-                            ? `(${Object.keys(this.state.participants).length}/${this.state.participantsLimit})`
-                            : Object.keys(this.state.participants).length}</h4>
-                            <div style={subscribeButtonStyle}>{this.renderSubscribeButton()}</div>
-                        </div>
-                        <Table striped>
-                            <tbody>
-                                {participantsTableRows}
-                            </tbody>
-                        </Table>*/}
+                        {this.isOrganizerOrAdmin() ? this.renderParticipantsBlock() : null}
                     </div>
                 </div>
                 <CommentsBlock eventId={this.state.id}/>
@@ -308,14 +339,12 @@ export default class EventDetail extends Component {
         }
 
         return (
-            <>
-                {this.state.loading ? null : content}
-            </>
+            this.state.loading ? null : content
         )
     }
 
     async loadData(eventId) {
-        await fetch('api/events/' + eventId)
+        AuthHelper.fetchWithCredentials('api/events/' + eventId)
             .then((response) => {
                 this.setState({
                     error: !response.ok,
@@ -345,10 +374,12 @@ export default class EventDetail extends Component {
                         publicationTime: data.publicationTime,
                         image: data.image,
                         isRecurrent: data.isRecurrent,
+                        amISubscribed: data.amISubscribed,
                         isActive: data.isActive,
+                        isApproved: data.isApproved,
                         weekDays: data.isRecurrent ? data.weekDays : null,
-                        activeTabId: data.isRecurrent ? data.weekDays[0].id : null
-                    });
+                        activeWeekDayId: data.isRecurrent ? data.weekDays[0].id : null
+                    }, this.loadParticipantsIfNecessary);
                 }
             }).catch((ex) => {
                 console.log(ex.toString());
@@ -357,10 +388,6 @@ export default class EventDetail extends Component {
                     loading: false
                 });
             });
-    }
-
-    async loadParticipants() {
-        
     }
 
     async deleteEvent() {
@@ -392,7 +419,7 @@ export default class EventDetail extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();    
+                this.loadData(this.state.id);
             } 
             else if (response.status === 401) {
                 this.props.history.push("/signIn");
@@ -413,7 +440,7 @@ export default class EventDetail extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();             
+                this.loadData(this.state.id);
             } 
             else if (response.status === 401) {
                 this.props.history.push("/signIn");
@@ -434,7 +461,7 @@ export default class EventDetail extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();
+                this.loadData(this.state.id);
             }
             else if (response.status === 401) {
                 this.props.history.push("/signIn");
@@ -455,7 +482,83 @@ export default class EventDetail extends Component {
             }
         }).then((response) => {
             if (response.ok) {
-                window.location.reload();
+                this.loadData(this.state.id);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
+            else {
+                console.log(response.json());
+            }
+        }).catch((ex) => {
+            console.log(ex.toString());
+        });
+    }
+
+    async toggleApprove() {
+        AuthHelper.fetchWithCredentials(`api/events/${this.state.id}/approve`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            if (response.ok) {
+                this.loadData(this.state.id);
+            }
+            else if (response.status === 401) {
+                this.props.history.push("/signIn");
+            }
+            else {
+                console.log(response.json());
+            }
+        }).catch((ex) => {
+            console.log(ex.toString());
+        });
+    }
+
+    async loadParticipants() {
+        const path = this.state.isRecurrent
+            ? `api/recurrentEvents/${this.state.activeWeekDayId}/participants`
+            : `api/events/${this.state.id}/participants`;
+
+        AuthHelper.fetchWithCredentials(path)
+            .then((response) => {
+                this.setState({
+                    error: !response.ok,
+                    statusCode: response.status
+                });
+                return response.json();
+            }).then((data) => {
+            if (this.state.error) {
+                console.log(data);
+            }
+            else {
+                this.setState({
+                    participantsList: data
+                });
+            }
+        }).catch((ex) => {
+            console.log(ex.toString());
+        }).finally(() => {
+            this.setState({
+                loading: false
+            });
+        });
+    }
+
+    async toggleCheck(participantId) {
+        const path = this.state.isRecurrent
+            ? `api/recurrentEvents/checkParticipant/${participantId}`
+            : `api/events/checkParticipant/${participantId}`;
+
+        AuthHelper.fetchWithCredentials(path, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            if (response.ok) {
+                this.loadParticipantsIfNecessary()
             }
             else if (response.status === 401) {
                 this.props.history.push("/signIn");

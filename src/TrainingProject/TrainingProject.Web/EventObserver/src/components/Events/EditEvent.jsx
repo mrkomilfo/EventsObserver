@@ -548,7 +548,7 @@ export default class EditEvent extends Component{
             body: formData
         }).then((response) => {
             if (response.ok){
-                this.props.history.push(`/event?id=${this.state.id}`);
+                this.props.history.push(`/events?id=${this.state.id}`);
             }
             else if (response.status === 401) {
                 this.props.history.push('/signIn');
@@ -556,7 +556,7 @@ export default class EditEvent extends Component{
             else {
                 this.setState({
                     error: true,
-                    statusCode: this.response.status
+                    statusCode: response.status
                 });
                 return response.json();
             }
